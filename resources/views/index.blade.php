@@ -10,6 +10,7 @@
     @if ($name)
         <div class="container">
             <h1>こんにちは、{{ $name }}さん</h1>
+            <h1>GGWP</h1>
         </div>
     @endif
 </body>
