@@ -9,3 +9,8 @@ Route::get('/', function () {
 Route::get('/home', function () {
     return view('index', ['name' => 'test']);
 });
+
+Route::get('/login', function () {
+    return view('login');
+});
+
