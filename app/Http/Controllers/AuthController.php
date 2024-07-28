@@ -21,6 +21,6 @@ class AuthController extends Controller
         //     return response()->json(['error' => 'Unauthorised'], 401);
         // }
         //redirect
-        return response()->json(['error' => 'Unauthorised'], 401);
+        return "login";
     }
 }

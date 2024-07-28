@@ -31,5 +31,25 @@
             </div>
         </div>
     </div>
+
+    <script>
+        form = document.querySelector('form');
+        form.addEventListener('submit', function(e){
+            e.preventDefault();
+            let formData = new FormData(form);
+            fetch('/api/login', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.status == 'success'){
+                    alert('Login Success');
+                }else{
+                    alert('Login Failed');
+                }
+            })
+        })
+    </script>
 </body>
 </html>
