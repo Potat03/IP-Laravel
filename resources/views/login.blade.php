@@ -14,8 +14,8 @@
                         Login
                     </div>
                     <div class="card-body">
-                        <form action="{{ route('login') }}" method="post">
-                            @csrf
+                        <form action="/api/login" method="post">
+                        @csrf
                             <div class="form-group">
                                 <label for="email">Email</label>
                                 <input type="email" name="email" class="form-control">
