@@ -16,8 +16,7 @@ class ProductController extends Controller
         $imageName = time().'.'.$request->image->extension();  
         $request->image->move(public_path('images'), $imageName);
 
-        return back()
-            ->with('success','You have successfully upload image.')
-            ->with('image',$imageName); 
+        //display success message
+        return response()->json(['success'=>'You have successfully uploaded an image.']);
     }
 }

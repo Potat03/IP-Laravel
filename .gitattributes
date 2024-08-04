@@ -5,6 +5,7 @@
 *.html diff=html
 *.md diff=markdown
 *.php diff=php
+vite.config.js merge=ours
 
 /.github export-ignore
 CHANGELOG.md export-ignore
