@@ -23,3 +23,6 @@ Route::get('/cart', function () {
     return view('cart');
 });
 
+Route::get('/userlogin', function () {
+    return view('userlogin');
+});

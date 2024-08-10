@@ -10,3 +10,11 @@
 
     //upload product image
     Route::post('product/image/upload', [ProductController::class, 'productImageUpload'])->name('product.image.upload');
+
+    //pass login/register details
+    use App\Http\Controllers\AuthController;
+
+    Route::get('/auth', [AuthController::class, 'showForm'])->name('auth.showForm');
+    Route::post('/login', [AuthController::class, 'login'])->name('auth.login');
+    Route::post('/register', [AuthController::class, 'register'])->name('auth.register');
+    Route::post('logout', [AuthController::class, 'logout'])->name('logout');
