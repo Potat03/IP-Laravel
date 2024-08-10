@@ -19,4 +19,8 @@ Route::get('/upload', function () {
     return view('upload');
 });
 
+Route::get('/shop', function() {
+    return view('shop');
+});
+
 
