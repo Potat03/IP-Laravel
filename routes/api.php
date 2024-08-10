@@ -9,4 +9,5 @@
 
 
     //upload product image
-    Route::post('product/image/upload', [ProductController::class, 'productImageUpload'])->name('product.image.upload');
+    Route::post('/product/image/upload', [ProductController::class, 'productImageUpload']);
+    Route::get('/product/generateTable', [ProductController::class, 'generateTable']);

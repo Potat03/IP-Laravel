@@ -20,3 +20,21 @@ Route::get('/upload', function () {
 });
 
 
+
+
+
+
+
+//admin side
+
+Route::get('/admin/dashboard', function () {
+    return view('admin.dashboard');
+});
+
+Route::get('/admin/product', function () {
+    return view('admin.product');
+});
+
+Route::get('/template', function () {
+    return view('admin.error');
+});
