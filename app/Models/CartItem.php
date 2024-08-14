@@ -11,9 +11,6 @@ class CartItem extends Model
 
     protected $table = 'cart_item';
 
-    //multiple primary key
-    protected $primaryKey = ['customer_id', 'product_id'];
-
     protected $fillable = [
         'customer_id',
         'product_id',
@@ -38,4 +35,6 @@ class CartItem extends Model
     {
         return $this->belongsTo(Promotion::class, 'promotion_id', 'promotion_id');
     }
+
 }
+
