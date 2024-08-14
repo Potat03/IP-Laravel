@@ -8,15 +8,15 @@
 </head>
 
 <body>
-    <form action="" method="POST" enctype="multipart/form-data">
+    <form action="" method="POST">
         @csrf 
-        <input type="text" value="1" name="customer_id">
-        <input type="text" value="1" name="product_id">
-        <input type="text" value="1" name="promotion_id">
-        <input type="text" value="1" name="quantity">
-        <input type="text" value="100.00" name="subtotal">
-        <input type="text" value="20.00" name="discount">
-        <input type="text" value="80.00" name="total">
+        <input type="text" value="1" name="customer_id" id="customer_id">
+        <input type="text" value="1" name="product_id" id="product_id">
+        <input type="text" value="1" name="promotion_id" id="promotion_id">
+        <input type="text" value="1" name="quantity" id="quantity">
+        <input type="text" value="100.00" name="subtotal" id="subtotal">
+        <input type="text" value="20.00" name="discount" id="discount">
+        <input type="text" value="80.00" name="total" id="total">
         <button type="submit">Upload</button>
     </form>
 
@@ -40,7 +40,7 @@
                 }
             })
             .catch(error => {
-                console.log('Error:', error);
+                console.error('Error:', error);
                 alert('An error occurred while uploading the image.');
             });
     });
