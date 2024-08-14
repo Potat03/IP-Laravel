@@ -8,7 +8,8 @@
 </head>
 
 <body>
-    <form method="POST">
+    <form action="" method="POST" enctype="multipart/form-data">
+        @csrf 
         <input type="text" value="C001" name="customer_id">
         <input type="text" value="P001" name="product_id">
         <input type="text" value="P" name="promotion_id">
@@ -39,7 +40,7 @@
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
+                console.log('Error:', error);
                 alert('An error occurred while uploading the image.');
             });
     });

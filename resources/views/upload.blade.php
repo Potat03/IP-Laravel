@@ -5,16 +5,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    @vite(['resources/css/test.css'])
 </head>
 
 <body>
     <img src="{{ URL('storage/images/pinkglock.png') }}" alt="pinkglock" width="200" height="200">
-    <form action="{{ route('product.image.upload') }}" method="POST" enctype="multipart/form-data">
+    <form action="" method="POST" enctype="multipart/form-data">
         @csrf
         <input type="file" name="image" id="image">
         <button type="submit">Upload</button>
     </form>
-
+    <div class="container">
+        test
+    </div>
     <script>
         //handle form submit
         form = document.querySelector('form');
