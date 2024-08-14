@@ -27,7 +27,13 @@ Route::get('/cart', function () {
     return view('cart');
 });
 
+Route::get('/promotion', function(){
+    return view('promotion');
+});
 
+Route::get('/promotion/details', function(){
+    return view('promotionDetails');
+});
 
 
 
@@ -44,4 +50,8 @@ Route::get('/admin/product', function () {
 
 Route::get('/template', function () {
     return view('admin.error');
+});
+
+Route::get('/admin/promotion', function () {
+    return view('admin.promotion');
 });

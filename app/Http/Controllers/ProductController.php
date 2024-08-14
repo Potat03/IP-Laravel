@@ -6,8 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Exception;
-use Illuminate\Support\Facades\Log; 
-use App\Models\Product;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Adapters\ProductAdapter;
 
 class ProductController extends Controller
