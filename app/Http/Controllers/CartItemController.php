@@ -6,5 +6,17 @@ use Illuminate\Http\Request;
 
 class CartItemController extends Controller
 {
-    //
+   //product image upload
+   public function cartItemUpload(Request $request)
+   {
+       $request->validate([
+           'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+       ]);
+
+       $imageName = time().'.'.$request->image->extension();  
+       $request->image->move(public_path('images'), $imageName);
+
+       //display success message
+       return response()->json(['success'=>'You have successfully uploaded an image.']);
+   }
 }

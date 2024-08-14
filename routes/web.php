@@ -23,3 +23,15 @@ Route::get('/cart', function () {
     return view('cart');
 });
 
+Route::get('/payment', function () {
+    return view('payment');
+});
+
+Route::get('/tracking', function () {
+    return view('tracking');
+});
+
+Route::get('/testDB', function () {
+    return view('testDB');
+});
+
