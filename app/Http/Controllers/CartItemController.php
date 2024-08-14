@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\CartItem;
 
 class CartItemController extends Controller
 {
@@ -10,15 +11,15 @@ class CartItemController extends Controller
    public function addToCart(Request $request)
    {
        try {
-           $request->validate([
-               'customer_id' => 'required|string',
-               'product_id' => 'required|string',
-               'promotion_id' => 'required|string',
-               'quantity' => 'required|numberic',
-               'subtotal' => 'required|numberic',
-               'discount' => 'required|numberic',
-               'total' => 'required|numberic',
-           ]);
+        //    $request->validate([
+        //        'customer_id' => 'required|string',
+        //        'product_id' => 'required|string',
+        //        'promotion_id' => 'required|string',
+        //        'quantity' => 'required|numberic',
+        //        'subtotal' => 'required|numberic',
+        //        'discount' => 'required|numberic',
+        //        'total' => 'required|numberic',
+        //    ]);
 
            CartItem::create([
                'customer_id' => $request->customer_id,

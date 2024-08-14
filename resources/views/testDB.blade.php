@@ -10,9 +10,9 @@
 <body>
     <form action="" method="POST" enctype="multipart/form-data">
         @csrf 
-        <input type="text" value="C001" name="customer_id">
-        <input type="text" value="P001" name="product_id">
-        <input type="text" value="P" name="promotion_id">
+        <input type="text" value="1" name="customer_id">
+        <input type="text" value="1" name="product_id">
+        <input type="text" value="1" name="promotion_id">
         <input type="text" value="1" name="quantity">
         <input type="text" value="100.00" name="subtotal">
         <input type="text" value="20.00" name="discount">
