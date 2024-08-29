@@ -136,10 +136,15 @@
             max-height: 100%;
             -webkit-user-drag: none;
             /* For WebKit browsers (e.g., Chrome, Safari) */
-            user-drag: none;
+            user-select: none;
         }
 
         .card-text {
+            user-select: none;
+        }
+
+        .card .btn{
+            -webkit-user-drag: none;
             user-select: none;
         }
 
@@ -206,7 +211,7 @@
     </nav>
 
     <!-- Header -->
-    <header class="bg-dark py-5" style="min-height: 600px; display: flex; align-items: center; user-drag: none;">
+    <header class="bg-dark py-5" style="min-height: 600px; display: flex; align-items: center; user-select: none;">
         <div class="overlay"></div> <!-- Add this overlay element -->
         <div class="container px-4 px-lg-5">
             <div class="text-center text-white" style="user-select: none; position: relative; z-index: 2;">
@@ -808,15 +813,12 @@
         </div>
     </section>
 
-    <script src="{{ asset('js/app.js') }}"></script>
-
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <!-- jQuery migrate (for compatibility with older jQuery versions) -->
     <script src="https://code.jquery.com/jquery-migrate-3.3.2.min.js"></script>
     <!-- Bootstrap JS -->
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="{{ asset('js/app.js') }}"></script>
 
     <script>
         var multipleCardCarousel = document.querySelector(

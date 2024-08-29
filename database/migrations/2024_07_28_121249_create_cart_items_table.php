@@ -13,16 +13,17 @@ return new class extends Migration
     {
         Schema::create('cart_item', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('cart_id')->references('cart_id')->on('cart');
+            $table->unsignedBigInteger('customer_id')->references('customer_id')->on('cart');
             $table->unsignedBigInteger('product_id')->references('product_id')->on('product');
             $table->unsignedBigInteger('promotion_id')->references('promotion_id')->on('promotion');
             $table->integer('quantity');
             $table->decimal('subtotal', 8, 2);
-            $table->string('discount');
+            $table->decimal('discount', 8, 2);
             $table->decimal('total', 8, 2);
             $table->timestamps();
 
-            $table->unique(['cart_id', 'product_id']);
+            $table->foreign('customer_id')->references('customer_id')->on('cart');
+            $table->foreign('product_id')->references('product_id')->on('product');
         });
     }
 

@@ -27,3 +27,43 @@ Route::get('/cart', function () {
     return view('cart');
 });
 
+Route::get('/payment', function () {
+    return view('payment');
+});
+
+Route::get('/tracking', function () {
+    return view('tracking');
+});
+
+Route::get('/testDB', function () {
+    return view('testDB');
+});
+
+Route::get('/promotion', function(){
+    return view('promotion');
+});
+
+Route::get('/promotion/details', function(){
+    return view('promotionDetails');
+});
+
+
+
+
+//admin side
+
+Route::get('/admin/dashboard', function () {
+    return view('admin.dashboard');
+});
+
+Route::get('/admin/product', function () {
+    return view('admin.product');
+});
+
+Route::get('/template', function () {
+    return view('admin.error');
+});
+
+Route::get('/admin/promotion', function () {
+    return view('admin.promotion');
+});
