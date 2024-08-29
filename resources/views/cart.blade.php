@@ -148,8 +148,9 @@ for ($x = 0; $x <= 10; $x++) {
                 <tbody>
                     <tr>
 
-                        <td colspan=2 style="text-align:right!important;padding-top:0.5%!important;padding-bottom:0.5%!important;">Discount Details<button
-                                style="background-color: #ffffff;border:0" onclick=showDiscount()><i
+                        <td colspan=2
+                            style="text-align:right!important;padding-top:0.5%!important;padding-bottom:0.5%!important;">
+                            Discount Details<button style="background-color: #ffffff;border:0" onclick=showDiscount()><i
                                     id="show-discount-icon" style="display:inline">&#9650;</i><i id="hide-discount-icon"
                                     style="display:none;">&#9660;</i></button></td>
 
@@ -235,4 +236,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
         row.classList.add('animate-row');
     });
 });
+
+
 </script>

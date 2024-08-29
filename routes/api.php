@@ -11,6 +11,13 @@
 
 
     //upload product image
-    Route::post('/cartItem/upload', [CartItemController::class, 'addToCart']);
     Route::post('/product/image/upload', [ProductController::class, 'productImageUpload']);
     Route::get('/product/generateTable', [ProductController::class, 'generateTable']);
+
+    Route::post('/cartItem/upload', [CartItemController::class, 'addToCart']);
+    Route::get('/cartItem/getCartItemByCustomerID/{customerID}', [CartItemController::class, 'getCartItemByCustomerID']);
+
+    // Route::get('/cartItem/getCartItem/{id}', [CartItemController::class, 'getCartItem']);
+    // Route::post('/cartItems/get', [CartItemController::class, 'getCartItems']);
+
+
