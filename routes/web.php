@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\customAuth;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -47,23 +48,21 @@ Route::get('/promotion/details', function(){
     return view('promotionDetails');
 });
 
-
-
-
-//admin side
-
-Route::get('/admin/dashboard', function () {
-    return view('admin.dashboard');
-});
-
-Route::get('/admin/product', function () {
-    return view('admin.product');
-});
-
-Route::get('/template', function () {
-    return view('admin.error');
-});
-
-Route::get('/admin/promotion', function () {
-    return view('admin.promotion');
+//middleware
+Route::middleware([customAuth::class])->group(function () {
+    Route::get('/admin/dashboard', function () {
+        return view('admin.dashboard');
+    });
+    
+    Route::get('/admin/product', function () {
+        return view('admin.product');
+    });
+    
+    Route::get('/template', function () {
+        return view('admin.error');
+    });
+    
+    Route::get('/admin/promotion', function () {
+        return view('admin.promotion');
+    });
 });

@@ -44,22 +44,25 @@
 <script>
     //when page complete load
     document.addEventListener('DOMContentLoaded', function() {
-        fetch('/api/product/generateTable')
+        fetch('/api/product/index')
             .then(response => response.json())
-            .then(responseData => {
-                if (responseData.success) {
-                    let data = responseData.data;
-                    let dataHolder = document.getElementById('data-holder');
-                    dataHolder.innerHTML = '';
-                    data.forEach((product, index) => {
-                        let tr = document.createElement('tr');
-                        tr.innerHTML = product;
-                        dataHolder.appendChild(tr);
-                    });
-                } else {
-                    console.error('Error:', responseData.message);
-                    alert('An error occurred while fetching the product data.');
-                }
+            .then(data => {
+                let dataHolder = document.getElementById('data-holder');
+                dataHolder.innerHTML = '';
+                data.forEach((product, index) => {
+                    let tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <th scope="row">${index + 1}</th>
+                        <td>${product.name}</td>
+                        <td>${product.price}</td>
+                        <td>${product.stock}</td>
+                        <td>
+                            <button class="btn btn-warning"><i class="fa-regular fa-pen-to-square pe-2"></i>Edit</button>
+                            <button class="btn btn-danger"><i class="fa-solid fa-trash-can pe-2"></i>Delete</button>
+                        </td>
+                    `;
+                    dataHolder.appendChild(tr);
+                });
             })
             .catch(error => {
                 console.error('Error:', error);

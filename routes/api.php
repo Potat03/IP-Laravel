@@ -12,5 +12,5 @@
 
     //upload product image
     Route::post('/cartItem/upload', [CartItemController::class, 'addToCart']);
-    Route::post('/product/image/upload', [ProductController::class, 'productImageUpload']);
-    Route::get('/product/generateTable', [ProductController::class, 'generateTable']);
+    Route::post('/product/image/upload', [ProductController::class, 'productImageUpload'])->middleware('customAuth');
+    Route::get('/product/index', [ProductController::class, 'index']);
