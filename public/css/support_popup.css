@@ -1,0 +1,12 @@
+.popup_btn{
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    padding: 10px;
+}
+
+
+.popup_btn_icon{
+    font-size: 20px;
+    color: #fff;
+}
