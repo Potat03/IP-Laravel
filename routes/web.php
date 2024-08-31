@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\customAuth;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ChatController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -66,3 +67,18 @@ Route::middleware([customAuth::class])->group(function () {
         return view('admin.promotion');
     });
 });
+
+
+//TW blade
+Route::get('/wei', function () {
+    return view('wei');
+});
+
+Route::get('/cc', function () {
+    return view('customerChat');
+});
+
+
+Route::get('/chat', [ChatController::class, 'index']);
+Route::post('/chat', [ChatController::class, 'store']);
+Route::get('/chat/{chatId}', [ChatController::class, 'show']);
