@@ -78,6 +78,11 @@ Route::get('/cc', function () {
     return view('customerChat');
 });
 
+Route::get('/cc2', function () {
+    return view('adminChat');
+});
+
+
 
 Route::get('/chat', [ChatController::class, 'index']);
 Route::post('/chat', [ChatController::class, 'store']);
