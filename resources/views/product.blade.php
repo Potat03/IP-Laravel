@@ -277,7 +277,7 @@
     </div>
 
     <!-- Bundle Deal Section -->
-    {{-- <div class="container bundle-deal">
+    <div class="container bundle-deal">
         <h2>Bundle Deal</h2>
         <div class="row">
             <!-- Bundle Products -->
@@ -301,17 +301,16 @@
             <!-- Bundle Summary -->
             <div class="col-md-4">
                 <div class="bundle-summary">
-                    <h3>Total Price: RM 50.00</h3>
+                    <h3>Total Price: RM 60.00</h3>
                     <div class="pt-3 border-top-0 bg-transparent">
                         <div class="text-center text-uppercase">
-                            <a class="btn btn-outline-dark btn-add-to-cart mt-auto w-100 fw-bold" href="#">Add to
-                                Cart</a>
+                            <a class="btn btn-outline-dark btn-add-to-cart mt-auto w-100 fw-bold" href="{{ url('/promotion') }}">View More</a>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div> --}}
+    </div>
 
     <!-- Review Section -->
     <div class="container review-section mb-5">
