@@ -59,12 +59,12 @@ Route::middleware([customAuth::class])->group(function () {
         return view('admin.product');
     });
     
-    Route::get('/template', function () {
-        return view('admin.error');
-    });
-    
     Route::get('/admin/promotion', function () {
         return view('admin.promotion');
+    });
+
+    Route::get('/admin/promotion/add', function () {
+        return view('admin.promotion_add');
     });
 });
 
