@@ -211,7 +211,7 @@
 
 
     <main class="pt-5">
-        <div class="flex-shrink-0 p-3 bg-white d-flex flex-column">
+        <div class="flex-shrink-0 p-3 bg-white d-flex flex-column" data-spy="affix" data-offset-top="197">
             <div class="container">
                 <div class="card">
                     <div class="card-header">
@@ -291,6 +291,9 @@
                                 <div class="text-center text-uppercase"><a
                                         class="btn btn-outline-dark mt-auto w-100 fw-bold py-3 py-md-2" href="#">Add to
                                         Cart</a>
+                                </div>
+                                <div class="text-center text-uppercase"><a
+                                        class="btn btn-outline-dark mt-auto w-100 fw-bold py-3 py-md-2" href="/promotion/details">View Details</a>
                                 </div>
                             </div>
                         </div>

@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Middleware\customAuth;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ChatController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -55,23 +57,36 @@ Route::get('/promotion/details', function(){
     return view('promotionDetails');
 });
 
-
-
-
-//admin side
-
-Route::get('/admin/dashboard', function () {
-    return view('admin.dashboard');
+//middleware
+Route::middleware([customAuth::class])->group(function () {
+    Route::get('/admin/dashboard', function () {
+        return view('admin.dashboard');
+    });
+    
+    Route::get('/admin/product', function () {
+        return view('admin.product');
+    });
+    
+    Route::get('/template', function () {
+        return view('admin.error');
+    });
+    
+    Route::get('/admin/promotion', function () {
+        return view('admin.promotion');
+    });
 });
 
-Route::get('/admin/product', function () {
-    return view('admin.product');
+
+//TW blade
+Route::get('/wei', function () {
+    return view('wei');
 });
 
-Route::get('/template', function () {
-    return view('admin.error');
+Route::get('/cc', function () {
+    return view('customerChat');
 });
 
-Route::get('/admin/promotion', function () {
-    return view('admin.promotion');
-});
+
+Route::get('/chat', [ChatController::class, 'index']);
+Route::post('/chat', [ChatController::class, 'store']);
+Route::get('/chat/{chatId}', [ChatController::class, 'show']);

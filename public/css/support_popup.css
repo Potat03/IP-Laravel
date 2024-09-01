@@ -1,0 +1,238 @@
+:root {
+    --red: #F76C6C;
+    --yellow: #F8E9A1;
+    --lightblue: #A8D0E6;
+    --blue: #374785;
+    --darkblue: #24305E;
+    --grey: #f0f0f0;
+    --black: #3f3f3f;
+    --white: #fff;
+}
+
+
+/* Popup */
+.popup_btn {
+    position: fixed;
+    right: 25px;
+    bottom: 30px;
+    display: flex;
+    gap: 5px;
+    transition: all 0.3s;
+    z-index: 1000;
+    align-items: center;
+    font-family: 'Poppins', sans-serif;
+}
+
+.popup_btn *{
+    transition: all 0.3s;
+}
+
+.popup_btn_icon {
+    font-size: 2em;
+    color: #fff;
+    padding: 10px;
+    border-radius: 50%;
+    cursor: pointer;
+    background-color: var(--red);
+    opacity: 0.8;
+}
+
+.popup_btn:hover .popup_btn_icon , .popup_active .popup_btn_icon{
+    opacity: 1;
+}
+
+.popup_btn_txt {
+    font-size: 12px;
+    color: var(--black);
+    padding: 5px 20px 5px 10px;
+    cursor: pointer;
+    background-color: var(--grey);
+    border-radius: 5px;
+    height: fit-content;
+    transition: opacity 0.4s ease, transform 0.4s ease; 
+}
+
+.popup_btn_txt.show{
+    opacity: 1;
+    transform: translateY(0);
+}
+
+
+.popup_btn_txt.hide{
+    opacity: 0;
+    transform: translateY(10px); 
+}
+
+.popup_box {
+    position: fixed;
+    right: 25px;
+    bottom: 100px;
+    width: 350px;
+    height: 410px;
+    background-color: var(--white);
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    z-index: 999;
+    box-shadow: 2px 2px 10px 0px rgba(0, 0, 0, 0.10);
+    -webkit-box-shadow: 2px 2px 10px 0px rgba(0, 0, 0, 0.10);
+    -moz-box-shadow: 2px 2px 10px 0px rgba(0, 0, 0, 0.10);
+    transition: opacity 0.6s ease, transform 0.6s ease, box-shadow 0.3s ease; 
+    font-family: 'Poppins', sans-serif;
+}
+
+.popup_box:hover{
+    box-shadow: 2px 2px 10px 0px rgba(0, 0, 0, 0.28);
+    -webkit-box-shadow: 2px 2px 10px 0px rgba(0, 0, 0, 0.28);
+    -moz-box-shadow: 2px 2px 10px 0px rgba(0, 0, 0, 0.28);
+}
+
+
+.popup_box.show {
+    opacity: 1;
+    transform: translateY(0); 
+}
+
+.popup_box.hide {
+    opacity: 0;
+    transform: translateY(50px); 
+}
+
+.popup_box_header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: var(--red);
+    color: var(--white);
+    font-size: 1.1em;
+}
+
+.popup_box_header_icon{
+    cursor: pointer;
+    padding-top: 1px;
+    opacity: 0.8;
+    transition: all 0.3s;
+}
+
+.popup_box_header_icon:hover{
+    opacity: 1;
+}
+
+.popup_box_body{
+    padding: 20px 25px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    position: relative;
+}
+
+.popup_box_body::before{
+    position: absolute;
+    background: url(../images/chat1.jpg);
+    background-position-x: -30px;
+    left: 0;
+    top: 0;
+    filter: blur(2px);
+    width: 100%;
+    height: 100%;
+    content: '';
+    opacity: 0.05;
+}
+
+.popup_box_body_chat{
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+ 
+}
+
+
+.popup_box_body_chat_msg{
+    width: fit-content;
+    position: relative;
+    box-shadow: 1px 1px 2px 0px rgba(0, 0, 0, 0.20);
+}
+
+.popup_box_body_chat_msg_txt{
+    display: flex;
+    padding: 5px 8px;
+}
+
+.popup_box_body_chat_msg::before{
+    position: absolute;
+    content: '';
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent; /* Hide the left side */
+    border-right: 10px solid transparent; /* Hide the right side */
+}
+
+.popup_box_body_chat_msg.user{
+    background-color: var(--lightblue);
+    border-radius: 0px 5px 5px 5px;
+}
+
+.popup_box_body_chat_msg.user::before{
+    left: -10px; 
+    border-top: 10px solid var(--lightblue); /* Height of the triangle */
+}
+
+.popup_box_body_chat_msg.admin{
+    background-color: var(--white);
+    border-radius: 5px 0px 5px 5px;
+    align-self: end;
+}
+
+.popup_box_body_chat_msg.admin::before{
+    right: -10px; 
+    border-top: 10px solid var(--white);
+}
+
+.popup_box_body_input{
+    border-radius: 5px;
+    font-size: 1em;
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 10px 10px 0px;
+    z-index: 999;
+}
+
+/* End Popup */
+
+/* General Style */
+.shadow {
+    box-shadow: 2px 2px 10px 0px rgba(0, 0, 0, 0.28);
+    -webkit-box-shadow: 2px 2px 10px 0px rgba(0, 0, 0, 0.28);
+    -moz-box-shadow: 2px 2px 10px 0px rgba(0, 0, 0, 0.28);
+}
+
+/* End General Style */
+
+
+/* Animation */
+@keyframes slideDownFadeOut {
+    0% {
+        opacity: 1;
+        transform: translateY(0); /* Initial position */
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(10px); /* Slide down 100px */
+    }
+}
+
+@keyframes fadeInSlideUp {
+    0% {
+        opacity: 0;
+        transform: translateY(40px); /* Start 100px below its original position */
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0); /* End at the original position */
+    }
+}
+
+/* End Animation */

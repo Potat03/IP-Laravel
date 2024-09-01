@@ -36,7 +36,7 @@ class ProductController extends Controller
             $request->image->move(public_path($folderPath), $imageName);
     
             return response()->json(['success' => true, 'message' => 'You have successfully uploaded an image.'], 200);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
         }
     }
@@ -77,18 +77,6 @@ class ProductController extends Controller
         }
     }
 
-    public function generateTable()
-    {
-        try {
-            $products = Product::all();
-            $adapter = new ProductAdapter($products);
-            $rows = $adapter->toRow();
-            return response()->json(['success' => true, 'data' => $rows], 200);
-        } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
-        }
-    }
-
     public function store(Request $request)
     {
         try {
@@ -121,7 +109,6 @@ class ProductController extends Controller
             $products = Product::all();
             return response()->json($products);
         } catch (Exception $e) {
-            // Log the error
             Log::error('Fetching products failed: ' . $e->getMessage());
             return response()->json(['error' => 'Fetching products failed.'], 500);
         }
