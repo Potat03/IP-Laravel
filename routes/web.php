@@ -21,8 +21,16 @@ Route::get('/upload', function () {
     return view('upload');
 });
 
+Route::get('/home', function() {
+    return view('home');
+});
+
 Route::get('/shop', function() {
     return view('shop');
+});
+
+Route::get('/product', function() {
+    return view('product');
 });
 
 Route::get('/cart', function () {
