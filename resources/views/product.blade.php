@@ -353,6 +353,15 @@
 
             quantityInput.value = newQuantity;
         }
+
+        document.getElementById('quantity').addEventListener('change', function() {
+            var quantityInput = document.getElementById('quantity');
+            var currentQuantity = parseInt(quantityInput.value);
+
+            if (currentQuantity < 1 || isNaN(currentQuantity)) {
+                quantityInput.value = 1;
+            }
+        });
     </script>
 </body>
 

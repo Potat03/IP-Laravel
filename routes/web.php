@@ -49,13 +49,22 @@ Route::get('/testDB', function () {
     return view('testDB');
 });
 
+
+//promotion
+
 Route::get('/promotion', function(){
     return view('promotion');
 });
 
-Route::get('/promotion/details', function(){
+Route::get('/promotion/{id}', function(){
     return view('promotionDetails');
 });
+
+//admin side
+Route::get('/admin/login', function () {
+    return view('admin.login');
+});
+
 
 //middleware
 Route::middleware([customAuth::class])->group(function () {

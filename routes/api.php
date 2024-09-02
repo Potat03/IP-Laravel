@@ -4,6 +4,7 @@
     use Illuminate\Support\Facades\Route;
     use App\Http\Controllers\ProductController;
     use App\Http\Proxy\PromotionProxy;
+    use App\Http\Middleware\customAuth;
 
     use App\Http\Controllers\CartItemController;
     // Route::get('/user', function (Request $request) {
@@ -19,7 +20,9 @@
     //promotion
     Route::get('/promotion', [PromotionProxy::class, 'getPromotion']);
     Route::get('/promotion/{id}', [PromotionProxy::class, 'getPromotionById']);
-    Route::post('/promotion', [PromotionProxy::class, 'createPromotion'])->middleware('customAuth');
-    Route::put('/promotion/{id}', [PromotionProxy::class, 'updatePromotion'])->middleware('customAuth');
-    Route::delete('/promotion/{id}', [PromotionProxy::class, 'deletePromotion'])->middleware('customAuth');
+    Route::middleware([customAuth::class])->group(function () {
+        Route::post('/promotion', [PromotionProxy::class, 'createPromotion'])->name('promotion.create');
+        Route::put('/promotion/{id}', [PromotionProxy::class, 'updatePromotion']);
+        Route::delete('/promotion/{id}', [PromotionProxy::class, 'deletePromotion']);
+    });
 

@@ -17,15 +17,25 @@ class PromotionProxy extends PromotionController implements PromotionInterface
     }
 
     public function createPromotion(Request $request){
-        //check if user is admin
-        if($_SESSION['role'] != 'admin' || $_SESSION['role'] != 'manager'){
-            return response()->json(['success' => false, 'message' => 'You are not authorized to create promotion'], 400);
+        //start session
+        if(!isset($_SESSION)){
+            session_start();
         }
-        return $this->createPromotion($request);
+        //check if role is set
+        // if(!isset($_SESSION['role'])){
+        //     return response()->json(['success' => false, 'message' => 'You are not authorized to create promotion'], 400);
+        // }else{
+        //     //check if user is admin
+        //     if($_SESSION['role'] != 'admin' || $_SESSION['role'] != 'manager'){
+        //         return response()->json(['success' => false, 'message' => 'You are not authorized to create promotion'], 400);
+        //     }
+        return parent::createPromotion($request);
+        // }
     }
 
     public function updatePromotion(Request $request, $id){
         //check if user is admin
+        
         if($_SESSION['role'] != 'admin' || $_SESSION['role'] != 'manager'){
             return response()->json(['success' => false, 'message' => 'You are not authorized to update promotion'], 400);
         }

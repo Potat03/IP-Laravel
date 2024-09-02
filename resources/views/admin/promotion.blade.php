@@ -34,7 +34,7 @@
                 </div>
             </div>
             <div class="ms-auto">
-                <button class="btn btn-primary"><i class="fa-regular fa-plus pe-2"></i>New</button>
+                <button class="btn btn-primary" onclick="window.location.href='/admin/promotion/add'"><i class="fa-solid fa-plus pe-2"></i>Add</button>
             </div>
         </div>
         <table class="table">

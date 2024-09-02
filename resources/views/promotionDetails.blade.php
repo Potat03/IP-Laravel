@@ -4,105 +4,176 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Promotion</title>
+    <title>Product Detail</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-    {{-- <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css" /> --}}
-    @vite(['resources/sass/app.scss', 'resources/js/app.js'])
+    @vite(['resources/sass/app.scss', 'resources/js/app.js', 'resources/css/app.css'])
     <style>
-        html {
-            -webkit-user-drag: none;
-            /* For WebKit browsers (e.g., Chrome, Safari) */
-            user-select: none;
-        }
-
-        .img-carousel {
-            width: 500px;
-            height: 500px;
-        }
-
-        .img-carousel .carousel-item,
-        .img-carousel .carousel-item img {
-            height: 100%;
-
-            -webkit-user-drag: none;
-            /* For WebKit browsers (e.g., Chrome, Safari) */
-            user-select: none;
-        }
-
-        .tiny-carousel img {
-            height: 100px;
-            width: 100px;
-
-            -webkit-user-drag: none;
-            /* For WebKit browsers (e.g., Chrome, Safari) */
-            user-select: none;
-        }
-
-        .tiny-carousel .carousel-inner {
-            padding: 1em;
-        }
-
-        .tiny-carousel .card {
-            margin: 0 0.5em;
-            box-shadow: 2px 6px 8px 0 rgba(22, 22, 26, 0.18);
-            border: none;
-            user-select: none;
-        }
-
-        .tiny-carousel .carousel-control-prev,
-        .tiny-carousel .carousel-control-next {
-            width: 6vh;
-            height: 6vh;
-            border-radius: 50%;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-
-        .tiny-carousel .card-img-top .img {
-            user-select: none;
-        }
-
-        /* .card img {
-            max-width: 100%;
-            height: 13em;
+        .product-detail-container {
             display: flex;
-            justify-content: center;
-            align-items: center;
-        } */
-
-        .tiny-carousel .card img {
-            max-height: 100%;
-            -webkit-user-drag: none;
-            /* For WebKit browsers (e.g., Chrome, Safari) */
-            user-select: none;
+            flex-wrap: wrap;
+            margin-top: 50px;
         }
 
-        @media (min-width: 1025px) {
-            .tiny-carousel .carousel-item {
-                margin-right: 0;
-                flex: 0 0 calc(100%/5);
-                display: block;
-            }
-
-            .tiny-carousel .carousel-inner {
-                display: flex;
-            }
+        .product-image {
+            flex: 1;
+            max-width: 50%;
+            padding-right: 20px;
         }
 
-        @media (max-width: 1024px) {
-            .tiny-carousel .carousel-item {
-                margin-right: 0;
-                flex: 0 0 calc(100%/3);
-                display: block;
-            }
+        .product-info {
+            flex: 1;
+            max-width: 50%;
+            display: flex;
+            flex-direction: column;
+        }
 
-            .tiny-carousel .carousel-inner {
-                display: flex;
-            }
+        .product-info h1 {
+            font-size: 2.5rem;
+            /* Increase font size for product name */
+        }
 
-            .tiny-carousel .card img {
-                height: 17em;
-            }
+        .product-info h4 {
+            font-size: 1.5rem;
+            /* Increase font size for price */
+        }
+
+        .product-info h5 {
+            font-size: 1.3rem;
+            /* Increase font size for product variation */
+        }
+
+        .product-info .d-flex {
+            font-size: 1.2rem;
+            /* Increase font size for rating */
+        }
+
+        .product-details {
+            margin-top: 10px;
+            /* Reduce space between product info and product details */
+        }
+
+        /* Variation Button Styling */
+        .btn-variation {
+            /* Match border color to primary color */
+            background-color: #ffffff;
+            /* White background for default state */
+            padding: 10px 20px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            border-radius: 0.25rem;
+        }
+
+        .quantity-selector {
+            margin-top: 10px;
+        }
+
+        .quantity-selector .input-group {
+            width: 200px;
+        }
+
+        .quantity-selector .input-group button {
+            font-size: 1.2rem;
+        }
+
+        .quantity-selector .input-group input {
+            text-align: center;
+            font-size: 1.2rem;
+        }
+
+        .btn-add-to-cart {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            font-size: 1.2rem;
+            text-align: center;
+            border-radius: 0.25rem;
+        }
+
+        /* Bundle Deal Section */
+        .bundle-deal {
+            margin-top: 50px;
+        }
+
+        .bundle-item {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 20px;
+            /* Adjust space below each item */
+            padding-right: 30px;
+            /* Space for the plus symbol */
+        }
+
+        .bundle-item:not(:last-child)::after {
+            content: '+';
+            position: absolute;
+            top: 25%;
+            /* Adjust this value to move the plus symbol higher */
+            right: -3%;
+            transform: translateY(0);
+            /* Remove vertical centering */
+            font-size: 2.5rem;
+            /* Adjust the size of the plus symbol */
+        }
+
+        .bundle-image {
+            max-width: 150px;
+            /* Adjust this value as needed to increase the image size */
+            height: auto;
+            /* Maintain aspect ratio */
+            object-fit: cover;
+            /* Ensure the image covers the area while maintaining aspect ratio */
+        }
+
+        .bundle-details {
+            text-align: center;
+            /* Center-align text within the details section */
+        }
+
+        .price {
+            font-size: 1rem;
+        }
+
+        .original-price {
+            text-decoration: line-through;
+            /* Crosses out the original price */
+        }
+
+        .discounted-price {
+            font-size: 1.3rem;
+            /* Larger size for the discounted price */
+            color: #dc3545;
+            /* Make the discounted price stand out */
+        }
+
+        .bundle-summary {
+            text-align: center;
+            /* Center-align the summary */
+        }
+
+        .bundle-deal,
+        .review-section {
+            margin-top: 50px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 0.25rem;
+        }
+
+        .bundle-deal h2,
+        .review-section h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        .review-section .review-item {
+            border-bottom: 1px solid #ddd;
+            padding: 10px 0;
+        }
+
+        .review-section .review-item:last-child {
+            border-bottom: none;
         }
     </style>
 </head>
@@ -139,203 +210,160 @@
         </div>
     </nav>
 
-
-    <section>
-        <div class="container pt-5">
-            <div class="row">
-                <div class="col-5 justify-content-center d-flex">
-                    <div>
-                        <div id="product-carousel" class="carousel slide carousel-fade img-carousel">
-                            <div class="carousel-inner h-100">
-                                <div class="carousel-item active">
-                                    <img src={{ URL('storage/images/pokemon.png') }} class="d-block img-fluid" alt="...">
-                                </div>
-                                <div class="carousel-item">
-                                    <img src={{ URL('storage/images/pinkglock.png') }} class="d-block img-fluid" alt="...">
-                                </div>
-                                <div class="carousel-item">
-                                    <img src={{ URL('storage/images/pika.jpg') }} class="d-block img-fluid" alt="...">
-                                </div>
-                            </div>
-                            <button class="carousel-control-prev" type="button" data-bs-target="#product-carousel" data-bs-slide="prev">
-                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                <span class="visually-hidden">Previous</span>
-                            </button>
-                            <button class="carousel-control-next" type="button" data-bs-target="#product-carousel" data-bs-slide="next">
-                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                <span class="visually-hidden">Next</span>
-                            </button>
-                        </div>
+    <!-- Product Detail Section -->
+    <div class="container product-detail-container">
+        <!-- Product Image -->
+        <div class="product-image">
+            <div class="container">
+                <div class="row pt-3 p-2">
+                    <div class="col-6 p-0">
+                        <img src={{ URL('storage/images/pokemon.png') }}
+                            class="d-block img-thumbnail border-0" alt="product image">
                     </div>
-                </div>
-                <div class="col-7">
-                    <div class="h3 ps-1">Title</div>
-                    <hr>
-                    <div>
-                    <div class="h6 ps-3">Items :</div>
-                        <ul class="list-group list-group-flush px-3">
-                            <li class="list-group-item d-flex w-100">An item<span class="ms-auto">x 2</span></li>
-                            <li class="list-group-item d-flex w-100">An item 2<span class="ms-auto">x 1</span></li>
-                            <li class="list-group-item d-flex w-100">An item 3<span class="ms-auto">x 3</span></li>
-                            <li class="list-group-item d-flex w-100">An item 4<span class="ms-auto">x 1</span></li>
-                        </ul>
+                    <div class="col-6 p-0">
+                        <img src={{ URL('storage/images/consumable.png') }}
+                            class="d-block img-thumbnail border-0" alt="product image">
                     </div>
-                    <div id="tiny-carousel" class="carousel tiny-carousel">
-                        <div class="carousel-inner">
-                            <div class="carousel-item active">
-                                <img src={{ URL('storage/images/pokemon.png') }} class="d-block img-fluid" alt="...">
-                            </div>
-                            <div class="carousel-item">
-                                <img src={{ URL('storage/images/pinkglock.png') }} class="d-block img-fluid" alt="...">
-                            </div>
-                            <div class="carousel-item">
-                                <img src={{ URL('storage/images/pika.jpg') }} class="d-block img-fluid" alt="...">
-                            </div>
-                        </div>
+                    <div class="col-6 p-0">
+                        <img src={{ URL('storage/images/collectible.png') }}
+                            class="d-block img-thumbnail border-0" alt="product image">
+                    </div>
+                    <div class="col-6 p-0">
+                        <img src={{ URL('storage/images/pika.jpg') }}
+                            class="d-block img-thumbnail border-0" alt="product image">
                     </div>
                 </div>
             </div>
         </div>
-    </section>
 
-        <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-        <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <!-- jQuery migrate (for compatibility with older jQuery versions) -->
-    <script src="https://code.jquery.com/jquery-migrate-3.3.2.min.js"></script>
-    <!-- Bootstrap JS -->
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+        <!-- Product Info -->
+        <div class="product-info">
+            <div class="mb-5">
+                <h1 class="fw-bold">Product Name</h1>
+                <h4 class="text-muted original-price">RM 80.00</h5>
+                    <h5 class="discounted-price">RM 60.00</h5>
+                    <div class="d-flex align-items-center text-warning">
+                        <i class="bi bi-star-fill me-1"></i>
+                        <i class="bi bi-star-fill me-1"></i>
+                        <i class="bi bi-star-fill me-1"></i>
+                        <i class="bi bi-star-fill me-1"></i>
+                        <i class="bi bi-star-fill me-1"></i>
+                        <span class="text-dark ms-2">(20)</span>
+                    </div>
+                    <h4 class="text-muted pt-2">In Stock</h4>
+            </div>
 
-    <script defer>
-        var imgCarousel = document.querySelector("#img-carousel");
-        var multipleCardCarousel = document.querySelector("#tiny-carousel");
+            <!-- Product Variation -->
+            <div class="mt-1">
+                <h5>Select Variation:</h5>
+                <div class="btn-group" role="group" aria-label="Product Variations">
+                    <button type="button" class="btn btn-variation btn-outline-dark fw-bold"
+                        onclick="selectVariation(this)">Small</button>
+                    <button type="button" class="btn btn-variation btn-outline-dark fw-bold"
+                        onclick="selectVariation(this)">Medium</button>
+                    <button type="button" class="btn btn-variation btn-outline-dark fw-bold"
+                        onclick="selectVariation(this)">Large</button>
+                    <button type="button" class="btn btn-variation btn-outline-dark fw-bold"
+                        onclick="selectVariation(this)">Xtra Large</button>
+                </div>
+            </div>
 
+            <!-- Quantity Selector -->
+            <div class="quantity-selector mt-4">
+                <h5>Quantity:</h5>
+                <div class="input-group">
+                    <button class="btn btn-outline-dark fw-bold" type="button" onclick="changeQuantity(-1)">-</button>
+                    <input type="text" class="form-control" id="quantity" value="1">
+                    <button class="btn btn-outline-dark fw-bold" type="button" onclick="changeQuantity(1)">+</button>
+                </div>
+            </div>
 
-        if (window.matchMedia("(min-width: 1025px)").matches) {
-            var carousel = new bootstrap.Carousel(multipleCardCarousel, {
-                interval: false,
+            <div class="pt-5 border-top-0 bg-transparent">
+                <div class="text-center text-uppercase">
+                    <a class="btn btn-outline-dark btn-add-to-cart mt-auto w-100 fw-bold" href="#">Add to
+                        Cart</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bundle Deal Section -->
+    <div class="container bundle-deal">
+        <h2>Bundle Details :</h2>
+        <div class="row">
+            <!-- Bundle Products -->
+            <div class="col px-5 py-2">
+                <div class="d-flex flex-wrap">
+                    @for ($i = 0; $i < 4; $i++)
+                        <a class="text-decoration-none text-dark" href="{{ url('/product') }}">
+                        <div class="bundle-item d-flex flex-column mb-3 me-3">
+                            <img src="{{ URL('storage/images/pokemon.png') }}" class="img-fluid bundle-image"
+                                alt="Product A">
+                            <div class="bundle-details mt-2">
+                                <h5>Product {{ $i + 1 }}</h5>
+                                <h5 class="text-muted original-price">RM 20.00</h5>
+                                <h5 class="discounted-price">RM 15.00</h5>
+                            </div>
+                        </div>
+                        </a>
+                        @endfor
+                        <!-- Add more bundle items as needed -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Review Section -->
+    <div class="container review-section mb-5">
+        <h2>Reviews</h2>
+        @for ($i = 0; $i < 10; $i++)
+            <div class="review-item">
+            <h5>John Doe</h5>
+            <div class="d-flex align-items-center text-warning">
+                <i class="bi bi-star-fill me-1"></i>
+                <i class="bi bi-star-fill me-1"></i>
+                <i class="bi bi-star-fill me-1"></i>
+                <i class="bi bi-star-fill me-1"></i>
+                <i class="bi bi-star-fill me-1"></i>
+            </div>
+            <p style="font-size: 1.2rem;">This is an amazing product! Highly recommended.</p>
+    </div>
+    @endfor
+    </div>
+
+    <script>
+        function selectVariation(element) {
+            // Remove active class from all variation buttons
+            var buttons = document.querySelectorAll('.btn-variation');
+            buttons.forEach(function(button) {
+                button.classList.remove('active');
             });
-            var carouselWidth = $(".carousel-inner")[0].scrollWidth;
-            var cardWidth = $(".carousel-item").width();
-            var scrollPosition = 0;
-            $("#tiny-carousel .carousel-control-prev").hide();
-            $("#tiny-carousel .carousel-control-next").on("click", function() {
-                if (scrollPosition < carouselWidth - cardWidth * 5) {
-                    scrollPosition += cardWidth * 5;
-                    $("#tiny-carousel .carousel-inner").animate({
-                            scrollLeft: scrollPosition
-                        },
-                        600
-                    );
-                    if (scrollPosition > 0) {
-                        $("#tiny-carousel .carousel-control-prev").show();
-                    }
-                    if (scrollPosition > carouselWidth - cardWidth * 6) {
-                        $("#tiny-carousel .carousel-control-next").hide();
-                    }
-                }
-            });
-            $("#tiny-carousel .carousel-control-prev").on("click", function() {
-                if (scrollPosition > 0) {
-                    scrollPosition -= cardWidth * 5;
-                    $("#tiny-carousel .carousel-inner").animate({
-                            scrollLeft: scrollPosition
-                        },
-                        600
-                    );
-                    if (scrollPosition <= 0) {
-                        $("#tiny-carousel .carousel-control-prev").hide();
-                    }
-                    if (scrollPosition < carouselWidth - cardWidth * 6) {
-                        $("#tiny-carousel .carousel-control-next").show();
-                    }
-                }
-            });
-        } else if (window.matchMedia("(min-width: 1024px)").matches) {
-            var carousel = new bootstrap.Carousel(multipleCardCarousel, {
-                interval: false,
-            });
-            var carouselWidth = $(".carousel-inner")[0].scrollWidth;
-            var cardWidth = $(".carousel-item").width();
-            var scrollPosition = 0;
-            $("#tiny-carousel .carousel-control-prev").hide();
-            $("#tiny-carousel .carousel-control-next").on("click", function() {
-                if (scrollPosition < carouselWidth - cardWidth * 3) {
-                    scrollPosition += cardWidth * 3;
-                    $("#tiny-carousel .carousel-inner").animate({
-                            scrollLeft: scrollPosition
-                        },
-                        600
-                    );
-                    if (scrollPosition > 0) {
-                        $("#tiny-carousel .carousel-control-prev").show();
-                    }
-                    if (scrollPosition > carouselWidth - cardWidth * 3) {
-                        $("#tiny-carousel .carousel-control-next").hide();
-                    }
-                }
-            });
-            $("#tiny-carousel .carousel-control-prev").on("click", function() {
-                if (scrollPosition > 0) {
-                    scrollPosition -= cardWidth * 3;
-                    $("#tiny-carousel .carousel-inner").animate({
-                            scrollLeft: scrollPosition
-                        },
-                        600
-                    );
-                    if (scrollPosition <= 0) {
-                        $("#tiny-carousel .carousel-control-prev").hide();
-                    }
-                    if (scrollPosition < carouselWidth - cardWidth * 3) {
-                        $("#tiny-carousel .carousel-control-next").show();
-                    }
-                }
-            });
-        } else {
-            $(multipleCardCarousel).addClass("slide");
+
+            // Add active class to the clicked button
+            element.classList.add('active');
         }
 
-        document.addEventListener("DOMContentLoaded", function() {
-            const scrollContainer = document.querySelector('#tiny-carousel .carousel-inner');
-            const tinyCarouselItems = document.querySelectorAll('#tiny-carousel .carousel-item img');
-            let isMouseDown = false;
-            let startX, scrollLeft;
+        function changeQuantity(amount) {
+            var quantityInput = document.getElementById('quantity');
+            var currentQuantity = parseInt(quantityInput.value);
+            var newQuantity = currentQuantity + amount;
 
-            scrollContainer.addEventListener('mousedown', (e) => {
-                isMouseDown = true;
-                startX = e.pageX - scrollContainer.offsetLeft;
-                scrollLeft = scrollContainer.scrollLeft;
-            });
+            if (newQuantity < 1) {
+                newQuantity = 1; // Prevent quantity from going below 1
+            }
 
-            scrollContainer.addEventListener('mouseleave', () => {
-                isMouseDown = false;
-            });
+            quantityInput.value = newQuantity;
+        }
 
-            scrollContainer.addEventListener('mouseup', () => {
-                isMouseDown = false;
-            });
+        document.getElementById('quantity').addEventListener('change', function() {
+            var quantityInput = document.getElementById('quantity');
+            var currentQuantity = parseInt(quantityInput.value);
 
-            scrollContainer.addEventListener('mousemove', (e) => {
-                if (!isMouseDown) return;
-                e.preventDefault();
-                const x = e.pageX - scrollContainer.offsetLeft;
-                const walk = (x - startX) * 2; //scroll-fast
-                scrollContainer.scrollLeft = scrollLeft - walk;
-
-                // Update button visibility
-                const maxScrollLeft = scrollContainer.scrollWidth - scrollContainer.clientWidth;
-            });
-
-            tinyCarouselItems.forEach((item, index) => {
-                item.addEventListener('click', function() {
-                    const mainCarousel = document.querySelector('#product-carousel');
-                    console.log(index)
-                    const bootstrapCarousel = new bootstrap.Carousel(mainCarousel);
-                    bootstrapCarousel.to(index);
-                });
-            });
+            if (currentQuantity < 1 || isNaN(currentQuantity)) {
+                quantityInput.value = 1;
+            }
         });
     </script>
-
 </body>
 
 </html>
