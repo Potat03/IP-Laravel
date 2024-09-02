@@ -19,7 +19,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('chat_messages', function (Blueprint $table) {
-            $table->timestamp('updated_at');
             $table->bigInteger('by_customer')->change();
         });
     }

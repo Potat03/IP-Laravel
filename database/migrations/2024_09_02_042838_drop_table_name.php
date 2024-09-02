@@ -22,8 +22,6 @@ return new class extends Migration
         Schema::create('chat_state', function (Blueprint $table) {
             $table->bigInteger('chat_id');
             $table->string('status');
-            $table->timestamps('created_at');
-            $table->timestamps('updated_at');
         });
     }
 };
