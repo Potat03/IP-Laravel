@@ -86,53 +86,71 @@
 
 @section('js')
 <script>
-    document.getElementById('start_date').addEventListener('change', function() {
-        document.getElementById('end_date').setAttribute('min', this.value);
-    });
-
-    document.getElementById('end_date').addEventListener('change', function() {
-        document.getElementById('start_date').setAttribute('max', this.value);
-    });
-
-    let product_list = [];
-    let selected_products = [];
-    fetch("{{ route('product.index') }}")
-        .then(response => response.json())
-        .then(data => {
-            let product_select = document.getElementById('product_select');
-
-            data.forEach(product => {
-                product_list.push(product);
-                let option = document.createElement('option');
-                option.value = product.id;
-                option.text = product.name;
-                product_select.appendChild(option);
-            });
-            console.log(product_list);
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('start_date').addEventListener('change', function() {
+            document.getElementById('end_date').setAttribute('min', this.value);
         });
 
-    document.getElementById('product_select').addEventListener('change', function() {
-        let product_id = this.value;
-        if (product_id == -1) {
-            return;
-        }
-        let product = product_list.find(product => product_id == product_id);
+        document.getElementById('end_date').addEventListener('change', function() {
+            document.getElementById('start_date').setAttribute('max', this.value);
+        });
 
-        if (selected_products.find(p => p.id == product.id)) {
-            alert('Product already selected');
-            this.value = -1;
-            return;
-        } else if (product != null) {
-            product.quantity = 1;
-            selected_products.push(product);
-            let display = document.getElementById('product_list');
-            let div = document.createElement('div');
-            div.classList.add('col-12');
-            div.innerHTML = `
+        let product_list = [];
+        let selected_products = [];
+        //set options for product select
+        fetch("{{ route('product.index') }}")
+            .then(response => response.json())
+            .then(data => {
+                let product_select = document.getElementById('product_select');
+
+                data.forEach(product => {
+                    if (product.stock != 0 && product.status != 'inactive') {
+                        product_list.push(product);
+                        let option = document.createElement('option');
+                        option.value = product.product_id;
+                        option.text = product.name;
+                        product_select.appendChild(option);
+                    }
+                });
+                console.log(product_list);
+            });
+
+        //allow only one product to be selected if type is single
+        document.getElementById('type').addEventListener('change', function() {
+            let type = this.value;
+            if (type == 1) {
+                document.getElementById('product_select').removeAttribute('multiple');
+            } else {
+                document.getElementById('product_select').setAttribute('multiple', 'true');
+            }
+        });
+
+        document.getElementById('product_select').addEventListener('change', function() {
+            let product_id = this.value;
+
+            if (product_id == -1) {
+                return;
+            }
+
+            let product = product_list.find(product => product.product_id == product_id);
+            if (selected_products.find(p => p.product_id == product.product_id)) {
+                alert('Product already selected');
+                this.value = -1;
+                return;
+            } else if (product != null) {
+                product.quantity = 1;
+                selected_products.push(product);
+                let display = document.getElementById('product_list');
+                let div = document.createElement('div');
+                div.classList.add('col-12');
+                div.innerHTML = `
                 <div class="card shadow-sm p-3 mt-3 w-75">
                     <div class="d-flex justify-content-start gap-5">
-                        <input type="hidden" name="product_id" value="${product.id}">
-                        <input type="text" class="form-control" id="product_name" name="product_name" value="${product.name}" required disabled>
+                        <input type="hidden" name="product_id" value="${product.product_id}">
+                        <div class="input-group">
+                            <span class="input-group-text">Name</span>
+                            <input type="text" class="form-control" id="product_name" name="product_name" value="${product.name}" required disabled>
+                        </div>
                         <div class="input-group">
                             <span class="input-group-text">Quantity</span>
                             <input type="number" class="form-control" id="quantity" name="product_qty" placeholder="Quantity" value="1" min="1" max="${product.stock}" required>
@@ -145,57 +163,60 @@
                     </div>
                 </div>
             `;
-            display.appendChild(div);
+                display.appendChild(div);
 
-            //add event listener to remove product
-            div.querySelector('#remove_product').addEventListener('click', function() {
-                let index = selected_products.findIndex(p => p.id == product.id);
-                selected_products.splice(index, 1);
-                div.remove();
-            });
+                //add event listener to remove product
+                div.querySelector('#remove_product').addEventListener('click', function() {
+                    let index = selected_products.findIndex(p => p.id == product.id);
+                    selected_products.splice(index, 1);
+                    div.remove();
+                });
 
-            //add qty change event
-            div.querySelector('#quantity').addEventListener('change', function() {
-                let qty = parseInt(this.value);
-                let index = selected_products.findIndex(p => p.id == product.id);
-                selected_products[index].quantity = qty;
-            });
-        }
-        this.value = -1;
-    });
+                //add qty change event
+                div.querySelector('#quantity').addEventListener('change', function() {
+                    let qty = parseInt(this.value);
+                    let index = selected_products.findIndex(p => p.id == product.id);
+                    selected_products[index].quantity = qty;
+                });
 
-    //confirm reset
-    document.querySelector('form').addEventListener('reset', function(e) {
-        if (!confirm('Are you sure you want to reset the form?')) {
+                console.log(selected_products);
+            }
+            this.value = -1;
+        });
+
+        //confirm reset
+        document.querySelector('form').addEventListener('reset', function(e) {
+            if (!confirm('Are you sure you want to reset the form?')) {
+                e.preventDefault();
+            }
+            selected_products = [];
+            document.getElementById('product_list').innerHTML = '';
+
+        });
+
+        //ajax request to add promotion
+        document.querySelector('form').addEventListener('submit', function(e) {
             e.preventDefault();
-        }
-        selected_products = [];
-        document.getElementById('product_list').innerHTML = '';
-        
-    });
-
-    //ajax request to add promotion
-    document.querySelector('form').addEventListener('submit', function(e) {
-        e.preventDefault();
-        let form = new FormData(this);
-        let invalid_qty = selected_products.find(p => p.quantity > p.stock);
-        if (invalid_qty) {
-            alert('Quantity exceeds stock :' + invalid_qty.name);
-            return;
-        }
-        form.append('products', JSON.stringify(selected_products));
-        fetch("{{ route('promotion.create') }}", {
-                method: 'POST',
-                body: form
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    window.location.href = "../promotion";
-                } else {
-                    alert(data.message);
-                }
-            });
+            let form = new FormData(this);
+            let invalid_qty = selected_products.find(p => p.quantity > p.stock);
+            if (invalid_qty) {
+                alert('Quantity exceeds stock :' + invalid_qty.name);
+                return;
+            }
+            form.append('products', JSON.stringify(selected_products));
+            fetch("{{ route('promotion.create') }}", {
+                    method: 'POST',
+                    body: form
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.href = "../promotion";
+                    } else {
+                        alert(data.message);
+                    }
+                });
+        });
     });
 </script>
 

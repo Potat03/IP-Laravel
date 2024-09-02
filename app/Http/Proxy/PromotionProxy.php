@@ -9,11 +9,11 @@ use App\Http\Controllers\PromotionController;
 class PromotionProxy extends PromotionController implements PromotionInterface
 {
     public function getPromotion(){
-        return $this->getPromotion();
+        return parent::getPromotion();
     }    
 
     public function getPromotionById($id){
-        return $this->getPromotionById($id);
+        return parent::getPromotionById($id);
     }
 
     public function createPromotion(Request $request){

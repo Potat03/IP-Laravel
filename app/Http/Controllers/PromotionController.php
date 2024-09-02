@@ -4,19 +4,25 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Interface\PromotionInterface;
+use App\Models\Product;
 use App\Models\Promotion;
 use App\Models\PromotionItem;
 use Exception;
 
-class PromotionController extends Controller implements PromotionInterface
+class PromotionController extends Controller
 {
     public function getPromotion(){
         try{
             $promotion = Promotion::all();
+
+            foreach($promotion as $promo){
+                $promo->product_list = Promotion::find($promo->promotion_id)->product;
+            }
+            
             return response()->json(['success' => true, 'data' => $promotion], 200);
         }
         catch(Exception $e){
-            return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
+            return response()->json(['success' => false, 'message' => '$e->getMessage()'], 400);
         }
     }    
 
@@ -60,7 +66,6 @@ class PromotionController extends Controller implements PromotionInterface
             ]);
 
             foreach($productList as $product){
-                //dd($product);
                 PromotionItem::create([
                     'promotion_id' => $newPromo->promotion_id,
                     'product_id' => $product->product_id,
