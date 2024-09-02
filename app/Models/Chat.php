@@ -17,8 +17,8 @@ class Chat extends Model
         'customer_id',
         'admin_id',
         'status',
-        'created_at',
         'ended_at',
+        'updated_at'
     ];
 
     public function admin()
@@ -34,10 +34,5 @@ class Chat extends Model
     public function chatMessages()
     {
         return $this->hasMany(ChatMessage::class, 'chat_id', 'chat_id');
-    }
-
-    public function chatState()
-    {
-        return $this->hasMany(ChatState::class, 'status', 'status_id');
     }
 }
