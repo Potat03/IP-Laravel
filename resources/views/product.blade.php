@@ -214,43 +214,23 @@
     <div class="container product-detail-container">
         <!-- Product Image -->
         <div class="product-image">
-            <div class="container">
-                <div class="row pt-3 p-2">
-                    <div class="col-6 p-0">
-                        <img src={{ URL('storage/images/pokemon.png') }}
-                            class="d-block img-thumbnail border-0" alt="product image">
-                    </div>
-                    <div class="col-6 p-0">
-                        <img src={{ URL('storage/images/consumable.png') }}
-                            class="d-block img-thumbnail border-0" alt="product image">
-                    </div>
-                    <div class="col-6 p-0">
-                        <img src={{ URL('storage/images/collectible.png') }}
-                            class="d-block img-thumbnail border-0" alt="product image">
-                    </div>
-                    <div class="col-6 p-0">
-                        <img src={{ URL('storage/images/pika.jpg') }}
-                            class="d-block img-thumbnail border-0" alt="product image">
-                    </div>
-                </div>
-            </div>
+            <img src="{{ URL('storage/images/pokemon.png') }}" class="img-fluid" alt="Product Image">
         </div>
 
         <!-- Product Info -->
         <div class="product-info">
             <div class="mb-5">
                 <h1 class="fw-bold">Product Name</h1>
-                <h4 class="text-muted original-price">RM 80.00</h5>
-                    <h5 class="discounted-price">RM 60.00</h5>
-                    <div class="d-flex align-items-center text-warning">
-                        <i class="bi bi-star-fill me-1"></i>
-                        <i class="bi bi-star-fill me-1"></i>
-                        <i class="bi bi-star-fill me-1"></i>
-                        <i class="bi bi-star-fill me-1"></i>
-                        <i class="bi bi-star-fill me-1"></i>
-                        <span class="text-dark ms-2">(20)</span>
-                    </div>
-                    <h4 class="text-muted pt-2">In Stock</h4>
+                <h4 class="text-muted">RM 40.00</h4>
+                <div class="d-flex align-items-center text-warning">
+                    <i class="bi bi-star-fill me-1"></i>
+                    <i class="bi bi-star-fill me-1"></i>
+                    <i class="bi bi-star-fill me-1"></i>
+                    <i class="bi bi-star-fill me-1"></i>
+                    <i class="bi bi-star-fill me-1"></i>
+                    <span class="text-dark ms-2">(20)</span>
+                </div>
+                <h4 class="text-muted pt-2">In Stock</h4>
             </div>
 
             <!-- Product Variation -->
@@ -284,18 +264,26 @@
                         Cart</a>
                 </div>
             </div>
+
+            <!-- Product Details -->
+            <div class="product-details mt-5">
+                <h5>Product Details:</h5>
+                <p style="font-size: 1.2rem;">
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce auctor eros ac eros vehicula,
+                    eget vehicula lectus scelerisque. Suspendisse nec efficitur sem, in luctus risus.
+                </p>
+            </div>
         </div>
     </div>
 
     <!-- Bundle Deal Section -->
     <div class="container bundle-deal">
-        <h2>Bundle Details :</h2>
+        <h2>Bundle Deal</h2>
         <div class="row">
             <!-- Bundle Products -->
-            <div class="col px-5 py-2">
+            <div class="col-md-8">
                 <div class="d-flex flex-wrap">
                     @for ($i = 0; $i < 4; $i++)
-                        <a class="text-decoration-none text-dark" href="{{ url('/product') }}">
                         <div class="bundle-item d-flex flex-column mb-3 me-3">
                             <img src="{{ URL('storage/images/pokemon.png') }}" class="img-fluid bundle-image"
                                 alt="Product A">
@@ -305,9 +293,20 @@
                                 <h5 class="discounted-price">RM 15.00</h5>
                             </div>
                         </div>
-                        </a>
-                        @endfor
-                        <!-- Add more bundle items as needed -->
+                    @endfor
+                    <!-- Add more bundle items as needed -->
+                </div>
+            </div>
+
+            <!-- Bundle Summary -->
+            <div class="col-md-4">
+                <div class="bundle-summary">
+                    <h3>Total Price: RM 60.00</h3>
+                    <div class="pt-3 border-top-0 bg-transparent">
+                        <div class="text-center text-uppercase">
+                            <a class="btn btn-outline-dark btn-add-to-cart mt-auto w-100 fw-bold" href="{{ url('/promotion') }}">View More</a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -318,17 +317,17 @@
         <h2>Reviews</h2>
         @for ($i = 0; $i < 10; $i++)
             <div class="review-item">
-            <h5>John Doe</h5>
-            <div class="d-flex align-items-center text-warning">
-                <i class="bi bi-star-fill me-1"></i>
-                <i class="bi bi-star-fill me-1"></i>
-                <i class="bi bi-star-fill me-1"></i>
-                <i class="bi bi-star-fill me-1"></i>
-                <i class="bi bi-star-fill me-1"></i>
+                <h5>John Doe</h5>
+                <div class="d-flex align-items-center text-warning">
+                    <i class="bi bi-star-fill me-1"></i>
+                    <i class="bi bi-star-fill me-1"></i>
+                    <i class="bi bi-star-fill me-1"></i>
+                    <i class="bi bi-star-fill me-1"></i>
+                    <i class="bi bi-star-fill me-1"></i>
+                </div>
+                <p style="font-size: 1.2rem;">This is an amazing product! Highly recommended.</p>
             </div>
-            <p style="font-size: 1.2rem;">This is an amazing product! Highly recommended.</p>
-    </div>
-    @endfor
+        @endfor
     </div>
 
     <script>

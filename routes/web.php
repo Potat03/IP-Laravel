@@ -21,8 +21,16 @@ Route::get('/upload', function () {
     return view('upload');
 });
 
+Route::get('/home', function() {
+    return view('home');
+});
+
 Route::get('/shop', function() {
     return view('shop');
+});
+
+Route::get('/product', function() {
+    return view('product');
 });
 
 Route::get('/cart', function () {
@@ -41,13 +49,22 @@ Route::get('/testDB', function () {
     return view('testDB');
 });
 
+
+//promotion
+
 Route::get('/promotion', function(){
     return view('promotion');
 });
 
-Route::get('/promotion/details', function(){
+Route::get('/promotion/{id}', function(){
     return view('promotionDetails');
 });
+
+//admin side
+Route::get('/admin/login', function () {
+    return view('admin.login');
+});
+
 
 //middleware
 Route::middleware([customAuth::class])->group(function () {
@@ -59,12 +76,12 @@ Route::middleware([customAuth::class])->group(function () {
         return view('admin.product');
     });
     
-    Route::get('/template', function () {
-        return view('admin.error');
-    });
-    
     Route::get('/admin/promotion', function () {
         return view('admin.promotion');
+    });
+
+    Route::get('/admin/promotion/add', function () {
+        return view('admin.promotion_add');
     });
 });
 

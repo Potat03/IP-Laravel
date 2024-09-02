@@ -20,6 +20,7 @@ class Promotion extends Model
         'discount',
         'type',
         'limit',
+        'status',
         'start_at',
         'end_at',
     ];
