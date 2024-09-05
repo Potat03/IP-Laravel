@@ -17,8 +17,7 @@ class Chat extends Model
         'customer_id',
         'admin_id',
         'status',
-        'ended_at',
-        'updated_at'
+        'ended_at'
     ];
 
     public function admin()

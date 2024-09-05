@@ -3,9 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class Admin extends Model
+class Admin extends Authenticatable implements UserInterface
 {
     use HasFactory;
 
@@ -28,5 +28,13 @@ class Admin extends Model
     public function adminLogs()
     {
         return $this->hasMany(AdminLog::class, 'admin_id', 'admin_id');
+    }
+
+    public function getId() {
+        return $this->admin_id;
+    }
+
+    public function getRole() {
+        return $this->role;
     }
 }
