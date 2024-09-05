@@ -18,10 +18,10 @@
     Route::get('/product/index', [ProductController::class, 'index'])->name('product.index');
 
     //promotion
-    Route::get('/promotion', [PromotionProxy::class, 'getPromotion']);
-    Route::get('/promotion/{id}', [PromotionProxy::class, 'getPromotionById']);
+    Route::get('/promotion', [PromotionProxy::class, 'getPromotion'])->name('promotion.index');
+    Route::post('/promotion/{id}', [PromotionProxy::class, 'getPromotionById']);
     Route::middleware([customAuth::class])->group(function () {
-        Route::post('/promotion', [PromotionProxy::class, 'createPromotion'])->name('promotion.create');
+        Route::post('/promotion/create', [PromotionProxy::class, 'createPromotion'])->name('promotion.create');
         Route::put('/promotion/{id}', [PromotionProxy::class, 'updatePromotion']);
         Route::delete('/promotion/{id}', [PromotionProxy::class, 'deletePromotion']);
     });

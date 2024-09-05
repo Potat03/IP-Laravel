@@ -116,24 +116,6 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <th scope="row">1</th>
-                                    <td>Product 1</td>
-                                    <td>100</td>
-                                    <td>10</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">2</th>
-                                    <td>Product 2</td>
-                                    <td>200</td>
-                                    <td>20</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">3</th>
-                                    <td>Product 3</td>
-                                    <td>300</td>
-                                    <td>30</td>
-                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -150,26 +132,80 @@
 
 @section('js')
 <script>
+    promotion_list = []
     //when page complete load
-    // document.addEventListener('DOMContentLoaded', function() {
-    //     fetch('/api/product/index')
-    //         .then(response => response.json())
-    //         .then(data => {
-    //             let dataHolder = document.getElementById('data-holder');
-    //             dataHolder.innerHTML = '';
-    //             data.forEach((product, index) => {
-    //                 let tr = document.createElement('tr');
-    //                 tr.innerHTML = `
+    document.addEventListener('DOMContentLoaded', function() {
+        fetch("{{ route('promotion.index') }}")
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    let dataHolder = document.getElementById('data-holder');
+                    dataHolder.innerHTML = '';
+                    $count = 1;
+                    console.log(data);
+                    data.data.forEach(promotion => {
+                        promotion_list.push(promotion);
+                        let tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <tr>
+                                <th scope="row">${$count++}</th>
+                                <td>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" ${promotion.status == "active" ? "checked":""}>
+                                    </div>
+                                </td>
+                                <td>Christmas Sale</td>
+                                <td><i class="fa-solid ${promotion.status == "bundle" ? "fa-cube":"fa-cubes"}"></i><span class="ps-2">${promotion.type}</span></td>
+                                <td>${promotion.product_list.length} product(s)
+                                    <a class="text-decoration-none text-secondary ps-1" data-bs-toggle="modal" data-bs-target="#viewProducts"><i class="fa-solid fa-eye"></i></a>
+                                </td>
+                                <td> ${promotion.start_at}</td>
+                                <td> ${promotion.end_at}</td>
+                                <td>
+                                    <span class="badge bg-success">${promotion.status}</span>
+                                </td>
+                                <td>
+                                    <button class="btn btn-warning"><i class="fa-regular fa-pen-to-square pe-2"></i>Edit</button>
+                                    <button class="btn btn-danger"><i class="fa-solid fa-trash-can pe-2"></i>Delete</button>
+                                </td>
+                            </tr>
+                            `;
+                        dataHolder.appendChild(tr);
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while fetching the product data.');
+            });
+    });
 
-    //                 `;
-    //                 dataHolder.appendChild(tr);
-    //             });
-    //         })
-    //         .catch(error => {
-    //             console.error('Error:', error);
-    //             alert('An error occurred while fetching the product data.');
-    //         });
-    // });
+    //view product modal
+    document.getElementById('viewProducts').addEventListener('show.bs.modal', function(event) {
+        let button = event.relatedTarget;
+        let modal = this;
+        let modalBody = modal.querySelector('.modal-body');
+        let modalTitle = modal.querySelector('.modal-title');
+        let modalFooter = modal.querySelector('.modal-footer');
+        let modalBodyTable = modalBody.querySelector('table tbody');
+        let promotionIndex = button.closest('tr').rowIndex - 1;
+        let promotion = promotion_list[promotionIndex];
+        console.log(promotion);
+        modalTitle.textContent = promotion.title;
+        modalBodyTable.innerHTML = '';
+        promotion.product_list.forEach((product, index) => {
+            let tr = document.createElement('tr');
+            tr.innerHTML = `
+            <tr>
+                <th scope="row">${index + 1}</th>
+                <td>${product.name}</td>
+                <td>${product.price}</td>
+                <td>${product.stock}</td>
+            </tr>
+            `;
+            modalBodyTable.appendChild(tr);
+        });
+    });
 </script>
 
 @endsection
