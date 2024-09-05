@@ -90,8 +90,35 @@
     </div>
 
     <script>
+        //animation
         document.querySelector('.img__btn').addEventListener('click', function() {
             document.querySelector('.cont').classList.toggle('s--signup');
+        });
+
+        //handle form
+        document.querySelectorAll('form').forEach(form => {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                let formData = new FormData(form);
+                let actionUrl = form.action;
+
+                fetch(actionUrl, {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('Operation Success');
+                        } else {
+                            alert('Operation Failed');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Fetch error:', error);
+                        alert('An unexpected error occurred.');
+                    });
+            });
         });
     </script>
 </body>

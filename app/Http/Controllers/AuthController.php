@@ -1,10 +1,12 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use App\Models\Customer;
+use Exception;
 
 class AuthController extends Controller
 {
@@ -21,7 +23,7 @@ class AuthController extends Controller
         ]);
 
         if (Auth::attempt($request->only('email', 'password'))) {
-            return redirect()->intended('dashboard');
+            return redirect()->intended('/home');
         }
 
         return back()->withErrors(['email' => 'Invalid credentials'])->withInput();
@@ -31,20 +33,36 @@ class AuthController extends Controller
     {
         $request->validate([
             'username' => 'required|string|max:50',
-            'email' => 'required|email|unique:users,email',
+            'email' => 'required|email|unique:customer,email',
             'phone' => 'required|regex:/^(\+?6?01)[0-46-9]-*[0-9]{7,8}$/',
-            'birthday' => 'required',
             'password' => 'required|min:8|confirmed',
-            'password_retype' => 'required|min:8|confirmed',
         ]);
 
-        User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
+        try {
+            // create a new customer
+            Customer::create([
+                'username' => $request->username,
+                'tier' => "Basic",
+                'phone_number' => $request->phone,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'status' => "Activated",
+            ]);
 
-        return redirect()->route('auth.showForm')->with('success', 'Account created successfully');
+            $customer = new Customer();
+
+            $customer->username = $request->username;
+            $customer->tier = "Basic";
+            $customer->phone_number = $request->phone;
+            $customer->email = $request->email;
+            $customer->password = Hash::make($request->password);
+            $customer->status = "Activated";
+            $customer->save();
+
+            return response()->json(['success' => true, 'message' => 'You have successfully registered an account'], 200);
+        } catch (Exception $e) {
+            return response()->json(['failure' => false, 'message' => $e->getMessage()], 400);
+        }
     }
 
     public function logout()
