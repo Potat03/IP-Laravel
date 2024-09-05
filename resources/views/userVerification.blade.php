@@ -92,21 +92,24 @@
     <div class="container">
         <h3 class="title">OTP Verification</h3>
         <p class="sub-title">
-            Enter the OTP you received to
-            <span class="phone-number">sittisak@hotmail.com</span>
+            Enter the OTP sent to your email
         </p>
-        <div class="wrapper">
-            <input type="text" class="field 1" maxlength="1">
-            <input type="text" class="field 2" maxlength="1">
-            <input type="text" class="field 3" maxlength="1">
-            <input type="text" class="field 4" maxlength="1">
-            <input type="text" class="field 5" maxlength="1">
-            <input type="text" class="field 6" maxlength="1">
-        </div>
-        <button class="resend">
-            Resend OTP
-            <i class="fa fa-caret-right"></i>
-        </button>
+        <form method="POST" action="{{ url('verify') }}">
+            @csrf
+            <input type="hidden" name="email" value="{{ request('email') }}">
+            <div class="wrapper">
+                <input type="text" name="otp1" maxlength="1" class="field 1" required>
+                <input type="text" name="otp2" maxlength="1" class="field 2" required>
+                <input type="text" name="otp3" maxlength="1" class="field 3" required>
+                <input type="text" name="otp4" maxlength="1" class="field 4" required>
+                <input type="text" name="otp5" maxlength="1" class="field 5" required>
+                <input type="text" name="otp6" maxlength="1" class="field 6" required>
+            </div>
+            <p class="sub-title">
+                Send again in 60s..
+            </p>
+            <button type="submit">Verify OTP</button>
+        </form>
     </div>
 </body>
 <script>

@@ -7,7 +7,7 @@
     <title>Shop</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     {{-- <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css" /> --}}
-    @vite(['resources/sass/app.scss', 'resources/js/app.js'])
+    @vite(['resources/sass/app.scss', 'resources/js/app.js', 'resources/css/app.css'])
     <style>
         /* .bg-image {
             background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.6)), URL('storage/images/banner3.jpg');
@@ -18,6 +18,11 @@
 
         .mainthree {
             background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.6));
+        }
+
+        main {
+            display: flex;
+            min-height: 100vh;
         }
 
         /* Slideshow text styling */
@@ -94,12 +99,6 @@
             transform: scale(1.5);
         }
 
-        .container {
-            max-width: 1920px;
-            min-width: 1024px;
-            padding: 32px 48px;
-        }
-
         .carousel-inner {
             padding: 1em;
         }
@@ -136,11 +135,21 @@
             max-height: 100%;
             -webkit-user-drag: none;
             /* For WebKit browsers (e.g., Chrome, Safari) */
-            user-drag: none;
+            user-select: none;
         }
 
         .card-text {
             user-select: none;
+        }
+
+        .card .btn {
+            -webkit-user-drag: none;
+            user-select: none;
+        }
+
+        .col-md-2-4 {
+            flex: 0 0 calc(100% / 5);
+            max-width: calc(100% / 5);
         }
 
         @media (min-width: 1025px) {
@@ -205,610 +214,86 @@
         </div>
     </nav>
 
-    <!-- Header -->
-    <header class="bg-dark py-5" style="min-height: 600px; display: flex; align-items: center; user-drag: none;">
-        <div class="overlay"></div> <!-- Add this overlay element -->
-        <div class="container px-4 px-lg-5">
-            <div class="text-center text-white" style="user-select: none; position: relative; z-index: 2;">
-                <h1 class="display-1 fw-bolder">Futatabi</h1>
-                <p class="lead fs-2 fw-medium text-white-50 mb-0 text-slideshow">
-                    <span class="slideshow-text fs-2">Malaysia Best Selling Japanese Store</span>
-                </p>
+    <main class="pt-5">
+        <div class="flex-shrink-0 p-3 bg-white d-flex flex-column">
+            <div class="container">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control" id="search" name="search"
+                                placeholder="Search" aria-label="Search" aria-describedby="search-btn">
+                            <button class="btn btn-outline-secondary" type="button" id="search-btn"><i
+                                    class="fa-solid fa-magnifying-glass"></i></button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="input-group mb-3">
+                            <div class="input-group-text">
+                                <input class="form-check-input mt-0" type="checkbox" value=""
+                                    aria-label="Checkbox for following text input">
+                            </div>
+                            <input type="text" class="form-control" aria-label="Text input with checkbox"
+                                value="category" disabled>
+                        </div>
+                        <div class="input-group mb-3">
+                            <div class="input-group-text">
+                                <input class="form-check-input mt-0" type="checkbox" value=""
+                                    aria-label="Checkbox for following text input">
+                            </div>
+                            <input type="text" class="form-control" aria-label="Text input with checkbox"
+                                value="category" disabled>
+                        </div>
+                        <div class="input-group mb-3">
+                            <div class="input-group-text">
+                                <input class="form-check-input mt-0" type="checkbox" value=""
+                                    aria-label="Checkbox for following text input">
+                            </div>
+                            <input type="text" class="form-control" aria-label="Text input with checkbox"
+                                value="category" disabled>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    </header>
-
-    <section>
-        <div class="container mt-5">
+        <div class="col-md-9">
             <div class="row">
-                <!-- Card 1 -->
-                <div class="col-md-4 align-self-center">
-                    <div class="card card-showcase mb-4">
-                        <img class="card-img" src={{ URL('storage/images/collectible.png') }} alt="Card image">
-                        <div class="card-img-overlay mainthree text-white">
-                            <div class="m-5 py-5">
-                                <h5 class="card-title fw-bold display-4 mb-0">Collectible</h5>
-                                <p class="card-text display-5">収集品</p>
-                                <a href="#" class="btn btn-outline-light btn-lg mt-4 custom-btn fw-bold fs-3">View
-                                    More</a>
+                @for ($i = 0; $i < 10; $i++)
+                    <div class="col-md-2-4 mb-4">
+                        <a href="{{ url('product') }}" class="text-decoration-none text-dark">
+                            <div class="card h-100">
+                                <div class="badge bg-dark text-white position-absolute w-50 d-flex align-items-center justify-content-center fs-5"
+                                    style="top: 0.5rem; left: 0rem; border-radius: 0 5px 5px 0;">
+                                    <span class="fs-5">Best Seller</span>
+                                </div>
+                                <div class="card-img-top">
+                                    <img src="{{ URL('storage/images/pokemon.png') }}" class="d-block w-100"
+                                        alt="product image" width="280" height="300">
+                                </div>
+                                <div class="card-body">
+                                    <p class="card-text mb-1 fs-5 fs-lg-5 fs-xl-3">Product {{ $i + 1 }}</p>
+                                    <h4 class="card-text fw-bold mb-2 fs-5 fs-xl-3">RM40.00 - RM80.00</h4>
+                                    <div class="d-flex justify-content align-items-center small text-warning">
+                                        <i class="bi bi-star-fill me-1"></i>
+                                        <i class="bi bi-star-fill me-1"></i>
+                                        <i class="bi bi-star-fill me-1"></i>
+                                        <i class="bi bi-star-fill me-1"></i>
+                                        <i class="bi bi-star-fill me-1"></i>
+                                        <span class="text-dark ms-lg-2">(20)</span>
+                                    </div>
+                                </div>
+                                <div class="card-footer p-3 pt-0 border-top-0 bg-transparent">
+                                    <div class="text-center text-uppercase">
+                                        <a class="btn btn-outline-dark mt-auto w-100 fw-bold" href="#">Add to
+                                            Cart</a>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
+                        </a>
                     </div>
-                </div>
-                <!-- Card 2 -->
-                <div class="col-md-4 align-self-center">
-                    <div class="card card-showcase mb-4">
-                        <img class="card-img" src={{ URL('storage/images/consumable.png') }} alt="Card image">
-                        <div class="card-img-overlay mainthree text-white">
-                            <div class="m-5 py-5">
-                                <h5 class="card-title fw-bold display-4 mb-0">Consumable</h5>
-                                <p class="card-text display-5">消耗品</p>
-                                <a href="#" class="btn btn-outline-light btn-lg mt-4 custom-btn fw-bold fs-3">View
-                                    More</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Card 3 -->
-                <div class="col-md-4 align-self-center">
-                    <div class="card card-showcase mb-4">
-                        <img class="card-img" src={{ URL('storage/images/wearable.png') }} alt="Card image">
-                        <div class="card-img-overlay mainthree text-white">
-                            <div class="m-5 py-5">
-                                <h5 class="card-title fw-bold display-4 mb-0">Wearable</h5>
-                                <p class="card-text display-5">着用可能</p>
-                                <a href="#" class="btn btn-outline-light btn-lg mt-4 custom-btn fw-bold fs-3">View
-                                    More</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                @endfor
             </div>
         </div>
-    </section>
-
-    <!-- Products -->
-    <!-- New Arrivals -->
-    <section>
-        <div class="container p-3">
-            <div class="pt-4 row align-items-center">
-                <div class="col">
-                    <h1 class="pb-4 text-uppercase" style="padding-left: 25px;">New Arrivals</h1>
-                </div>
-                <div class="col-auto">
-                    <a href="#" class="btn btn-link fs-4">View all</a>
-                </div>
-            </div>
-
-            <div id="carouselExampleControls" class="carousel">
-                <div class="carousel-inner">
-                    <div class="carousel-item active">
-                        <div class="card h-100">
-                            <div class="badge bg-dark text-white position-absolute w-50 d-flex align-items-center justify-content-center fs-5" style="top: 0.5rem; left: 0rem; border-radius: 0 5px 5px 0;"><span class="fs-4">New</span></div>
-                            <div class="card-img-top"><img src={{ URL('storage/images/pokemon.png') }}
-                                    class="d-block w-100" alt="product image" width="280" height="300"> </div>
-                            <div class="card-body">
-                                <p class="card-text mb-1 fs-5 fs-lg-5 fs-xl-3">Product 1</p>
-                                <h4 class="card-text fw-bold mb-2 fs-5 fs-xl-3">RM40.00 - RM80.00</h4>
-                                <div class="d-flex justify-content align-items-center small text-warning">
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <span class="text-dark ms-lg-2">(20)</span>
-                                </div>
-                            </div>
-                            <div class="card-footer p-3 pt-0 border-top-0 bg-transparent">
-                                <div class="text-center text-uppercase"><a
-                                        class="btn btn-outline-dark mt-auto w-100 fw-bold" href="#">Add to
-                                        Cart</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="carousel-item">
-                        <div class="card h-100">
-                            <div class="card-img-top"><img src={{ URL('storage/images/pokemon.png') }}
-                                    class="d-block w-100" alt="product image" width="280" height="300"> </div>
-                            <div class="card-body">
-                                <p class="card-text mb-1 fs-5 fs-lg-5 fs-xl-3">Product 2</p>
-                                <h4 class="card-text fw-bold mb-2 fs-5 fs-xl-3">RM40.00 - RM80.00</h4>
-                                <div class="d-flex justify-content align-items-center small text-warning">
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <span class="text-dark ms-lg-2">(20)</span>
-                                </div>
-                            </div>
-                            <div class="card-footer p-3 pt-0 border-top-0 bg-transparent">
-                                <div class="text-center text-uppercase"><a
-                                        class="btn btn-outline-dark mt-auto w-100 fw-bold" href="#">Add to
-                                        Cart</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="carousel-item">
-                        <div class="card h-100">
-                            <div class="card-img-top"><img src={{ URL('storage/images/pokemon.png') }}
-                                    class="d-block w-100" alt="product image" width="280" height="300"> </div>
-                            <div class="card-body">
-                                <p class="card-text mb-1 fs-5 fs-lg-5 fs-xl-3">Product 3</p>
-                                <h4 class="card-text fw-bold mb-2 fs-5 fs-xl-3">RM40.00 - RM80.00</h4>
-                                <div class="d-flex justify-content align-items-center small text-warning">
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <span class="text-dark ms-lg-2">(20)</span>
-                                </div>
-                            </div>
-                            <div class="card-footer p-3 pt-0 border-top-0 bg-transparent">
-                                <div class="text-center text-uppercase"><a
-                                        class="btn btn-outline-dark mt-auto w-100 fw-bold" href="#">Add to
-                                        Cart</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="carousel-item">
-                        <div class="card h-100">
-                            <div class="card-img-top"><img src={{ URL('storage/images/pokemon.png') }}
-                                    class="d-block w-100" alt="product image" width="280" height="300"> </div>
-                            <div class="card-body">
-                                <p class="card-text mb-1 fs-5 fs-lg-5 fs-xl-3">Product 4</p>
-                                <h4 class="card-text fw-bold mb-2 fs-5 fs-xl-3">RM40.00 - RM80.00</h4>
-                                <div class="d-flex justify-content align-items-center small text-warning">
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <span class="text-dark ms-lg-2">(20)</span>
-                                </div>
-                            </div>
-                            <div class="card-footer p-3 pt-0 border-top-0 bg-transparent">
-                                <div class="text-center text-uppercase"><a
-                                        class="btn btn-outline-dark mt-auto w-100 fw-bold" href="#">Add to
-                                        Cart</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="carousel-item">
-                        <div class="card h-100">
-                            <div class="card-img-top"><img src={{ URL('storage/images/pokemon.png') }}
-                                    class="d-block w-100" alt="product image" width="280" height="300"> </div>
-                            <div class="card-body">
-                                <p class="card-text mb-1 fs-5 fs-lg-5 fs-xl-3">Product 5</p>
-                                <h4 class="card-text fw-bold mb-2 fs-5 fs-xl-3">RM40.00 - RM80.00</h4>
-                                <div class="d-flex justify-content align-items-center small text-warning">
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <span class="text-dark ms-lg-2">(20)</span>
-                                </div>
-                            </div>
-                            <div class="card-footer p-3 pt-0 border-top-0 bg-transparent">
-                                <div class="text-center text-uppercase"><a
-                                        class="btn btn-outline-dark mt-auto w-100 fw-bold" href="#">Add to
-                                        Cart</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="carousel-item">
-                        <div class="card h-100">
-                            <div class="card-img-top"><img src={{ URL('storage/images/pokemon.png') }}
-                                    class="d-block w-100" alt="product image" width="280" height="300"> </div>
-                            <div class="card-body">
-                                <p class="card-text mb-1 fs-5 fs-lg-5 fs-xl-3">Product 6</p>
-                                <h4 class="card-text fw-bold mb-2 fs-5 fs-xl-3">RM40.00 - RM80.00</h4>
-                                <div class="d-flex justify-content align-items-center small text-warning">
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <span class="text-dark ms-lg-2">(20)</span>
-                                </div>
-                            </div>
-                            <div class="card-footer p-3 pt-0 border-top-0 bg-transparent">
-                                <div class="text-center text-uppercase"><a
-                                        class="btn btn-outline-dark mt-auto w-100 fw-bold" href="#">Add to
-                                        Cart</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="carousel-item">
-                        <div class="card h-100">
-                            <div class="card-img-top"><img src={{ URL('storage/images/pokemon.png') }}
-                                    class="d-block w-100" alt="product image" width="280" height="300"> </div>
-                            <div class="card-body">
-                                <p class="card-text mb-1 fs-5 fs-lg-5 fs-xl-3">Product 7</p>
-                                <h4 class="card-text fw-bold mb-2 fs-5 fs-xl-3">RM40.00 - RM80.00</h4>
-                                <div class="d-flex justify-content align-items-center small text-warning">
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <span class="text-dark ms-lg-2">(20)</span>
-                                </div>
-                            </div>
-                            <div class="card-footer p-3 pt-0 border-top-0 bg-transparent">
-                                <div class="text-center text-uppercase"><a
-                                        class="btn btn-outline-dark mt-auto w-100 fw-bold" href="#">Add to
-                                        Cart</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="carousel-item">
-                        <div class="card h-100">
-                            <div class="card-img-top"><img src={{ URL('storage/images/pokemon.png') }}
-                                    class="d-block w-100" alt="product image" width="280" height="300"> </div>
-                            <div class="card-body">
-                                <p class="card-text mb-1 fs-5 fs-lg-5 fs-xl-3">Product 8</p>
-                                <h4 class="card-text fw-bold mb-2 fs-5 fs-xl-3">RM40.00 - RM80.00</h4>
-                                <div class="d-flex justify-content align-items-center small text-warning">
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <span class="text-dark ms-lg-2">(20)</span>
-                                </div>
-                            </div>
-                            <div class="card-footer p-3 pt-0 border-top-0 bg-transparent">
-                                <div class="text-center text-uppercase"><a
-                                        class="btn btn-outline-dark mt-auto w-100 fw-bold" href="#">Add to
-                                        Cart</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="carousel-item">
-                        <div class="card h-100">
-                            <div class="card-img-top"><img src={{ URL('storage/images/pokemon.png') }}
-                                    class="d-block w-100" alt="product image" width="280" height="300"> </div>
-                            <div class="card-body">
-                                <p class="card-text mb-1 fs-5 fs-lg-5 fs-xl-3">Product 9</p>
-                                <h4 class="card-text fw-bold mb-2 fs-5 fs-xl-3">RM40.00 - RM80.00</h4>
-                                <div class="d-flex justify-content align-items-center small text-warning">
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <span class="text-dark ms-lg-2">(20)</span>
-                                </div>
-                            </div>
-                            <div class="card-footer p-3 pt-0 border-top-0 bg-transparent">
-                                <div class="text-center text-uppercase"><a
-                                        class="btn btn-outline-dark mt-auto w-100 fw-bold" href="#">Add to
-                                        Cart</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="carousel-item">
-                        <div class="card h-100">
-                            <div class="card-img-top"><img src={{ URL('storage/images/pokemon.png') }}
-                                    class="d-block w-100" alt="product image" width="280" height="300"> </div>
-                            <div class="card-body">
-                                <p class="card-text mb-1 fs-5 fs-lg-5 fs-xl-3">Product 10</p>
-                                <h4 class="card-text fw-bold mb-2 fs-5 fs-xl-3">RM40.00 - RM80.00</h4>
-                                <div class="d-flex justify-content align-items-center small text-warning">
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <span class="text-dark ms-lg-2">(20)</span>
-                                </div>
-                            </div>
-                            <div class="card-footer p-3 pt-0 border-top-0 bg-transparent">
-                                <div class="text-center text-uppercase"><a
-                                        class="btn btn-outline-dark mt-auto w-100 fw-bold" href="#">Add to
-                                        Cart</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <button class="carousel-control-prev bg-dark" type="button"
-                    data-bs-target="#carouselExampleControls" data-bs-slide="prev">
-                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Previous</span>
-                </button>
-                <button class="carousel-control-next bg-dark" type="button"
-                    data-bs-target="#carouselExampleControls" data-bs-slide="next">
-                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Next</span>
-                </button>
-            </div>
-        </div>
-    </section>
-
-    <!-- Best Sellers -->
-    <section>
-        <div class="container p-3">
-            <div class="pt-4 row align-items-center">
-                <div class="col">
-                    <h1 class="pb-4 text-uppercase" style="padding-left: 25px;">Best Sellers in Japan</h1>
-                </div>
-                <div class="col-auto">
-                    <a href="#" class="btn btn-link fs-4">View all</a>
-                </div>
-            </div>
-
-            <div id="carouselExampleControls2" class="carousel">
-                <div class="carousel-inner carousel-inner2">
-                    <div class="carousel-item active">
-                        <div class="card h-100">
-                            <div class="badge bg-dark text-white position-absolute w-50 d-flex align-items-center justify-content-center fs-5" style="top: 0.5rem; left: 0rem; border-radius: 0 5px 5px 0;"><span class="fs-4">Best Seller</span></div>
-                            <div class="card-img-top"><img src={{ URL('storage/images/pokemon.png') }}
-                                    class="d-block w-100" alt="product image" width="280" height="300"> </div>
-                            <div class="card-body">
-                                <p class="card-text mb-1 fs-5 fs-lg-5 fs-xl-3">Product 1</p>
-                                <h4 class="card-text fw-bold mb-2 fs-5 fs-xl-3">RM40.00 - RM80.00</h4>
-                                <div class="d-flex justify-content align-items-center small text-warning">
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <span class="text-dark ms-lg-2">(20)</span>
-                                </div>
-                            </div>
-                            <div class="card-footer p-3 pt-0 border-top-0 bg-transparent">
-                                <div class="text-center text-uppercase"><a
-                                        class="btn btn-outline-dark mt-auto w-100 fw-bold" href="#">Add to
-                                        Cart</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="carousel-item">
-                        <div class="card h-100">
-                            <div class="card-img-top"><img src={{ URL('storage/images/pokemon.png') }}
-                                    class="d-block w-100" alt="product image" width="280" height="300"> </div>
-                            <div class="card-body">
-                                <p class="card-text mb-1 fs-5 fs-lg-5 fs-xl-3">Product 2</p>
-                                <h4 class="card-text fw-bold mb-2 fs-5 fs-xl-3">RM40.00 - RM80.00</h4>
-                                <div class="d-flex justify-content align-items-center small text-warning">
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <span class="text-dark ms-lg-2">(20)</span>
-                                </div>
-                            </div>
-                            <div class="card-footer p-3 pt-0 border-top-0 bg-transparent">
-                                <div class="text-center text-uppercase"><a
-                                        class="btn btn-outline-dark mt-auto w-100 fw-bold" href="#">Add to
-                                        Cart</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="carousel-item">
-                        <div class="card h-100">
-                            <div class="card-img-top"><img src={{ URL('storage/images/pokemon.png') }}
-                                    class="d-block w-100" alt="product image" width="280" height="300"> </div>
-                            <div class="card-body">
-                                <p class="card-text mb-1 fs-5 fs-lg-5 fs-xl-3">Product 3</p>
-                                <h4 class="card-text fw-bold mb-2 fs-5 fs-xl-3">RM40.00 - RM80.00</h4>
-                                <div class="d-flex justify-content align-items-center small text-warning">
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <span class="text-dark ms-lg-2">(20)</span>
-                                </div>
-                            </div>
-                            <div class="card-footer p-3 pt-0 border-top-0 bg-transparent">
-                                <div class="text-center text-uppercase"><a
-                                        class="btn btn-outline-dark mt-auto w-100 fw-bold" href="#">Add to
-                                        Cart</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="carousel-item">
-                        <div class="card h-100">
-                            <div class="card-img-top"><img src={{ URL('storage/images/pokemon.png') }}
-                                    class="d-block w-100" alt="product image" width="280" height="300"> </div>
-                            <div class="card-body">
-                                <p class="card-text mb-1 fs-5 fs-lg-5 fs-xl-3">Product 4</p>
-                                <h4 class="card-text fw-bold mb-2 fs-5 fs-xl-3">RM40.00 - RM80.00</h4>
-                                <div class="d-flex justify-content align-items-center small text-warning">
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <span class="text-dark ms-lg-2">(20)</span>
-                                </div>
-                            </div>
-                            <div class="card-footer p-3 pt-0 border-top-0 bg-transparent">
-                                <div class="text-center text-uppercase"><a
-                                        class="btn btn-outline-dark mt-auto w-100 fw-bold" href="#">Add to
-                                        Cart</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="carousel-item">
-                        <div class="card h-100">
-                            <div class="card-img-top"><img src={{ URL('storage/images/pokemon.png') }}
-                                    class="d-block w-100" alt="product image" width="280" height="300"> </div>
-                            <div class="card-body">
-                                <p class="card-text mb-1 fs-5 fs-lg-5 fs-xl-3">Product 5</p>
-                                <h4 class="card-text fw-bold mb-2 fs-5 fs-xl-3">RM40.00 - RM80.00</h4>
-                                <div class="d-flex justify-content align-items-center small text-warning">
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <span class="text-dark ms-lg-2">(20)</span>
-                                </div>
-                            </div>
-                            <div class="card-footer p-3 pt-0 border-top-0 bg-transparent">
-                                <div class="text-center text-uppercase"><a
-                                        class="btn btn-outline-dark mt-auto w-100 fw-bold" href="#">Add to
-                                        Cart</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="carousel-item">
-                        <div class="card h-100">
-                            <div class="card-img-top"><img src={{ URL('storage/images/pokemon.png') }}
-                                    class="d-block w-100" alt="product image" width="280" height="300"> </div>
-                            <div class="card-body">
-                                <p class="card-text mb-1 fs-5 fs-lg-5 fs-xl-3">Product 6</p>
-                                <h4 class="card-text fw-bold mb-2 fs-5 fs-xl-3">RM40.00 - RM80.00</h4>
-                                <div class="d-flex justify-content align-items-center small text-warning">
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <span class="text-dark ms-lg-2">(20)</span>
-                                </div>
-                            </div>
-                            <div class="card-footer p-3 pt-0 border-top-0 bg-transparent">
-                                <div class="text-center text-uppercase"><a
-                                        class="btn btn-outline-dark mt-auto w-100 fw-bold" href="#">Add to
-                                        Cart</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="carousel-item">
-                        <div class="card h-100">
-                            <div class="card-img-top"><img src={{ URL('storage/images/pokemon.png') }}
-                                    class="d-block w-100" alt="product image" width="280" height="300"> </div>
-                            <div class="card-body">
-                                <p class="card-text mb-1 fs-5 fs-lg-5 fs-xl-3">Product 7</p>
-                                <h4 class="card-text fw-bold mb-2 fs-5 fs-xl-3">RM40.00 - RM80.00</h4>
-                                <div class="d-flex justify-content align-items-center small text-warning">
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <span class="text-dark ms-lg-2">(20)</span>
-                                </div>
-                            </div>
-                            <div class="card-footer p-3 pt-0 border-top-0 bg-transparent">
-                                <div class="text-center text-uppercase"><a
-                                        class="btn btn-outline-dark mt-auto w-100 fw-bold" href="#">Add to
-                                        Cart</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="carousel-item">
-                        <div class="card h-100">
-                            <div class="card-img-top"><img src={{ URL('storage/images/pokemon.png') }}
-                                    class="d-block w-100" alt="product image" width="280" height="300"> </div>
-                            <div class="card-body">
-                                <p class="card-text mb-1 fs-5 fs-lg-5 fs-xl-3">Product 8</p>
-                                <h4 class="card-text fw-bold mb-2 fs-5 fs-xl-3">RM40.00 - RM80.00</h4>
-                                <div class="d-flex justify-content align-items-center small text-warning">
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <span class="text-dark ms-lg-2">(20)</span>
-                                </div>
-                            </div>
-                            <div class="card-footer p-3 pt-0 border-top-0 bg-transparent">
-                                <div class="text-center text-uppercase"><a
-                                        class="btn btn-outline-dark mt-auto w-100 fw-bold" href="#">Add to
-                                        Cart</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="carousel-item">
-                        <div class="card h-100">
-                            <div class="card-img-top"><img src={{ URL('storage/images/pokemon.png') }}
-                                    class="d-block w-100" alt="product image" width="280" height="300"> </div>
-                            <div class="card-body">
-                                <p class="card-text mb-1 fs-5 fs-lg-5 fs-xl-3">Product 9</p>
-                                <h4 class="card-text fw-bold mb-2 fs-5 fs-xl-3">RM40.00 - RM80.00</h4>
-                                <div class="d-flex justify-content align-items-center small text-warning">
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <span class="text-dark ms-lg-2">(20)</span>
-                                </div>
-                            </div>
-                            <div class="card-footer p-3 pt-0 border-top-0 bg-transparent">
-                                <div class="text-center text-uppercase"><a
-                                        class="btn btn-outline-dark mt-auto w-100 fw-bold" href="#">Add to
-                                        Cart</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="carousel-item">
-                        <div class="card h-100">
-                            <div class="card-img-top"><img src={{ URL('storage/images/pokemon.png') }}
-                                    class="d-block w-100" alt="product image" width="280" height="300"> </div>
-                            <div class="card-body">
-                                <p class="card-text mb-1 fs-5 fs-lg-5 fs-xl-3">Product 10</p>
-                                <h4 class="card-text fw-bold mb-2 fs-5 fs-xl-3">RM40.00 - RM80.00</h4>
-                                <div class="d-flex justify-content align-items-center small text-warning">
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <i class="bi bi-star-fill me-1"></i>
-                                    <span class="text-dark ms-lg-2">(20)</span>
-                                </div>
-                            </div>
-                            <div class="card-footer p-3 pt-0 border-top-0 bg-transparent">
-                                <div class="text-center text-uppercase"><a
-                                        class="btn btn-outline-dark mt-auto w-100 fw-bold" href="#">Add to
-                                        Cart</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <button class="carousel-control-prev bg-dark" type="button"
-                    data-bs-target="#carouselExampleControls2" data-bs-slide="prev">
-                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Previous</span>
-                </button>
-                <button class="carousel-control-next bg-dark" type="button"
-                    data-bs-target="#carouselExampleControls2" data-bs-slide="next">
-                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Next</span>
-                </button>
-            </div>
-        </div>
-    </section>
-
-    <script src="{{ asset('js/app.js') }}"></script>
+    </main>
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
@@ -816,296 +301,8 @@
     <script src="https://code.jquery.com/jquery-migrate-3.3.2.min.js"></script>
     <!-- Bootstrap JS -->
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="{{ asset('js/app.js') }}"></script>
 
-    <script>
-        var multipleCardCarousel = document.querySelector(
-            "#carouselExampleControls"
-        );
-        if (window.matchMedia("(min-width: 1025px)").matches) {
-            var carousel = new bootstrap.Carousel(multipleCardCarousel, {
-                interval: false,
-            });
-            var carouselWidth = $(".carousel-inner")[0].scrollWidth;
-            var cardWidth = $(".carousel-item").width();
-            var scrollPosition = 0;
-            $("#carouselExampleControls .carousel-control-prev").hide();
-            $("#carouselExampleControls .carousel-control-next").on("click", function() {
-                if (scrollPosition < carouselWidth - cardWidth * 5) {
-                    scrollPosition += cardWidth * 5;
-                    $("#carouselExampleControls .carousel-inner").animate({
-                            scrollLeft: scrollPosition
-                        },
-                        600
-                    );
-                    if (scrollPosition > 0) {
-                        $("#carouselExampleControls .carousel-control-prev").show();
-                    }
-                    if (scrollPosition > carouselWidth - cardWidth * 6) {
-                        $("#carouselExampleControls .carousel-control-next").hide();
-                    }
-                }
-            });
-            $("#carouselExampleControls .carousel-control-prev").on("click", function() {
-                if (scrollPosition > 0) {
-                    scrollPosition -= cardWidth * 5;
-                    $("#carouselExampleControls .carousel-inner").animate({
-                            scrollLeft: scrollPosition
-                        },
-                        600
-                    );
-                    if (scrollPosition <= 0) {
-                        $("#carouselExampleControls .carousel-control-prev").hide();
-                    }
-                    if (scrollPosition < carouselWidth - cardWidth * 6) {
-                        $("#carouselExampleControls .carousel-control-next").show();
-                    }
-                }
-            });
-        } else if (window.matchMedia("(min-width: 1024px)").matches) {
-            var carousel = new bootstrap.Carousel(multipleCardCarousel, {
-                interval: false,
-            });
-            var carouselWidth = $(".carousel-inner")[0].scrollWidth;
-            var cardWidth = $(".carousel-item").width();
-            var scrollPosition = 0;
-            $("#carouselExampleControls .carousel-control-prev").hide();
-            $("#carouselExampleControls .carousel-control-next").on("click", function() {
-                if (scrollPosition < carouselWidth - cardWidth * 3) {
-                    scrollPosition += cardWidth * 3;
-                    $("#carouselExampleControls .carousel-inner").animate({
-                            scrollLeft: scrollPosition
-                        },
-                        600
-                    );
-                    if (scrollPosition > 0) {
-                        $("#carouselExampleControls .carousel-control-prev").show();
-                    }
-                    if (scrollPosition > carouselWidth - cardWidth * 3) {
-                        $("#carouselExampleControls .carousel-control-next").hide();
-                    }
-                }
-            });
-            $("#carouselExampleControls .carousel-control-prev").on("click", function() {
-                if (scrollPosition > 0) {
-                    scrollPosition -= cardWidth * 3;
-                    $("#carouselExampleControls .carousel-inner").animate({
-                            scrollLeft: scrollPosition
-                        },
-                        600
-                    );
-                    if (scrollPosition <= 0) {
-                        $("#carouselExampleControls .carousel-control-prev").hide();
-                    }
-                    if (scrollPosition < carouselWidth - cardWidth * 3) {
-                        $("#carouselExampleControls .carousel-control-next").show();
-                    }
-                }
-            });
-        } else {
-            $(multipleCardCarousel).addClass("slide");
-        }
-
-        document.addEventListener("DOMContentLoaded", function() {
-            const scrollContainer = document.querySelector('.carousel-inner');
-            const prevButton = document.querySelector('#carouselExampleControls .carousel-control-prev');
-            const nextButton = document.querySelector('#carouselExampleControls .carousel-control-next');
-            let isMouseDown = false;
-            let startX, scrollLeft;
-
-            scrollContainer.addEventListener('mousedown', (e) => {
-                isMouseDown = true;
-                startX = e.pageX - scrollContainer.offsetLeft;
-                scrollLeft = scrollContainer.scrollLeft;
-            });
-
-            scrollContainer.addEventListener('mouseleave', () => {
-                isMouseDown = false;
-            });
-
-            scrollContainer.addEventListener('mouseup', () => {
-                isMouseDown = false;
-            });
-
-            scrollContainer.addEventListener('mousemove', (e) => {
-                if (!isMouseDown) return;
-                e.preventDefault();
-                const x = e.pageX - scrollContainer.offsetLeft;
-                const walk = (x - startX) * 2; //scroll-fast
-                scrollContainer.scrollLeft = scrollLeft - walk;
-
-                // Update button visibility
-                const maxScrollLeft = scrollContainer.scrollWidth - scrollContainer.clientWidth;
-                if (scrollContainer.scrollLeft <= 0) {
-                    prevButton.style.display = 'none';
-                } else {
-                    prevButton.style.display = 'block';
-                }
-                if (scrollContainer.scrollLeft >= maxScrollLeft) {
-                    nextButton.style.display = 'none';
-                } else {
-                    nextButton.style.display = 'block';
-                }
-            });
-        });
-
-        //2
-        var multipleCardCarousel = document.querySelector(
-            "#carouselExampleControls2"
-        );
-        if (window.matchMedia("(min-width: 1025px)").matches) {
-            var carousel = new bootstrap.Carousel(multipleCardCarousel, {
-                interval: false,
-            });
-            var carouselWidth = $(".carousel-inner")[0].scrollWidth;
-            var cardWidth = $(".carousel-item").width();
-            var scrollPosition = 0;
-            $("#carouselExampleControls2 .carousel-control-prev").hide();
-            $("#carouselExampleControls2 .carousel-control-next").on("click", function() {
-                if (scrollPosition < carouselWidth - cardWidth * 5) {
-                    scrollPosition += cardWidth * 5;
-                    $("#carouselExampleControls2 .carousel-inner").animate({
-                            scrollLeft: scrollPosition
-                        },
-                        600
-                    );
-                    if (scrollPosition > 0) {
-                        $("#carouselExampleControls2 .carousel-control-prev").show();
-                    }
-                    if (scrollPosition > carouselWidth - cardWidth * 6) {
-                        $("#carouselExampleControls2 .carousel-control-next").hide();
-                    }
-                }
-            });
-            $("#carouselExampleControls2 .carousel-control-prev").on("click", function() {
-                if (scrollPosition > 0) {
-                    scrollPosition -= cardWidth * 5;
-                    $("#carouselExampleControls2 .carousel-inner").animate({
-                            scrollLeft: scrollPosition
-                        },
-                        600
-                    );
-                    if (scrollPosition <= 0) {
-                        $("#carouselExampleControls2 .carousel-control-prev").hide();
-                    }
-                    if (scrollPosition < carouselWidth - cardWidth * 6) {
-                        $("#carouselExampleControls2 .carousel-control-next").show();
-                    }
-                }
-            });
-        } else if (window.matchMedia("(min-width: 1024px)").matches) {
-            var carousel = new bootstrap.Carousel(multipleCardCarousel, {
-                interval: false,
-            });
-            var carouselWidth = $(".carousel-inner")[0].scrollWidth;
-            var cardWidth = $(".carousel-item").width();
-            var scrollPosition = 0;
-            $("#carouselExampleControls2 .carousel-control-prev").hide();
-            $("#carouselExampleControls2 .carousel-control-next").on("click", function() {
-                if (scrollPosition < carouselWidth - cardWidth * 3) {
-                    scrollPosition += cardWidth * 3;
-                    $("#carouselExampleControls2 .carousel-inner").animate({
-                            scrollLeft: scrollPosition
-                        },
-                        600
-                    );
-                    if (scrollPosition > 0) {
-                        $("#carouselExampleControls2 .carousel-control-prev").show();
-                    }
-                    if (scrollPosition > carouselWidth - cardWidth * 3) {
-                        $("#carouselExampleControls2 .carousel-control-next").hide();
-                    }
-                }
-            });
-            $("#carouselExampleControls2 .carousel-control-prev").on("click", function() {
-                if (scrollPosition > 0) {
-                    scrollPosition -= cardWidth * 3;
-                    $("#carouselExampleControls2 .carousel-inner").animate({
-                            scrollLeft: scrollPosition
-                        },
-                        600
-                    );
-                    if (scrollPosition <= 0) {
-                        $("#carouselExampleControls2 .carousel-control-prev").hide();
-                    }
-                    if (scrollPosition < carouselWidth - cardWidth * 3) {
-                        $("#carouselExampleControls2 .carousel-control-next").show();
-                    }
-                }
-            });
-        } else {
-            $(multipleCardCarousel).addClass("slide");
-        }
-
-        document.addEventListener("DOMContentLoaded", function() {
-            const scrollContainer = document.querySelector('.carousel-inner2');
-            const prevButton = document.querySelector('#carouselExampleControls2 .carousel-control-prev');
-            const nextButton = document.querySelector('#carouselExampleControls2 .carousel-control-next');
-            let isMouseDown = false;
-            let startX, scrollLeft;
-
-            scrollContainer.addEventListener('mousedown', (e) => {
-                isMouseDown = true;
-                startX = e.pageX - scrollContainer.offsetLeft;
-                scrollLeft = scrollContainer.scrollLeft;
-            });
-
-            scrollContainer.addEventListener('mouseleave', () => {
-                isMouseDown = false;
-            });
-
-            scrollContainer.addEventListener('mouseup', () => {
-                isMouseDown = false;
-            });
-
-            scrollContainer.addEventListener('mousemove', (e) => {
-                if (!isMouseDown) return;
-                e.preventDefault();
-                const x = e.pageX - scrollContainer.offsetLeft;
-                const walk = (x - startX) * 2; //scroll-fast
-                scrollContainer.scrollLeft = scrollLeft - walk;
-
-                // Update button visibility
-                const maxScrollLeft = scrollContainer.scrollWidth - scrollContainer.clientWidth;
-                if (scrollContainer.scrollLeft <= 0) {
-                    prevButton.style.display = 'none';
-                } else {
-                    prevButton.style.display = 'block';
-                }
-                if (scrollContainer.scrollLeft >= maxScrollLeft) {
-                    nextButton.style.display = 'none';
-                } else {
-                    nextButton.style.display = 'block';
-                }
-            });
-        });
-
-        let slideIndex = 0;
-        const texts = [
-            "Malaysia Best-Selling Japanese Store",
-            "Discover Authentic Japanese Products",
-            "Experience Japan at Your Doorstep"
-        ];
-        const slideText = document.querySelector(".slideshow-text");
-
-        function showSlides() {
-            slideText.classList.remove("show"); // Start fade-out
-
-            setTimeout(() => {
-                slideText.textContent = texts[slideIndex]; // Update text content
-                slideText.classList.add("show"); // Start fade-in
-            }, 1000); // Wait for fade-out to complete (1 second)
-
-            slideIndex++;
-            if (slideIndex >= texts.length) {
-                slideIndex = 0; // Loop back to the first text
-            }
-
-            setTimeout(showSlides, 4000); // Change text every 4 seconds
-        }
-
-        showSlides();
-    </script>
+    <script></script>
 </body>
 
 </html>

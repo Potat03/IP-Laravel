@@ -1,12 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    @vite(['resources/css/app.css','resources/sass/app.scss', 'resources/js/app.js', 'resources/css/admin-nav.css','resources/js/bootstrap.js'])
 </head>
+
 <body>
     <div class="container">
+
+        @if (session('unauthorized_access'))
+        <div class="alert alert-danger">
+            {{ session('unauthorized_access') }}
+        </div>
+        @endif
+
+
         <div class="row">
             <div class="col-md-6 offset-md-3">
                 <div class="card">
@@ -15,7 +26,7 @@
                     </div>
                     <div class="card-body">
                         <form action="/api/login" method="post">
-                        @csrf
+                            @csrf
                             <div class="form-group">
                                 <label for="email">Email</label>
                                 <input type="email" name="email" class="form-control">
@@ -34,22 +45,23 @@
 
     <script>
         form = document.querySelector('form');
-        form.addEventListener('submit', function(e){
+        form.addEventListener('submit', function(e) {
             e.preventDefault();
             let formData = new FormData(form);
             fetch('/api/login', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if(data.status == 'success'){
-                    alert('Login Success');
-                }else{
-                    alert('Login Failed');
-                }
-            })
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status == 'success') {
+                        alert('Login Success');
+                    } else {
+                        alert('Login Failed');
+                    }
+                })
         })
     </script>
 </body>
+
 </html>

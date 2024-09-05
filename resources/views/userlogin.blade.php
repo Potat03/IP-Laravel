@@ -76,7 +76,7 @@
                                     </label>
                                     <label>
                                         <span>Confirm Password</span>
-                                        <input type="password" name="password_retype" required />
+                                        <input type="password" name="password_confirmation" required />
                                     </label>
                                 </div>
                                 <button type="submit" class="submit">Sign Up</button>
@@ -112,6 +112,7 @@
                             alert('Operation Success');
                         } else {
                             alert('Operation Failed');
+                            console.log(data.message);
                         }
                     })
                     .catch(error => {

@@ -11,7 +11,7 @@ class PromotionItem extends Model
 
     protected $table = 'promotion_item';
 
-    protected $primaryKey = ['promotion_id', 'product_id'];
+    protected $primaryKey = 'id';
 
     protected $fillable = [
         'promotion_id',
