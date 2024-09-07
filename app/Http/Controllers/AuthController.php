@@ -36,13 +36,33 @@ class AuthController extends Controller
             'password' => 'required|min:8|confirmed',
         ]);
 
+        //Store data in session
+        session([
+            'registration_data' => [
+                'email' => $request->email,
+            ]
+        ]);
+
         $response = AuthFacade::register($request->all());
 
-        if (isset($response['success']) && $response['success']) {
-            return response()->json($response, 200);
-        }
-
         return response()->json($response, 400);
+    }
+
+    public function verify(Request $request)
+    {
+        $request->validate([
+            'otp1' => 'required|numeric',
+            'otp2' => 'required|numeric',
+            'otp3' => 'required|numeric',
+            'otp4' => 'required|numeric',
+            'otp5' => 'required|numeric',
+            'otp6' => 'required|numeric',
+        ]);
+
+        $otp = $request->otp1 . $request->otp2 . $request->otp3 . $request->otp4 . $request->otp5 . $request->otp6;
+
+        if (session('otp_code') == $request->otp) {
+        }
     }
 
     public function logout()
