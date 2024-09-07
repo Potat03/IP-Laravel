@@ -30,7 +30,6 @@
             display: inline-block;
             opacity: 0;
             transition: opacity 1s ease-in-out;
-            /* Adjust transition to 1 second */
         }
 
         .overlay {
@@ -39,7 +38,6 @@
             left: 0;
             width: 100%;
             background-color: rgba(0, 0, 0, 0.5);
-            /* Adjust opacity as needed */
             z-index: 1;
         }
 
@@ -134,7 +132,6 @@
         .card img {
             max-height: 100%;
             -webkit-user-drag: none;
-            /* For WebKit browsers (e.g., Chrome, Safari) */
             user-select: none;
         }
 
@@ -257,49 +254,58 @@
         </div>
         <div class="col-md-9">
             <div class="row">
-                @for ($i = 0; $i < 10; $i++)
-                    <div class="col-md-2-4 mb-4">
-                        <a href="{{ url('product') }}" class="text-decoration-none text-dark">
-                            <div class="card h-100">
-                                <div class="badge bg-dark text-white position-absolute w-50 d-flex align-items-center justify-content-center fs-5"
-                                    style="top: 0.5rem; left: 0rem; border-radius: 0 5px 5px 0;">
-                                    <span class="fs-5">Best Seller</span>
-                                </div>
-                                <div class="card-img-top">
-                                    <img src="{{ URL('storage/images/pokemon.png') }}" class="d-block w-100"
-                                        alt="product image" width="280" height="300">
-                                </div>
-                                <div class="card-body">
-                                    <p class="card-text mb-1 fs-5 fs-lg-5 fs-xl-3">Product {{ $i + 1 }}</p>
-                                    <h4 class="card-text fw-bold mb-2 fs-5 fs-xl-3">RM40.00 - RM80.00</h4>
-                                    <div class="d-flex justify-content align-items-center small text-warning">
-                                        <i class="bi bi-star-fill me-1"></i>
-                                        <i class="bi bi-star-fill me-1"></i>
-                                        <i class="bi bi-star-fill me-1"></i>
-                                        <i class="bi bi-star-fill me-1"></i>
-                                        <i class="bi bi-star-fill me-1"></i>
-                                        <span class="text-dark ms-lg-2">(20)</span>
+                @forelse ($products as $product)
+                    @if ($product->status == 'active')
+                        <div class="col-md-2-4 mb-4">
+                            <a href="{{ url('product/' . $product->product_id) }}"
+                                class="text-decoration-none text-dark">
+                                <div class="card h-100">
+                                    @if ($product->is_new)
+                                        <div class="badge bg-dark text-white position-absolute w-50 d-flex align-items-center justify-content-center fs-5"
+                                            style="top: 0.5rem; left: 0rem; border-radius: 0 5px 5px 0;">
+                                            {{-- <span class="fs-5">Best Seller</span> --}}
+                                            <span class="fs-5">New Arrival</span>
+                                        </div>
+                                    @endif
+
+                                    <div class="card-img-top">
+                                        <img src="{{ URL('storage/images/pokemon.png') }}" class="d-block w-100"
+                                            alt="product image" width="280" height="300">
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="card-text mb-1 fs-5 fs-lg-5 fs-xl-3">{{ $product->name }}</p>
+                                        <h4 class="card-text fw-bold mb-2 fs-5 fs-xl-3">RM {{ $product->price }}</h4>
+                                        <div class="d-flex justify-content align-items-center small text-warning">
+                                            @for ($i = 0; $i < 5; $i++)
+                                                <i class="bi bi-star-fill me-1"></i>
+                                            @endfor
+                                            <span class="text-dark ms-lg-2">(20)</span>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer p-3 pt-0 border-top-0 bg-transparent">
+                                        <div class="text-center text-uppercase">
+                                            <a class="btn btn-outline-dark mt-auto w-100 fw-bold" href="#">Add
+                                                to
+                                                Cart</a>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="card-footer p-3 pt-0 border-top-0 bg-transparent">
-                                    <div class="text-center text-uppercase">
-                                        <a class="btn btn-outline-dark mt-auto w-100 fw-bold" href="#">Add to
-                                            Cart</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                @endfor
+                            </a>
+                        </div>
+                    @endif
+                @empty
+                    <p>No products found.</p>
+                @endforelse
+
+                <div class="justify-content-center mt-4">
+                    {{ $products->links() }}
+                </div>
             </div>
         </div>
     </main>
 
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <!-- jQuery migrate (for compatibility with older jQuery versions) -->
     <script src="https://code.jquery.com/jquery-migrate-3.3.2.min.js"></script>
-    <!-- Bootstrap JS -->
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
     <script></script>

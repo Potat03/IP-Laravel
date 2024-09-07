@@ -66,4 +66,23 @@ class Product extends Model
     {
         return $this->belongsToMany(Category::class, 'product_categories', 'product_id', 'category_name');
     }
+
+    public function getIsNewAttribute()
+    {
+        $newArrivalThreshold = now()->subDays(30); // 30-day threshold for new arrivals
+        return $this->created_at > $newArrivalThreshold;
+    }
+
+    public function getProductType()
+    {
+        if ($this->wearable) {
+            return 'Wearable';
+        } elseif ($this->consumable) {
+            return 'Consumable';
+        } elseif ($this->collectible) {
+            return 'Collectible';
+        }
+
+        return 'Other'; // or return null if you prefer
+    }
 }

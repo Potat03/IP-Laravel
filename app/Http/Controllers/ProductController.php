@@ -19,22 +19,22 @@ class ProductController extends Controller
                 'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg',
             ]);
 
-            
+
             $imageName = "main.png";
 
-            if($request->has('id')){
+            if ($request->has('id')) {
                 $folderPath = 'storage/images/products/' . $request->id;
-            }else{
+            } else {
                 $folderPath = 'storage/images/products/' . time();
             }
-            
+
 
             if (!file_exists(public_path($folderPath))) {
                 mkdir(public_path($folderPath), 0777, true);
             }
 
             $request->image->move(public_path($folderPath), $imageName);
-    
+
             return response()->json(['success' => true, 'message' => 'You have successfully uploaded an image.'], 200);
         } catch (Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
@@ -70,7 +70,7 @@ class ProductController extends Controller
             $product->status = $request->status;
             $product->save();
 
-    
+
             return response()->json(['success' => true, 'message' => 'You have successfully added a product.'], 200);
         } catch (Exception $e) {
             return response()->json(['failure' => false, 'message' => $e->getMessage()], 400);
@@ -103,11 +103,17 @@ class ProductController extends Controller
     }
 
     // Read all products
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $products = Product::all();
-            return response()->json($products);
+            $query = $request->input('search');
+
+            if ($query) {
+                $products = Product::where('name', 'LIKE', "%$query%")->paginate(20);
+            } else {
+                $products = Product::paginate(20);
+            }
+            return view('shop', ['products' => $products]);
         } catch (Exception $e) {
             Log::error('Fetching products failed: ' . $e->getMessage());
             return response()->json(['error' => 'Fetching products failed.'], 500);
@@ -119,9 +125,15 @@ class ProductController extends Controller
     {
         try {
             $product = Product::findOrFail($id);
-            return response()->json($product);
+
+            if (!$product || $product->status != 'active') {
+                return response()->view('errors.404', [], 404);
+            }
+
+            return view('product', ['product' => $product]);
         } catch (ModelNotFoundException $e) {
-            return response()->json(['error' => 'Product not found.'], 404);
+            return view('errors.404');
+            // return response()->json(['error' => 'Product not found.'], 404);
         } catch (Exception $e) {
             // Log the error
             Log::error('Fetching product failed: ' . $e->getMessage());
@@ -172,5 +184,15 @@ class ProductController extends Controller
             Log::error('Deleting product failed: ' . $e->getMessage());
             return response()->json(['error' => 'Deleting product failed.'], 500);
         }
+    }
+
+    public function showNewArrivals()
+    {
+        $newArrivals = Product::where('created_at', '>=', now()->subDays(30))
+            ->orderBy('created_at', 'desc')
+            ->take(10)
+            ->get();
+
+        return view('home', compact('newArrivals'));
     }
 }

@@ -5,6 +5,7 @@ use App\Http\Middleware\AdminAuth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\ChatMessageController;
+use App\Http\Controllers\ProductController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -27,13 +28,12 @@ Route::get('/home', function() {
     return view('home');
 });
 
-Route::get('/shop', function() {
-    return view('shop');
-});
+Route::get('/home', [ProductController::class, 'showNewArrivals']);
 
-Route::get('/product', function() {
-    return view('product');
-});
+Route::get('/shop', [ProductController::class, 'index']);
+
+Route::get('/product/{id}', [ProductController::class, 'show'])->name('product');
+
 
 Route::get('/cart', function () {
     return view('cart');

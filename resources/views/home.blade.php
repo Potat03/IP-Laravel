@@ -287,36 +287,40 @@
 
             <div id="carouselExampleControls" class="carousel">
                 <div class="carousel-inner">
-                    @for ($i = 0; $i < 10; $i++)
-                        <div class="carousel-item {{ $i == 0 ? 'active' : '' }}">
-                            <div class="card h-100">
-                                <div class="badge bg-dark text-white position-absolute w-50 d-flex align-items-center justify-content-center fs-5"
-                                    style="top: 0.5rem; left: 0rem; border-radius: 0 5px 5px 0;"><span
-                                        class="fs-4">New</span></div>
-                                <div class="card-img-top"><img src="{{ URL('storage/images/pokemon.png') }}"
-                                        class="d-block w-100" alt="product image" width="280" height="300">
-                                </div>
-                                <div class="card-body">
-                                    <p class="card-text mb-1 fs-5 fs-lg-5 fs-xl-3">Product {{ $i + 1 }}</p>
-                                    <h4 class="card-text fw-bold mb-2 fs-5 fs-xl-3">RM40.00 - RM80.00</h4>
-                                    <div class="d-flex justify-content align-items-center small text-warning">
-                                        <i class="bi bi-star-fill me-1"></i>
-                                        <i class="bi bi-star-fill me-1"></i>
-                                        <i class="bi bi-star-fill me-1"></i>
-                                        <i class="bi bi-star-fill me-1"></i>
-                                        <i class="bi bi-star-fill me-1"></i>
-                                        <span class="text-dark ms-lg-2">(20)</span>
+                    @foreach ($newArrivals as $index => $product)
+                        <div class="carousel-item {{ $index == 0 ? 'active' : '' }}">
+                            <a href="{{ url('product/' . $product->product_id) }}" class="text-decoration-none text-dark"
+                                draggable="false">
+                                <div class="card h-100">
+                                    <div class="badge bg-dark text-white position-absolute w-50 d-flex align-items-center justify-content-center fs-5"
+                                        style="top: 0.5rem; left: 0rem; border-radius: 0 5px 5px 0;"><span
+                                            class="fs-4">New</span></div>
+                                    <div class="card-img-top">
+                                        <img src="{{ URL('storage/images/pokemon.png') }}"
+                                            class="d-block w-100" alt="{{ $product->name }}" width="280"
+                                            height="300">
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="card-text mb-1 fs-5 fs-lg-5 fs-xl-3">{{ $product->name }}</p>
+                                        <h4 class="card-text fw-bold mb-2 fs-5 fs-xl-3">RM {{ $product->price }}</h4>
+                                        <div class="d-flex justify-content align-items-center small text-warning">
+                                            @for ($i = 0; $i < 5; $i++)
+                                                <i class="bi bi-star me-1"></i>
+                                            @endfor
+                                            <span class="text-dark ms-lg-2">({{ $product->reviews_count }})</span>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer p-3 pt-0 border-top-0 bg-transparent">
+                                        <div class="text-center text-uppercase">
+                                            <a class="btn btn-outline-dark mt-auto w-100 fw-bold" href="#">Add
+                                                to
+                                                Cart</a>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="card-footer p-3 pt-0 border-top-0 bg-transparent">
-                                    <div class="text-center text-uppercase"><a
-                                            class="btn btn-outline-dark mt-auto w-100 fw-bold" href="#">Add to
-                                            Cart</a>
-                                    </div>
-                                </div>
-                            </div>
+                            </a>
                         </div>
-                    @endfor
+                    @endforeach
                 </div>
                 <button class="carousel-control-prev bg-dark" type="button"
                     data-bs-target="#carouselExampleControls" data-bs-slide="prev">
@@ -329,7 +333,6 @@
                     <span class="visually-hidden">Next</span>
                 </button>
             </div>
-        </div>
     </section>
 
     <!-- Best Sellers -->
@@ -348,32 +351,35 @@
                 <div class="carousel-inner carousel-inner2">
                     @for ($i = 0; $i < 10; $i++)
                         <div class="carousel-item {{ $i == 0 ? 'active' : '' }}">
-                            <div class="card h-100">
-                                <div class="badge bg-dark text-white position-absolute w-50 d-flex align-items-center justify-content-center fs-5"
-                                    style="top: 0.5rem; left: 0rem; border-radius: 0 5px 5px 0;"><span
-                                        class="fs-4">Best Seller</span></div>
-                                <div class="card-img-top"><img src="{{ URL('storage/images/pokemon.png') }}"
-                                        class="d-block w-100" alt="product image" width="280" height="300">
-                                </div>
-                                <div class="card-body">
-                                    <p class="card-text mb-1 fs-5 fs-lg-5 fs-xl-3">Product {{ $i + 1 }}</p>
-                                    <h4 class="card-text fw-bold mb-2 fs-5 fs-xl-3">RM40.00 - RM80.00</h4>
-                                    <div class="d-flex justify-content align-items-center small text-warning">
-                                        <i class="bi bi-star-fill me-1"></i>
-                                        <i class="bi bi-star-fill me-1"></i>
-                                        <i class="bi bi-star-fill me-1"></i>
-                                        <i class="bi bi-star-fill me-1"></i>
-                                        <i class="bi bi-star-fill me-1"></i>
-                                        <span class="text-dark ms-lg-2">(20)</span>
+                            <a href="{{ url('product') }}" class="text-decoration-none text-dark" draggable="false">
+                                <div class="card h-100">
+                                    <div class="badge bg-dark text-white position-absolute w-50 d-flex align-items-center justify-content-center fs-5"
+                                        style="top: 0.5rem; left: 0rem; border-radius: 0 5px 5px 0;"><span
+                                            class="fs-4">Best Seller</span></div>
+                                    <div class="card-img-top"><img src="{{ URL('storage/images/pokemon.png') }}"
+                                            class="d-block w-100" alt="product image" width="280" height="300">
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="card-text mb-1 fs-5 fs-lg-5 fs-xl-3">Product {{ $i + 1 }}</p>
+                                        <h4 class="card-text fw-bold mb-2 fs-5 fs-xl-3">RM40.00 - RM80.00</h4>
+                                        <div class="d-flex justify-content align-items-center small text-warning">
+                                            <i class="bi bi-star-fill me-1"></i>
+                                            <i class="bi bi-star-fill me-1"></i>
+                                            <i class="bi bi-star-fill me-1"></i>
+                                            <i class="bi bi-star-fill me-1"></i>
+                                            <i class="bi bi-star-fill me-1"></i>
+                                            <span class="text-dark ms-lg-2">(20)</span>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer p-3 pt-0 border-top-0 bg-transparent">
+                                        <div class="text-center text-uppercase"><a
+                                                class="btn btn-outline-dark mt-auto w-100 fw-bold" href="#">Add
+                                                to
+                                                Cart</a>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="card-footer p-3 pt-0 border-top-0 bg-transparent">
-                                    <div class="text-center text-uppercase"><a
-                                            class="btn btn-outline-dark mt-auto w-100 fw-bold" href="#">Add to
-                                            Cart</a>
-                                    </div>
-                                </div>
-                            </div>
+                            </a>
                         </div>
                     @endfor
                 </div>
