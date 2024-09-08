@@ -5,7 +5,10 @@ use App\Http\Middleware\AdminAuth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\ChatMessageController;
+use App\Http\Controllers\CollectiblesController;
+use App\Http\Controllers\ConsumablesController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\WearableController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -30,7 +33,10 @@ Route::get('/home', function() {
 
 Route::get('/home', [ProductController::class, 'showNewArrivals']);
 
-Route::get('/shop', [ProductController::class, 'index']);
+Route::get('/shop', [ProductController::class, 'index'])->name('shop.index');;
+Route::get('/shop/wearable', [WearableController::class, 'index'])->name('shop.wearable');
+Route::get('/shop/consumable', [ConsumablesController::class, 'index'])->name('shop.consumable');
+Route::get('/shop/collectible', [CollectiblesController::class, 'index'])->name('shop.collectible');
 
 Route::get('/product/{id}', [ProductController::class, 'show'])->name('product');
 

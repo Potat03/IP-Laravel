@@ -1,6 +1,6 @@
 @extends('layout.shop')
 
-@section('title', 'Shop')
+@section('title', 'Wearable')
 
 @section('content')
     <div class="flex-shrink-0 p-3 bg-white d-flex flex-column">
