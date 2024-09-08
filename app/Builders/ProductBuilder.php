@@ -43,7 +43,7 @@ class ProductBuilder implements ProductBuilderInterface
         return $this;
     }
 
-    public function build(): Product
+    public function build():Product
     {
         return $this->product;
     }

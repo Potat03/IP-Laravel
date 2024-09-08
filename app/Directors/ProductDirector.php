@@ -15,11 +15,17 @@ class ProductDirector
 
     public function construct(array $productData, array $specificAttributes)
     {
-        $this->builder->setProductName($productData['name']);
-        $this->builder->setProductDescription($productData['description']);
-        $this->builder->setProductPrice($productData['price']);
-        $this->builder->setProductStock($productData['stock']);
-        $this->builder->setSpecificAttributes($specificAttributes);
+        $this->builder->setName($productData['name']);
+        $this->builder->setDescription($productData['description']);
+        $this->builder->setPrice($productData['price']);
+        $this->builder->setStock($productData['stock']);
+        $this->builder->setStatus($productData['status']);
+
+        foreach($productData as $attribute => $value){
+            if (method_exists($this->builder, "set" . ucfirst($attribute))) {
+                $this->builder->{"set" . ucfirst($attribute)}($value);
+            }
+        }
 
         return $this->builder->build();
     }

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Directors\ProductDirector;
+use App\Builders\ConsumableBuilder;
 use App\Models\Consumable;
 use App\Models\Product;
 use Exception;
@@ -10,6 +12,33 @@ use Illuminate\Support\Facades\Log;
 
 class ConsumablesController extends Controller
 {
+    public function store(Request $request)
+    {
+        $request->validate([
+            'expiry_date' => 'required|date',
+            'portion' => 'required|integer|min:1',
+            'is_halal' => 'required|in:0,1'
+        ]);
+
+        $builder = new ConsumableBuilder();
+        
+        $director = new ProductDirector($builder);
+
+        $consumable = $director->construct(
+            [
+                'expiry_date' => $request->expiry_date,
+                'portion' => $request->portion,
+                'is_halal' => $request->is_halal,
+            ],
+            $request->specificAttributes
+        );
+
+        // Save the product
+        $consumable->save();
+
+        return response()->json(['success' => true, 'message' => 'Consumable product added successfully.'], 200);
+    }
+
     public function index(Request $request)
     {
         try {

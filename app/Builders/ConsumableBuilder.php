@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Builder;
+namespace App\Builders;
 
-use App\Builders\ProductBuilder;
 use App\Models\Consumable;
 
-class ConsumableBuilder extends ProductBuilder
+class ConsumableBuilder implements ProductBuilderInterface
 {
     private $consumable;
 
@@ -60,5 +59,11 @@ class ConsumableBuilder extends ProductBuilder
     {
         $this->consumable->is_halal = $isHalal;
         return $this;
+    }
+
+    // Return the built product
+    public function build():Consumable
+    {
+        return $this->consumable;
     }
 }
