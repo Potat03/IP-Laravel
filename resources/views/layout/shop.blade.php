@@ -212,6 +212,10 @@
     </nav>
 
     <main class="pt-5">
+        @if (View::hasSection('prodTitle'))
+            @yield('prodTitle')
+        @endif
+
         @yield('content')
     </main>
 

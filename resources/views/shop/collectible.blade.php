@@ -44,6 +44,7 @@
         </div>
     </div>
     <div class="col-md-9">
+        <h1 class="mb-4">Collectible</h1>
         <div class="row">
             @forelse ($products as $product)
                 @if ($product->status == 'active')
