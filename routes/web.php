@@ -1,8 +1,14 @@
 <?php
 
 use App\Http\Middleware\customAuth;
+use App\Http\Middleware\AdminAuth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\ChatMessageController;
+use App\Http\Controllers\CollectiblesController;
+use App\Http\Controllers\ConsumablesController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\WearableController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -25,13 +31,15 @@ Route::get('/home', function() {
     return view('home');
 });
 
-Route::get('/shop', function() {
-    return view('shop');
-});
+Route::get('/home', [ProductController::class, 'showNewArrivals']);
 
-Route::get('/product', function() {
-    return view('product');
-});
+Route::get('/shop', [ProductController::class, 'index'])->name('shop.index');;
+Route::get('/shop/wearable', [WearableController::class, 'index'])->name('shop.wearable');
+Route::get('/shop/consumable', [ConsumablesController::class, 'index'])->name('shop.consumable');
+Route::get('/shop/collectible', [CollectiblesController::class, 'index'])->name('shop.collectible');
+
+Route::get('/product/{id}', [ProductController::class, 'show'])->name('product');
+
 
 Route::get('/cart', function () {
     return view('cart');
@@ -104,3 +112,29 @@ Route::get('/cc2', function () {
 Route::get('/chat', [ChatController::class, 'index']);
 Route::post('/chat', [ChatController::class, 'store']);
 Route::get('/chat/{chatId}', [ChatController::class, 'show']);
+
+
+
+
+
+use App\Http\Controllers\AuthController;
+
+
+
+
+use App\Http\Controllers\AdminController;
+Route::post('/admin', [AdminController::class, 'create'])->name('admin.create');
+
+
+Route::get('login2', [AuthController::class, 'showLoginForm'])->name('login2');
+
+Route::middleware([AdminAuth::class])->group(function () {
+    Route::get('/testchat', function () {
+        return view('chatConnectionTest');
+    }); 
+    
+    Route::post('login2', [AuthController::class, 'login']);
+    Route::post('logout2', [AuthController::class, 'logout'])->name('logout2');
+    Route::post('/send-message', [ChatMessageController::class, 'sendMessage'])->name('send.message');
+    Route::get('/get-messages', [ChatMessageController::class, 'getMessages'])->name('get.messages');
+});

@@ -9,6 +9,8 @@ class ChatMessage extends Model
 {
     use HasFactory;
 
+    public $timestamps = false;
+
     protected $table = 'chat_messages';
 
     protected $primaryKey = 'message_id';
@@ -16,7 +18,8 @@ class ChatMessage extends Model
     protected $fillable = [
         'chat_id',
         'by_customer',
-        'message'
+        'message_content',
+        'message_type'
     ];
 
     public function chat()

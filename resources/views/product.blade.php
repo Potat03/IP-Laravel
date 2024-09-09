@@ -1,13 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('layout.product')
 
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Product Detail</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-    @vite(['resources/sass/app.scss', 'resources/js/app.js', 'resources/css/app.css'])
+@section('title', $product->name)
+
+@push('styles')
     <style>
+        .breadcrumb-item+.breadcrumb-item::before {
+            content: ' > ';
+            padding: 0 0.5rem;
+            color: #6c757d;
+            /* Adjust color if needed */
+        }
+
         .product-detail-container {
             display: flex;
             flex-wrap: wrap;
@@ -53,7 +56,8 @@
         }
 
         /* Variation Button Styling */
-        .btn-variation {
+        .btn-variation,
+        .btn-variation-2 {
             /* Match border color to primary color */
             background-color: #ffffff;
             /* White background for default state */
@@ -176,52 +180,38 @@
             border-bottom: none;
         }
     </style>
-</head>
+@endpush
 
-<body>
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container px-4 px-lg-5">
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
-                    <li class="nav-item"><a class="nav-link active" aria-current="page" href="#!">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#!">About</a></li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button"
-                            data-bs-toggle="dropdown" aria-expanded="false">Shop</a>
-                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <li><a class="dropdown-item" href="#!">All Products</a></li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li><a class="dropdown-item" href="#!">Popular Items</a></li>
-                            <li><a class="dropdown-item" href="#!">New Arrivals</a></li>
-                        </ul>
-                    </li>
-                </ul>
-                <form class="d-flex">
-                    <button class="btn btn-outline-dark" type="submit">
-                        <i class="bi-cart-fill me-1"></i>
-                        Cart
-                        <span class="badge bg-dark text-white ms-1 rounded-pill">0</span>
-                    </button>
-                </form>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Product Detail Section -->
+@section('top')
     <div class="container product-detail-container">
-        <!-- Product Image -->
         <div class="product-image">
             <img src="{{ URL('storage/images/pokemon.png') }}" class="img-fluid" alt="Product Image">
         </div>
 
-        <!-- Product Info -->
         <div class="product-info">
-            <div class="mb-5">
-                <h1 class="fw-bold">Product Name</h1>
-                <h4 class="text-muted">RM 40.00</h4>
+            <div class="row">
+                <h5 class="text-muted">
+                    @php
+                        $productType = $product->getProductType();
+                    @endphp
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a class="text-muted text-decoration-none"
+                                    href="{{ url('/home') }}">Home</a></li>
+                            <li class="breadcrumb-item"><a class="text-muted text-decoration-none"
+                                    href="{{ url('/shop') }}">Shop</a></li>
+                            @if ($productType)
+                                <li class="breadcrumb-item"><a class="text-muted text-decoration-none"
+                                        href="{{ url('/shop/' . strtolower($productType)) }}">{{ $productType }}</a></li>
+                            @endif
+                            <li class="breadcrumb-item active" aria-current="page">{{ $product->name }}</li>
+                        </ol>
+                    </nav>
+                </h5>
+            </div>
+            <div>
+                <h1 class="fw-bold">{{ $product->name }}</h1>
+                <h4 class="text-muted">RM {{ $product->price }}</h4>
                 <div class="d-flex align-items-center text-warning">
                     <i class="bi bi-star-fill me-1"></i>
                     <i class="bi bi-star-fill me-1"></i>
@@ -230,25 +220,57 @@
                     <i class="bi bi-star-fill me-1"></i>
                     <span class="text-dark ms-2">(20)</span>
                 </div>
-                <h4 class="text-muted pt-2">In Stock</h4>
+                <h4 class="text-muted pt-2">{{ $product->stock > 0 ? 'In Stock' : 'Out of Stock' }}</h4>
             </div>
+        @endsection
 
-            <!-- Product Variation -->
-            <div class="mt-1">
-                <h5>Select Variation:</h5>
-                <div class="btn-group" role="group" aria-label="Product Variations">
-                    <button type="button" class="btn btn-variation btn-outline-dark fw-bold"
-                        onclick="selectVariation(this)">Small</button>
-                    <button type="button" class="btn btn-variation btn-outline-dark fw-bold"
-                        onclick="selectVariation(this)">Medium</button>
-                    <button type="button" class="btn btn-variation btn-outline-dark fw-bold"
-                        onclick="selectVariation(this)">Large</button>
-                    <button type="button" class="btn btn-variation btn-outline-dark fw-bold"
-                        onclick="selectVariation(this)">Xtra Large</button>
+        @if ($product->wearable)
+            @section('variation')
+                <div class="mt-5">
+                    @if ($product->wearable->size)
+                        @php
+                            $sizes = explode(',', $product->wearable->size);
+                        @endphp
+
+                        <div class="mb-2">
+                            <h5>Select Size:</h5>
+                            <div class="btn-group" role="group" aria-label="Product Variations">
+                                @foreach ($sizes as $size)
+                                    @php
+                                        // Capitalize the first letter of each size and trim any extra spaces
+                                        $size = ucfirst(trim($size));
+                                    @endphp
+                                    <button type="button" class="btn btn-variation btn-outline-dark fw-bold"
+                                        onclick="selectVariation(this)">{{ trim($size) }}</button>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+
+                    @if ($product->wearable->color)
+                        @php
+                            $colors = explode(',', $product->wearable->color);
+                        @endphp
+
+                        <div class="mt-2">
+                            <h5>Select Color:</h5>
+                            <div class="btn-group" role="group" aria-label="Product Variations">
+                                @foreach ($colors as $color)
+                                    @php
+                                        // Capitalize the first letter of each size and trim any extra spaces
+                                        $color = ucfirst(trim($color));
+                                    @endphp
+                                    <button type="button" class="btn btn-variation-2 btn-outline-dark fw-bold"
+                                        onclick="selectVariation2(this)">{{ trim($color) }}</button>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
                 </div>
-            </div>
+            @endsection
+        @endif
 
-            <!-- Quantity Selector -->
+        @section('mid')
             <div class="quantity-selector mt-4">
                 <h5>Quantity:</h5>
                 <div class="input-group">
@@ -260,27 +282,71 @@
 
             <div class="pt-5 border-top-0 bg-transparent">
                 <div class="text-center text-uppercase">
-                    <a class="btn btn-outline-dark btn-add-to-cart mt-auto w-100 fw-bold" href="#">Add to
-                        Cart</a>
+                    <a class="btn btn-outline-dark btn-add-to-cart mt-auto w-100 fw-bold {{ $product->stock > 0 ? '' : 'disabled' }}"
+                        href="#">Add to Cart</a>
                 </div>
             </div>
 
-            <!-- Product Details -->
             <div class="product-details mt-5">
-                <h5>Product Details:</h5>
+                <h5>Product Description:</h5>
                 <p style="font-size: 1.2rem;">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce auctor eros ac eros vehicula,
-                    eget vehicula lectus scelerisque. Suspendisse nec efficitur sem, in luctus risus.
+                    {{ $product->description }}
+                    @if ($product->collectible)
+                        <hr /><span style="font-size: 1.2rem;">
+                            <h5 style="display: inline; margin: 0;">Supplier:</h5>
+                            {{ $product->collectible->supplier }}
+                        </span>
+
+                    @endif
+
+                    @if ($product->consumable)
+                        <hr /><span style="font-size: 1.2rem;">
+                            <h5 style="display: inline; margin: 0;">Expiry Date:</h5>
+                            {{ \Carbon\Carbon::parse($product->consumable->expire_date)->format('d-m-Y') }} <br />
+                            <h5 style="display: inline; margin: 0;">Portion:</h5>
+                            {{ $product->consumable->portion }}
+                            @if ($product->consumable->portion > 1)
+                                items <br />
+                            @elseif ($product->consumable->portion == 1)
+                                item <br />
+                            @endif
+                            @if ($product->consumable->is_halal)
+                                <h5 style="display: inline; margin: 0;">Halal:</h5> Yes
+                            @else
+                                <h5 style="display: inline; margin: 0;">Halal:</h5> No
+                            @endif
+                        </span>
+
+                    @endif
+
+                    @if ($product->wearable)
+                        @if ($product->wearable->user_group)
+                            @php
+                                $userGroups = explode(',', $product->wearable->user_group);
+                                $userGroups = array_map('trim', $userGroups);
+                                $userGroups = array_map(function ($group) {
+                                    return ucwords(strtolower($group));
+                                }, $userGroups);
+                                $userGroupsList = implode(', ', $userGroups);
+                            @endphp
+
+                            <hr /><span style="font-size: 1.2rem;">
+                                <h5 style="display: inline; margin: 0;">Suitable For:</h5>
+                                {{ $userGroupsList }}
+                            </span>
+                        @endif
+                    @endif
                 </p>
             </div>
         </div>
     </div>
 
-    <!-- Bundle Deal Section -->
+@endsection
+
+@section('bundle')
     <div class="container bundle-deal">
         <h2>Bundle Deal</h2>
         <div class="row">
-            <!-- Bundle Products -->
             <div class="col-md-8">
                 <div class="d-flex flex-wrap">
                     @for ($i = 0; $i < 4; $i++)
@@ -294,17 +360,16 @@
                             </div>
                         </div>
                     @endfor
-                    <!-- Add more bundle items as needed -->
                 </div>
             </div>
 
-            <!-- Bundle Summary -->
             <div class="col-md-4">
                 <div class="bundle-summary">
                     <h3>Total Price: RM 60.00</h3>
                     <div class="pt-3 border-top-0 bg-transparent">
                         <div class="text-center text-uppercase">
-                            <a class="btn btn-outline-dark btn-add-to-cart mt-auto w-100 fw-bold" href="{{ url('/promotion') }}">View More</a>
+                            <a class="btn btn-outline-dark btn-add-to-cart mt-auto w-100 fw-bold"
+                                href="{{ url('/promotion') }}">View More</a>
                         </div>
                     </div>
                 </div>
@@ -312,6 +377,9 @@
         </div>
     </div>
 
+@endsection
+
+@section('bottom')
     <!-- Review Section -->
     <div class="container review-section mb-5">
         <h2>Reviews</h2>
@@ -329,16 +397,27 @@
             </div>
         @endfor
     </div>
+@endsection
 
+@push('scripts')
     <script>
         function selectVariation(element) {
-            // Remove active class from all variation buttons
             var buttons = document.querySelectorAll('.btn-variation');
+
             buttons.forEach(function(button) {
                 button.classList.remove('active');
             });
 
-            // Add active class to the clicked button
+            element.classList.add('active');
+        }
+
+        function selectVariation2(element) {
+            var buttons = document.querySelectorAll('.btn-variation-2');
+
+            buttons.forEach(function(button) {
+                button.classList.remove('active');
+            });
+
             element.classList.add('active');
         }
 
@@ -348,7 +427,7 @@
             var newQuantity = currentQuantity + amount;
 
             if (newQuantity < 1) {
-                newQuantity = 1; // Prevent quantity from going below 1
+                newQuantity = 1;
             }
 
             quantityInput.value = newQuantity;
@@ -363,6 +442,4 @@
             }
         });
     </script>
-</body>
-
-</html>
+@endpush

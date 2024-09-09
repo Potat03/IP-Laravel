@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('collectible', function (Blueprint $table) {
-            $table->id()->references('product_id')->on('product');
+            $table->id('product_id')->references('product_id')->on('product');
             $table->string('supplier');
             $table->timestamps();
         });

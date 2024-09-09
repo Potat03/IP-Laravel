@@ -1,6 +1,6 @@
 @extends('layout.shop')
 
-@section('title', 'Shop')
+@section('title', 'Wearable')
 
 @section('content')
     <div class="flex-shrink-0 p-3 bg-white d-flex flex-column">
@@ -44,6 +44,8 @@
         </div>
     </div>
     <div class="col-md-9">
+        <h1 class="mb-4">Wearable</h1>
+
         <div class="row">
             @forelse ($products as $product)
                 @if ($product->status == 'active')
