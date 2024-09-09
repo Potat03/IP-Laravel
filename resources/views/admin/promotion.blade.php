@@ -13,13 +13,11 @@
 </style>
 @endsection
 
+@section('title', 'Promotion')
+@section('page_title', 'Promotion')
+@section('page_gm', 'Prmotion bring smiles to faces')
+
 @section('content')
-<div>
-    <div class="px-2 py-3">
-        <h1>Promotion</h1>
-        <div class="nav-status text-muted fw-bold">Home > Promotion</div>
-    </div>
-</div>
 <div class="card shadow-sm p-3">
     <div class="card-body">
         <div class="card-title d-flex px-3">
@@ -52,50 +50,6 @@
                 </tr>
             </thead>
             <tbody id="data-holder">
-                <tr>
-                    <th scope="row">1</th>
-                    <td>
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" checked>
-                        </div>
-                    </td>
-                    <td>Christmas Sale</td>
-                    <td><i class="fa-solid fa-cubes"></i><span class="ps-2">Bundle</span></td>
-                    <td>3 products
-                        <a class="text-decoration-none text-secondary ps-1" data-bs-toggle="modal" data-bs-target="#viewProducts"><i class="fa-solid fa-eye"></i></a>
-                    </td>
-                    <td> Feb 1, 2024</td>
-                    <td> Feb 1, 2024</td>
-                    <td>
-                        <span class="badge bg-success">Active</span>
-                    </td>
-                    <td>
-                        <button class="btn btn-warning"><i class="fa-regular fa-pen-to-square pe-2"></i>Edit</button>
-                        <button class="btn btn-danger"><i class="fa-solid fa-trash-can pe-2"></i>Delete</button>
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row">2</th>
-                    <td>
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" checked>
-                        </div>
-                    </td>
-                    <td>Christmas Sale</td>
-                    <td><i class="fa-solid fa-cube"></i><span class="ps-2">Single</span></td>
-                    <td>3 products
-                        <a class="text-decoration-none text-secondary ps-1" data-bs-toggle="modal" data-bs-target="#viewProducts"><i class="fa-solid fa-eye"></i></a>
-                    </td>
-                    <td> Feb 1, 2024</td>
-                    <td> Feb 1, 2024</td>
-                    <td>
-                        <span class="badge bg-success">Active</span>
-                    </td>
-                    <td>
-                        <button class="btn btn-warning"><i class="fa-regular fa-pen-to-square pe-2"></i>Edit</button>
-                        <button class="btn btn-danger"><i class="fa-solid fa-trash-can pe-2"></i>Delete</button>
-                    </td>
-                </tr>
             </tbody>
         </table>
         <div class="modal fade" id="viewProducts" tabindex="-1" aria-labelledby="viewProductsLabel" aria-hidden="true">
@@ -135,7 +89,12 @@
     promotion_list = []
     //when page complete load
     document.addEventListener('DOMContentLoaded', function() {
-        fetch("{{ route('promotion.index') }}")
+        fetchPromotion();
+    });
+
+    //function to fetch promotion data
+    function fetchPromotion() {
+        fetch("{{ route('promotion.getAll') }}")
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
@@ -154,7 +113,7 @@
                                         <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" ${promotion.status == "active" ? "checked":""}>
                                     </div>
                                 </td>
-                                <td>Christmas Sale</td>
+                                <td>${promotion.title}</td>
                                 <td><i class="fa-solid ${promotion.status == "bundle" ? "fa-cube":"fa-cubes"}"></i><span class="ps-2">${promotion.type}</span></td>
                                 <td>${promotion.product_list.length} product(s)
                                     <a class="text-decoration-none text-secondary ps-1" data-bs-toggle="modal" data-bs-target="#viewProducts"><i class="fa-solid fa-eye"></i></a>
@@ -162,7 +121,7 @@
                                 <td> ${promotion.start_at}</td>
                                 <td> ${promotion.end_at}</td>
                                 <td>
-                                    <span class="badge bg-success">${promotion.status}</span>
+                                    <span class="badge ${promotion.status == 'active' ? 'bg-success' : 'bg-danger'}">${promotion.status}</span>
                                 </td>
                                 <td>
                                     <button class="btn btn-warning"><i class="fa-regular fa-pen-to-square pe-2"></i>Edit</button>
@@ -178,7 +137,7 @@
                 console.error('Error:', error);
                 alert('An error occurred while fetching the product data.');
             });
-    });
+    }
 
     //view product modal
     document.getElementById('viewProducts').addEventListener('show.bs.modal', function(event) {
@@ -205,6 +164,48 @@
             `;
             modalBodyTable.appendChild(tr);
         });
+    });
+
+    //switch status
+    document.getElementById('data-holder').addEventListener('change', function(event) {
+        let switchElement = event.target;
+        let promotionIndex = switchElement.closest('tr').rowIndex - 1;
+        let promotion = promotion_list[promotionIndex];
+        let status = switchElement.checked ? 'active' : 'inactive';
+        let api = "../api/promotion/toggle/" + promotion.promotion_id;
+        fetch(api, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    promotion_id: promotion.promotion_id,
+                    status: status
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    promotion_list[promotionIndex].status = status;
+                    //update status badge in same row
+                    let badge = switchElement.parentElement.parentElement.parentElement.querySelector('.badge');
+                    console.log(badge)
+                    badge.innerHTML = status;
+                    if(status == 'active'){
+                        badge.classList.remove('bg-danger');
+                        badge.classList.add('bg-success');
+                    }else{
+                        badge.classList.remove('bg-success');
+                        badge.classList.add('bg-danger');
+                    }
+                } else {
+                    alert('test');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while updating the status.');
+            });
     });
 </script>
 

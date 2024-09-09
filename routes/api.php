@@ -3,7 +3,7 @@
     use Illuminate\Http\Request;
     use Illuminate\Support\Facades\Route;
     use App\Http\Controllers\ProductController;
-    use App\Http\Proxy\PromotionProxy;
+    use App\Http\Controllers\PromotionController;
     use App\Http\Middleware\customAuth;
 
     use App\Http\Controllers\CartItemController;
@@ -18,11 +18,9 @@
     Route::get('/product/index', [ProductController::class, 'index'])->name('product.index');
 
     //promotion
-    Route::get('/promotion', [PromotionProxy::class, 'getPromotion'])->name('promotion.index');
-    Route::post('/promotion/{id}', [PromotionProxy::class, 'getPromotionById']);
-    Route::middleware([customAuth::class])->group(function () {
-        Route::post('/promotion/create', [PromotionProxy::class, 'createPromotion'])->name('promotion.create');
-        Route::put('/promotion/{id}', [PromotionProxy::class, 'updatePromotion']);
-        Route::delete('/promotion/{id}', [PromotionProxy::class, 'deletePromotion']);
-    });
-
+    Route::get('/promotion/all', [PromotionController::class, 'getPromotion'])->name('promotion.getAll');
+    Route::post('/promotion/{id}', [PromotionController::class, 'getPromotionById']);
+    Route::post('/promotion/create', [PromotionController::class, 'createPromotion'])->name('promotion.create');
+    Route::put('/promotion/{id}', [PromotionController::class, 'updatePromotion']);
+    Route::delete('/promotion/{id}', [PromotionController::class, 'deletePromotion']);
+    Route::put('/promotion/edit/status/{id}', [PromotionController::class, 'togglePromotion'])->name('promotion.setStatus');

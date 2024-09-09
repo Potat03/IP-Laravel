@@ -83,6 +83,10 @@ class PromotionController extends Controller
     public function updatePromotion(Request $request, $id){
         try{
             $promotion = Promotion::find($id);
+
+            //store old data in cache for 1 day
+            $promotion->storeCache();
+
             $promotion->title = $request->title;
             $promotion->description = $request->description;
             $promotion->discount = $request->discount;
@@ -96,8 +100,38 @@ class PromotionController extends Controller
 
     public function deletePromotion($id){
         try{
+            //status = deleted
             $promotion = Promotion::find($id);
-            $promotion->delete();
+            $promotion->status = 'deleted';
+            $promotion->save();
+            return response()->json(['success' => true, 'data' => $promotion], 200);
+
+        }
+        catch(Exception $e){
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
+        }
+    }
+
+    public function togglePromotion($id){
+        try{
+            $promotion = Promotion::find($id);
+            if($promotion->status == 'active'){
+                $promotion->status = 'inactive';
+            }else{
+                $promotion->status = 'active';
+            }
+            $promotion->save();
+            return response()->json(['success' => true, 'data' => $promotion], 200);
+        }
+        catch(Exception $e){
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
+        }
+    }
+
+    public function undoUpdatePromotion($id){
+        try{
+            $promotion = Promotion::find($id);
+            $promotion->restoreCache();
             return response()->json(['success' => true, 'data' => $promotion], 200);
         }
         catch(Exception $e){
@@ -107,8 +141,9 @@ class PromotionController extends Controller
 
     public function undoDeletePromotion($id){
         try{
-            $promotion = Promotion::withTrashed()->find($id);
-            $promotion->restore();
+            $promotion = Promotion::find($id);
+            $promotion->status = 'active';
+            $promotion->save();
             return response()->json(['success' => true, 'data' => $promotion], 200);
         }
         catch(Exception $e){
