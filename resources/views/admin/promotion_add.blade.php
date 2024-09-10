@@ -101,21 +101,21 @@
         let selected_products = [];
         let productLimit = 1;
         //set options for product select
-        fetch("{{ route('product.index') }}")
+        fetch("{{ route('product.getAll') }}")
             .then(response => response.json())
             .then(data => {
-                let product_select = document.getElementById('product_select');
-
-                data.forEach(product => {
-                    if (product.stock != 0 && product.status != 'inactive') {
-                        product_list.push(product);
-                        let option = document.createElement('option');
-                        option.value = product.product_id;
-                        option.text = product.name;
-                        product_select.appendChild(option);
-                    }
-                });
-                console.log(product_list);
+                if(data.success){
+                    product_list = data.data;
+                    let select = document.getElementById('product_select');
+                    product_list.forEach(product => {
+                        if (product.stock > 0 && product.status == 'active') {
+                            let option = document.createElement('option');
+                            option.value = product.product_id;
+                            option.text = product.name;
+                            select.appendChild(option);
+                        }
+                    });
+                }
             });
 
         //allow only one product to be selected if type is single

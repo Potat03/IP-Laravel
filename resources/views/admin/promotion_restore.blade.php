@@ -33,7 +33,7 @@
             </div>
             <div class="ms-auto">
                 <button class="btn btn-secondary me-2"><i class="fa-regular fa-trash-undo pe-2"></i>Restore</button>
-                <button class="btn btn-primary" onclick="window.location.href='{{ route('promotion.create') }}'"><i class="fa-regular fa-plus pe-2"></i>Create</button>
+                <button class="btn btn-primary" onclick="window.location.href='/admin/promotion/add'"><i class="fa-solid fa-plus pe-2"></i>Add</button>
             </div>
         </div>
         <table class="table">

@@ -15,25 +15,25 @@
 
 @section('title', 'Promotion')
 @section('page_title', 'Promotion')
-@section('page_gm', 'Add a promotion')
+@section('page_gm', 'Edit promotion')
 
 @section('content')
-    <div class="card shadow-sm p-3 mb-5 w-100">
+<div class="card shadow-sm p-3 mb-5 w-100">
     <div class="overflow-auto">
         <div class="card-body">
             <form method="POST">
                 @csrf
                 <div class="mb-3">
                     <label for="name" class="form-label">Promotion Title</label>
-                    <input type="text" class="form-control" id="title" name="title" value="1" required>
+                    <input type="text" class="form-control" id="title" name="title" required>
                 </div>
                 <div class="mb-3">
                     <label for="description" class="form-label">Description</label>
-                    <textarea class="form-control" id="description" name="description" value="1" required></textarea>
+                    <textarea class="form-control" id="description" name="description" required></textarea>
                 </div>
                 <div class="mb-3">
                     <label for="discount" class="form-label">Discount (%)</label>
-                    <input type="number" class="form-control" id="discount" name="discount" value="1" required>
+                    <input type="number" class="form-control" id="discount" name="discount" required>
                 </div>
                 <div class="mb-3">
                     <label for="product_id" class="form-label">Type</label>
@@ -44,7 +44,7 @@
                 </div>
                 <div class="mb-3">
                     <label for="limit" class="form-label">Limit</label>
-                    <input type="number" class="form-control" id="limit" name="limit" value="1" required>
+                    <input type="number" class="form-control" id="limit" name="limit" required>
                 </div>
                 <div class="mb-3">
                     <div class="row">
@@ -78,7 +78,7 @@
                         <option value="inactive">Inactive</option>
                     </select>
                 </div>
-                <button type="submit" class="btn btn-primary">Add Promotion</button>
+                <button type="submit" class="btn btn-primary">Edit Promotion</button>
                 <button type="reset" class="btn btn-secondary">Reset</button>
             </form>
         </div>
@@ -89,6 +89,30 @@
 @section('js')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        fetch("{{route('promotion.get', $id)}}")
+            .then(response => response.json())
+            .then(data => {
+                if (!data.success) {
+                    //redirect to promotion page
+                    window.location.href = "../../promotion";
+                } else {
+                    $promotion = data.data;
+                    document.getElementById('title').value = $promotion.title;
+                    document.getElementById('description').value = $promotion.description;
+                    document.getElementById('discount').value = $promotion.discount;
+                    document.getElementById('type').value = $promotion.type;
+                    document.getElementById('limit').value = $promotion.limit;
+                    document.getElementById('start_date').value = $promotion.start_at;
+                    document.getElementById('end_date').value = $promotion.end_at;
+                    document.getElementById('status').value = $promotion.status;
+                    selected_products = $promotion.product_list;
+                    displayProducts();
+                }
+
+            });
+
+
+
         document.getElementById('start_date').addEventListener('change', function() {
             document.getElementById('end_date').setAttribute('min', this.value);
         });
@@ -221,14 +245,14 @@
                 return;
             }
             form.append('products', JSON.stringify(selected_products));
-            fetch("{{ route('promotion.create') }}", {
+            fetch("{{ route('promotion.update', $id) }}", {
                     method: 'POST',
                     body: form
                 })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        window.location.href = "../promotion";
+                        window.location.href = "../";
                     } else {
                         alert(data.message);
                     }

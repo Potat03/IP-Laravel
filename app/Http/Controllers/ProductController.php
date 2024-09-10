@@ -7,37 +7,45 @@ use App\Models\Product;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Exception;
 use Illuminate\Support\Facades\Log;
-use App\Http\Controllers\Adapters\ProductAdapter;
+use Intervention\Image\ImageManagerStatic as Image;
 
 class ProductController extends Controller
 {
     //product image upload
-    public function productImageUpload(Request $request)
+    public function productImageUpload(Request $request, $id)
     {
         try {
             $request->validate([
-                'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg',
+                'images' => 'required',
             ]);
 
 
             $imageName = "main.png";
 
-            if ($request->has('id')) {
-                $folderPath = 'storage/images/products/' . $request->id;
+            if ($id) {
+                $folderPath = 'storage/images/products/' . $id;
             } else {
-                $folderPath = 'storage/images/products/' . time();
+                $folderPath = 'storage/images/products/lol';
+                // return response()->json(['success' => false, 'message' => 'Product ID is required.'], 400);
             }
-
 
             if (!file_exists(public_path($folderPath))) {
                 mkdir(public_path($folderPath), 0777, true);
             }
+            
+            $images = $request->file('images');
+            foreach ($images as $index => $image) {
+                if ($index === 0) {
+                    $imageName = 'main.' . $image->getClientOriginalExtension(); // The first image is named "main"
+                } else {
+                    $imageName = $index . '.' . $image->getClientOriginalExtension(); // Subsequent images are numbered
+                }
+                $image->move(public_path($folderPath), $imageName);
+            }
 
-            $request->image->move(public_path($folderPath), $imageName);
-
-            return response()->json(['success' => true, 'message' => 'You have successfully uploaded an image.'], 200);
+            return response()->json(['success' => true, 'data' => 'You have successfully uploaded an image.'], 200);
         } catch (Exception $e) {
-            return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
+            return response()->json(['success' => false, 'data' => $e->getMessage()], 400);
         }
     }
 
@@ -53,13 +61,13 @@ class ProductController extends Controller
                 'status' => 'required|string',
             ]);
 
-            Product::create([
+            $id = Product::create([
                 'name' => $request->name,
                 'description' => $request->description,
                 'price' => $request->price,
                 'stock' => $request->stock,
                 'status' => $request->status,
-            ]);
+            ])->product_id;
 
             $product = new Product();
 
@@ -69,6 +77,11 @@ class ProductController extends Controller
             $product->stock = $request->stock;
             $product->status = $request->status;
             $product->save();
+            $id = $product->product_id;
+
+            //forward request
+            //get the product id
+            ProductController::productImageUpload($request, $id);
 
 
             return response()->json(['success' => true, 'message' => 'You have successfully added a product.'], 200);
@@ -117,6 +130,17 @@ class ProductController extends Controller
         } catch (Exception $e) {
             Log::error('Fetching products failed: ' . $e->getMessage());
             return response()->json(['error' => 'Fetching products failed.'], 500);
+        }
+    }
+
+    public function getAll(Request $request)
+    {
+        try {
+            $products = Product::all();
+            
+            return response()->json(['success' => true, 'data' => $products], 200);
+        } catch (Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
         }
     }
 

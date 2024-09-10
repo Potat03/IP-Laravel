@@ -91,6 +91,14 @@ Route::middleware([customAuth::class])->group(function () {
     Route::get('/admin/promotion/add', function () {
         return view('admin.promotion_add');
     });
+
+    Route::get('/admin/promotion/edit/{id}', function ($id) {
+        return view('admin.promotion_edit', ['id' => $id]);
+    });
+
+    Route::get('/admin/promotion/restore', function () {
+        return view('admin.promotion_restore');
+    });
 });
 
 

@@ -3,8 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Http\Controllers\Interface\PromotionInterface;
-use App\Models\Product;
+use Illuminate\Support\Facades\Cache;
 use App\Models\Promotion;
 use App\Models\PromotionItem;
 use Exception;
@@ -29,6 +28,7 @@ class PromotionController extends Controller
     public function getPromotionById($id){
         try{
             $promotion = Promotion::find($id);
+            $promotion->product_list = Promotion::find($id)->product;
             return response()->json(['success' => true, 'data' => $promotion], 200);
         }
         catch(Exception $e){
@@ -85,12 +85,32 @@ class PromotionController extends Controller
             $promotion = Promotion::find($id);
 
             //store old data in cache for 1 day
-            $promotion->storeCache();
+            Cache::put('promotion_'.$id, $promotion, 86400);
 
             $promotion->title = $request->title;
             $promotion->description = $request->description;
             $promotion->discount = $request->discount;
+            $promotion->type = $request->type;
+            $promotion->limit = $request->limit;
+            $promotion->start_at = $request->start_date;
+            $promotion->end_at = $request->end_date;
+            $promotion->status = $request->status;
             $promotion->save();
+
+            //product list
+            $productList = json_decode($request->products);
+
+            //delete old product list
+            PromotionItem::where('promotion_id', $id)->delete();
+
+            //add new product list
+            foreach($productList as $product){
+                PromotionItem::create([
+                    'promotion_id' => $id,
+                    'product_id' => $product->product_id,
+                    'quantity' => $product->quantity
+                ]);
+            }
             return response()->json(['success' => true, 'data' => $promotion], 200);
         }
         catch(Exception $e){
