@@ -17,6 +17,7 @@
     Route::post('/product/image/upload/{id}', [ProductController::class, 'productImageUpload']);
     Route::get('/product/index', [ProductController::class, 'index'])->name('product.index');
     Route::get('/product/all', [ProductController::class, 'getAll'])->name('product.getAll');
+    Route::get('/product/get/{id}', [ProductController::class, 'getOne'])->name('product.get');
 
     //promotion
     Route::get('/promotion/all', [PromotionController::class, 'getPromotion'])->name('promotion.getAll');

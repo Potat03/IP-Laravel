@@ -170,5 +170,16 @@ class PromotionController extends Controller
             return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
         }
     }
+
+    public function showPromotionList($ids){
+        try{
+            $ids = explode(',', $ids);
+            $promotion = Promotion::whereIn('promotion_id', $ids)->get();
+            return view('promotion', ['promotion' => $promotion]);
+        }
+        catch(Exception $e){
+            return view('errors.404');
+        }
+    }
 }
 

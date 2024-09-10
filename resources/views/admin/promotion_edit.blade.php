@@ -89,6 +89,7 @@
 @section('js')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        
         fetch("{{route('promotion.get', $id)}}")
             .then(response => response.json())
             .then(data => {

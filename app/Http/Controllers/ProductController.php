@@ -146,6 +146,30 @@ class ProductController extends Controller
         }
     }
 
+    public function getOne($id){
+        try{
+            $product = Product::find($id);
+            return response()->json(['success' => true, 'data' => $product], 200);
+        }
+        catch(Exception $e){
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
+        }
+    }
+
+    public function getProductImages($id)
+    {
+        $product = Product::find($id);
+
+        // store images in array
+        $images = [];
+        $imageFiles = Storage::files('public/images/products/' . $id);
+        foreach ($imageFiles as $file) {
+            $images[] = basename($file);
+        }
+
+        return response()->json(['success' => true, 'data' => $images], 200);
+    }
+
     // Read a single product
     public function show($id)
     {
