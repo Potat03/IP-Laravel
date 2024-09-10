@@ -10,6 +10,7 @@ use App\Http\Controllers\ConsumablesController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\WearableController;
 use App\Http\Controllers\CartItemController;
+use App\Http\Controllers\PromotionController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -47,7 +48,7 @@ Route::get('/product/{id}', [ProductController::class, 'showProductImages']);
 //     return view('cart');
 // });
 
-Route::get('/cart/', [CartItemController::class, 'getCartItemByCustomerID']);    
+Route::get('/cart', [CartItemController::class, 'getCartItemByCustomerID']);    
 
 Route::get('/payment', function () {
     return view('payment');
@@ -88,17 +89,11 @@ Route::middleware([customAuth::class])->group(function () {
         return view('admin.product');
     });
     
-    Route::get('/admin/promotion', function () {
-        return view('admin.promotion');
-    });
+    Route::get('/admin/promotion', [PromotionController::class, 'adminList'])->name('admin.promotion');
 
-    Route::get('/admin/promotion/add', function () {
-        return view('admin.promotion_add');
-    });
+    Route::get('/admin/promotion/add', [PromotionController::class, 'addPromotion'])->name('admin.promotion.add');
 
-    Route::get('/admin/promotion/edit/{id}', function ($id) {
-        return view('admin.promotion_edit', ['id' => $id]);
-    });
+    Route::get('/admin/promotion/edit/{id}', [PromotionController::class, 'editPromotion'])->name('admin.promotion.edit');
 
     Route::get('/admin/promotion/restore', function () {
         return view('admin.promotion_restore');

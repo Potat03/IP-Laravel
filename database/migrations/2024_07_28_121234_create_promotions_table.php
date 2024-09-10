@@ -16,6 +16,8 @@ return new class extends Migration
             $table->string('title');
             $table->string('description');
             $table->string('discount');
+            $table->decimal('discount_amount', 8, 2);
+            $table->decimal('original_price', 8, 2);
             $table->string('type');
             $table->decimal('limit', 8, 2);
             $table->date('start_at');

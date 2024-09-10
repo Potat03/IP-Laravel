@@ -20,12 +20,12 @@
     Route::get('/product/get/{id}', [ProductController::class, 'getOne'])->name('product.get');
 
     //promotion
-    Route::get('/promotion/all', [PromotionController::class, 'getPromotion'])->name('promotion.getAll');
-    Route::get('/promotion/get/{id}', [PromotionController::class, 'getPromotionById'])->name('promotion.get');
+    Route::get('/promotion/all', [PromotionController::class, 'getPromotion']);
+    Route::get('/promotion/get/{id}', [PromotionController::class, 'getPromotionById']);
     Route::post('/promotion/create', [PromotionController::class, 'createPromotion'])->name('promotion.create');
     Route::post('/promotion/update/{id}', [PromotionController::class, 'updatePromotion'])->name('promotion.update');
-    Route::delete('/promotion/{id}', [PromotionController::class, 'deletePromotion'])->name('promotion.delete');
-    Route::put('/promotion/edit/status/{id}', [PromotionController::class, 'togglePromotion'])->name('promotion.setStatus');
+    Route::delete('/promotion/{id}', [PromotionController::class, 'deletePromotion']);
+    Route::put('/promotion/edit/status/{id}', [PromotionController::class, 'togglePromotion']);
     Route::post('/product/image/upload', [ProductController::class, 'productImageUpload']);
     Route::get('/product/generateTable', [ProductController::class, 'generateTable']);
 

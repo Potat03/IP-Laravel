@@ -62,6 +62,11 @@
                     <label for="product_id" class="form-label">Product</label>
                     <select class="form-select" id="product_select" name="product_select">
                         <option value="-1">-- Select Product --</option>
+                        @foreach ($products as $product)
+                            @if ($product->stock != 0 && $product->status != 'inactive')
+                                <option value="{{ $product->product_id }}">{{ $product->name }}</option>
+                            @endif
+                        @endforeach
                     </select>
                     <div class="container mx-0">
 
@@ -89,35 +94,19 @@
 @section('js')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        document.getElementById('start_date').addEventListener('change', function() {
-            document.getElementById('end_date').setAttribute('min', this.value);
-        });
 
-        document.getElementById('end_date').addEventListener('change', function() {
-            document.getElementById('start_date').setAttribute('max', this.value);
-        });
-
-        let product_list = [];
+        let product_list = @json($products);
         let selected_products = [];
-        let productLimit = 1;
-        //set options for product select
-        fetch("{{ route('product.getAll') }}")
-            .then(response => response.json())
-            .then(data => {
-                if(data.success){
-                    product_list = data.data;
-                    let select = document.getElementById('product_select');
-                    product_list.forEach(product => {
-                        if (product.stock > 0 && product.status == 'active') {
-                            let option = document.createElement('option');
-                            option.value = product.product_id;
-                            option.text = product.name;
-                            select.appendChild(option);
-                        }
-                    });
-                }
-            });
+        let productLimit = document.getElementById('limit').value;
 
+        $('#start_date').on('change', function() {
+            $('#end_date').attr('min', this.value);
+        });
+
+        $('#end_date').on('change', function() {
+            $('#start_date').attr('max', this.value);
+        });
+        
         //allow only one product to be selected if type is single
         document.getElementById('type').addEventListener('change', function() {
             let type = this.value;
