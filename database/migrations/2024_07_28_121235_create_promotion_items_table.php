@@ -18,7 +18,6 @@ return new class extends Migration
             $table->integer('quantity');
             $table->timestamps();
 
-            $table->unique(['promotion_id', 'product_id']);
         });
     }
 

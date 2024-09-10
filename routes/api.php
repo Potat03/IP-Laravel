@@ -3,6 +3,8 @@
     use Illuminate\Http\Request;
     use Illuminate\Support\Facades\Route;
     use App\Http\Controllers\ProductController;
+    use App\Http\Controllers\PromotionController;
+    use App\Http\Middleware\customAuth;
 
     use App\Http\Controllers\CartItemController;
     // Route::get('/user', function (Request $request) {
@@ -11,6 +13,18 @@
 
 
     //upload product image
+    Route::post('/cartItem/upload', [CartItemController::class, 'addToCart']);
+    Route::post('/product/image/upload/{id}', [ProductController::class, 'productImageUpload']);
+    Route::get('/product/index', [ProductController::class, 'index'])->name('product.index');
+    Route::get('/product/all', [ProductController::class, 'getAll'])->name('product.getAll');
+
+    //promotion
+    Route::get('/promotion/all', [PromotionController::class, 'getPromotion'])->name('promotion.getAll');
+    Route::get('/promotion/get/{id}', [PromotionController::class, 'getPromotionById'])->name('promotion.get');
+    Route::post('/promotion/create', [PromotionController::class, 'createPromotion'])->name('promotion.create');
+    Route::post('/promotion/update/{id}', [PromotionController::class, 'updatePromotion'])->name('promotion.update');
+    Route::delete('/promotion/{id}', [PromotionController::class, 'deletePromotion'])->name('promotion.delete');
+    Route::put('/promotion/edit/status/{id}', [PromotionController::class, 'togglePromotion'])->name('promotion.setStatus');
     Route::post('/product/image/upload', [ProductController::class, 'productImageUpload']);
     Route::get('/product/generateTable', [ProductController::class, 'generateTable']);
 

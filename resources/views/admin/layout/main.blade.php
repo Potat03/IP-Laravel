@@ -4,103 +4,152 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin</title>
+    <title>@yield('title')</title>
+
     @vite(['resources/css/app.css','resources/sass/app.scss', 'resources/js/app.js', 'resources/css/admin-nav.css','resources/js/bootstrap.js'])
-
-    <style>
-        body {
-            background-color: #f8f9fa;
-        }
-
-        main{
-            display: flex;
-            min-height: 100vh;
-        }
-
-        .main-sidebar .btn:active {
-            border-color: transparent;
-        }
-    </style>
+    @include('partials.fontawesome')
+    <link href="{{ asset('css/admin_support.css') }}" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     @yield('css')
 </head>
 
 <body>
-    <main>
-        <div class="flex-shrink-0 p-3 bg-white d-flex flex-column main-sidebar" style="width: 270px;">
-            <a href="/" class="d-flex align-items-center pb-3 mb-3 link-dark text-decoration-none border-bottom">
-                <span class="fs-5 fw-semibold text-center">Collapsible</span>
-            </a>
-            <ul class="list-unstyled ps-0 d-flex flex-column flex-fill">
-                <li class="mb-1">
-                    <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#home-collapse" aria-expanded="false">
-                        Home
-                    </button>
-                    <div class="collapse" id="home-collapse">
-                        <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small ps-3">
-                            <li><a href="#" class="link-dark rounded text-decoration-none">Overview</a></li>
-                            <li><a href="#" class="link-dark rounded text-decoration-none">Updates</a></li>
-                            <li><a href="#" class="link-dark rounded text-decoration-none">Reports</a></li>
-                        </ul>
+    <div class="admin_content">
+
+        <div class="image_big_preview">
+            <div class="image_big_preview_wrap">
+                <div class="big_preview_bg"></div>
+                <div class="big_preview_wrap">
+                    <div class="big_preview_container">
+                        <img class="big_preview_element" src="https://via.placeholder.com/42" alt="Image Preview">
                     </div>
-                </li>
-                <li class="mb-1">
-                    <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#dashboard-collapse" aria-expanded="false">
-                        Dashboard
-                    </button>
-                    <div class="collapse" id="dashboard-collapse">
-                        <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small ps-3">
-                            <li><a href="#" class="link-dark rounded text-decoration-none">Overview</a></li>
-                            <li><a href="#" class="link-dark rounded text-decoration-none">Weekly</a></li>
-                            <li><a href="#" class="link-dark rounded text-decoration-none">Monthly</a></li>
-                            <li><a href="#" class="link-dark rounded text-decoration-none">Annually</a></li>
-                        </ul>
-                    </div>
-                </li>
-                <li class="mb-1">
-                    <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#orders-collapse" aria-expanded="false">
-                        Orders
-                    </button>
-                    <div class="collapse" id="orders-collapse">
-                        <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small ps-3">
-                            <li><a href="#" class="link-dark rounded text-decoration-none">New</a></li>
-                            <li><a href="#" class="link-dark rounded text-decoration-none">Processed</a></li>
-                            <li><a href="#" class="link-dark rounded text-decoration-none">Shipped</a></li>
-                            <li><a href="#" class="link-dark rounded text-decoration-none">Returned</a></li>
-                        </ul>
-                    </div>
-                </li>
-                <li class="border-top mt-auto"></li>
-                <li class="mb-1">
-                    <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#account-collapse" aria-expanded="false">
-                        Hi, Husky
-                    </button>
-                </li>
-            </ul>
-        </div>
-        <div class="flex-fill">
-            <div class="p-5">
-                @yield('content')
+                </div>
             </div>
         </div>
-    </main>
-    @yield('js')
 
-    <script>
-        //collapse other menu when one menu is clicked
-        let btns = document.querySelectorAll('.main-sidebar .btn-toggle');
-        btns.forEach(btn => {
-            btn.addEventListener('click', function() {
-                btns.forEach(b => {
-                    if (b !== btn) {
-                        //click other btns to toggle collapse
-                        if(b.getAttribute('aria-expanded') === 'true'){
-                            b.click();
-                        }
+        <div class="top_content">
+            <div class="top_left">
+                <h1 class="fw-bold">Futatabi</h1>
+            </div>
+            <div class="top_middle">
+                <div class="current_time">
+                    <p class="cur_date">12/12/2021</p>
+                    <p class="cur_time">12:00 AM</p>
+                </div>
+            </div>
+            <div class="top_right">
+                <img src="https://www.w3schools.com/howto/img_avatar.png" alt="profile picture">
+                <div class="top_right_drop_down_menu">
+                    <ul>
+                        <li><a href="#">
+                                <div class="li_icon_wrap">
+                                    <i class="fa-regular fa-address-card"></i>
+                                </div>
+                                Profile
+                            </a>
+                        </li>
+                        <li><a href="#">
+                                <div class="li_icon_wrap">
+                                    <i class="fa-regular fa-person-from-portal"></i>
+                                </div>
+                                Logout
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="bottom_content">
+            <div class="left_bar">
+                <ul>
+                    <li><a href="#">
+                            <i class="fa-solid fa-square-poll-vertical"></i>
+                            DashBoard</a>
+                    </li>
+                    <li><a href="#">
+                            <i class="fa-regular fa-teddy-bear"></i>
+                            Product</a>
+                    </li><a href="#">
+                        <li class="active">
+                            <i class="fa-brands fa-rocketchat"></i>
+                            Support Chat
+                    </a>
+                    </li>
+                    <li><a href="#">
+                            <i class="fa-regular fa-box"></i>
+                            Order</a>
+                    </li>
+                    <li><a href="#">
+                            <i class="fa-regular fa-user"></i>
+                            Customer</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="right_content">
+                <div class="upper_content">
+                    <div class="back_btn">
+                        <a href="#">
+                            <i class="fa-solid fa-arrow-left"></i></a>
+                    </div>
+                    <div class="title">
+                        <h1>@yield('page_title')</h1>
+                        <p>@yield('page_gm')</p>
+                    </div>
+                </div>
+                <div class="lower_content overflow-auto">
+                    @yield('content')
+                </div>
+            </div>
+        </div>
+
+        <script>
+            $(document).ready(function() {
+                fixHeight();
+
+                $('.top_right').on('click', function() {
+                    $('.top_right_drop_down_menu').toggleClass('show');
+                });
+
+                $('.admin_content').on('click', function(event) {
+                    if (!$(event.target).closest('.top_right').length) {
+                        $('.top_right_drop_down_menu').removeClass('show');
                     }
                 });
+                updateTime();
             });
-        });
-    </script>
+
+            $(window).resize(function() {
+                fixHeight();
+            });
+
+            function fixHeight() {
+                $('.lower_content').css('max-height', $('.admin_content').height() - 200);
+            }
+
+            function updateTime() {
+                var date = new Date();
+                var hours = date.getHours();
+                var minutes = date.getMinutes();
+                var ampm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12;
+                hours = hours ? hours : 12; // the hour '0' should be '12'
+                minutes = minutes < 10 ? '0' + minutes : minutes;
+                var strTime = hours + ':' + minutes + ' ' + ampm;
+                $('.cur_time').text(strTime);
+
+                var monthNames = ["January", "February", "March", "April", "May", "June",
+                    "July", "August", "September", "October", "November", "December"
+                ];
+                var month = monthNames[date.getMonth()];
+                var day = date.getDate();
+                var year = date.getFullYear();
+                var strDate = day + ' ' + month + ' ' + year;
+                $('.cur_date').text(strDate);
+
+            }
+        </script>
+
+        @yield('js')
 </body>
 
 </html>

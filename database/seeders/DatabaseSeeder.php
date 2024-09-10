@@ -34,6 +34,30 @@ class DatabaseSeeder extends Seeder
             'status' => 'active',
         ]);
 
+        Product::create([
+            'name' => 'product2',
+            'description' => 'product2 description',
+            'price' => '1000',
+            'stock' => '50',
+            'status' => 'active',
+        ]);
+
+        Product::create([
+            'name' => 'product3',
+            'description' => 'product3 description',
+            'price' => '1000',
+            'stock' => '50',
+            'status' => 'inactive',
+        ]);
+
+        Product::create([
+            'name' => 'product4',
+            'description' => 'product4 description',
+            'price' => '1000',
+            'stock' => '0',
+            'status' => 'active',
+        ]);
+
         Cart::create([
             'customer_id' => '1',
             'subtotal' => '10000',

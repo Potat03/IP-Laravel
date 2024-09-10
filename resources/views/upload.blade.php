@@ -8,15 +8,11 @@
 </head>
 
 <body>
-    <img src="{{ URL('storage/images/pinkglock.png') }}" alt="pinkglock" width="200" height="200">
     <form action="" method="POST" enctype="multipart/form-data">
         @csrf
-        <input type="file" name="image" id="image">
+        <input type="file" name="images[]" id="images" multiple>
         <button type="submit">Upload</button>
     </form>
-    <div class="container">
-        test
-    </div>
     <script>
         //handle form submit
         form = document.querySelector('form');
@@ -24,7 +20,7 @@
             e.preventDefault();
             let formData = new FormData(form);
 
-            fetch('/api/product/image/upload', {
+            fetch('/api/product/image/upload/1', {
                     method: 'POST',
                     body: formData
                 })
@@ -34,6 +30,7 @@
                         alert('Upload Success');
                     } else {
                         alert('Upload Failed');
+                        console.log(data.data);
                     }
                 })
                 .catch(error => {

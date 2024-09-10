@@ -20,6 +20,7 @@ return new class extends Migration
             $table->decimal('limit', 8, 2);
             $table->date('start_at');
             $table->date('end_at');
+            $table->string('status');
             $table->timestamps();
         });
     }

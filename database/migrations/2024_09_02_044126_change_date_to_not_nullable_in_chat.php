@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('chat_state', function (Blueprint $table) {
-            $table->id('chat_id')->references('chat_id')->on('chat');
-            $table->string('status');
+        Schema::table('chat', function (Blueprint $table) {
+            $table->dropColumn('created_at');
+            $table->dropColumn('updated_at');
             $table->timestamps();
         });
     }
@@ -23,6 +23,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('chat_state');
+        Schema::table('chat', function (Blueprint $table) {
+            $table->timestamp('created_at')->nullable()->change();
+            $table->timestamp('updated_at')->nullable()->change();
+        });
     }
 };
