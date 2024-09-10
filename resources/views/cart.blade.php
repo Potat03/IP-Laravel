@@ -129,8 +129,17 @@ body, html {
         </div>
         <table class="table" id="cart-items-table" >
             <tbody >
-
-                <?php
+                @if(count($cartItems) > 0)
+                    @forEach($cartItems as $cartItem)
+                    <tr id="cartItem_{{cartItem->id}}"></tr>
+                        <p>{{cartItem->id}}</p>
+                        
+                    @endforeach
+                @else
+                <button type="button" class="btn btn-danger" onclick="deleteProd({{cartItem->id}})">DELETE</button>
+                    <p>No items</p>
+                @endif
+                <!-- <?php
 for ($x = 0; $x <= 10; $x++) {
     echo '
       <tr class="animate-row" style="animation-delay:'. 0.05 * $x .'s;">
@@ -154,7 +163,7 @@ for ($x = 0; $x <= 10; $x++) {
         <td style="width:15%;"><button type="button" class="btn btn-danger">DELETE</button></td>
       </tr>';
 }
-?>
+?> -->
             </tbody>
 
         </table>
@@ -412,5 +421,25 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('An error occurred while fetching the cart items.');
         });
 });
+
+function deleteProd(id){
+    fetch(`/api/cartItem/deleteCartItem/` . id)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Delete Success');
+                //handle success
+                //find the row and remove it
+                $('#cartItem_' . id).remove();
+            } else {
+                alert('Delete Failed');
+                console.log(data.data);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while deleting the product.');
+        });
+}
 
 </script>

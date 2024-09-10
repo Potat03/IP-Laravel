@@ -9,6 +9,7 @@ use App\Models\CartItem;
 use App\Models\Product;
 use Illuminate\Support\Facades\DB;
 use Exception;
+use Illuminate\Support\Facades\Auth;
 
 class CartItemController extends Controller
 {
@@ -46,11 +47,13 @@ class CartItemController extends Controller
        }
    }
 
-   public function getCartItemByCustomerID($customerID)
+   public function getCartItemByCustomerID()
    {
        try {
-           Log::info('Fetching cart items for Customer ID: ' . $customerID);
-   
+            //$user = Auth::guard('customer')->user();
+            //$customerID = $user->id;
+            $customerID = 1;
+
            // Find the cart items by customer_id
            $cartItems = CartItem::where('customer_id', $customerID)->get();
 
@@ -59,7 +62,6 @@ class CartItemController extends Controller
 
            if ($cartItems->isEmpty()) {
                Log::warning('No cart items found for Customer ID: ' . $customerID);
-               return response()->json(['error' => 'No cart items found for this customer.'], 404);
            }else{
             
             for ($i = 0; $i < $cartItems->count(); $i++) {
@@ -76,7 +78,9 @@ class CartItemController extends Controller
            }
    
 
-           return response()->json(['cartItems'=>$cartItems, 'products'=>$products, 'promotions' => $promotions]);
+        //    return response()->json(['cartItems'=>$cartItems, 'products'=>$products, 'promotions' => $promotions]);
+           //return to view
+              return view('cart', ['cartItems'=>$cartItems, 'products'=>$products, 'promotions' => $promotions]);
        } catch (Exception $e) {
            Log::error('Fetching cart items failed: ' . $e->getMessage());
            return response()->json(['error' => 'Fetching cart items failed.'], 500);

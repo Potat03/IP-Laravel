@@ -9,6 +9,7 @@ use App\Http\Controllers\CollectiblesController;
 use App\Http\Controllers\ConsumablesController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\WearableController;
+use App\Http\Controllers\CartItemController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -42,9 +43,11 @@ Route::get('/product/{id}', [ProductController::class, 'show'])->name('product')
 Route::get('/product/{id}', [ProductController::class, 'showProductImages']);
 
 
-Route::get('/cart', function () {
-    return view('cart');
-});
+// Route::get('/cart', function () {
+//     return view('cart');
+// });
+
+Route::get('/cart/', [CartItemController::class, 'getCartItemByCustomerID']);    
 
 Route::get('/payment', function () {
     return view('payment');
