@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Exception;
 use Illuminate\Support\Facades\Log;
 use Intervention\Image\ImageManagerStatic as Image;
+use Illuminate\Support\Facades\Storage;
+use App\Http\Controllers\Adapters\ProductAdapter;
 
 class ProductController extends Controller
 {
@@ -163,6 +165,20 @@ class ProductController extends Controller
             Log::error('Fetching product failed: ' . $e->getMessage());
             return response()->json(['error' => 'Fetching product failed.'], 500);
         }
+    }
+
+    // Show product images
+    public function showProductImages($id)
+    {
+        $product = Product::find($id);
+
+        // Get all images for this product from the storage directory
+        $imageFiles = Storage::files('public/images/products/' . $id);
+        $images = array_map(function ($file) {
+            return basename($file);
+        }, $imageFiles);
+
+        return view('product', compact('product', 'images'));
     }
 
     // Update a product

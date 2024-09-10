@@ -39,6 +39,7 @@ Route::get('/shop/consumable', [ConsumablesController::class, 'index'])->name('s
 Route::get('/shop/collectible', [CollectiblesController::class, 'index'])->name('shop.collectible');
 
 Route::get('/product/{id}', [ProductController::class, 'show'])->name('product');
+Route::get('/product/{id}', [ProductController::class, 'showProductImages']);
 
 
 Route::get('/cart', function () {

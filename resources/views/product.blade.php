@@ -3,12 +3,42 @@
 @section('title', $product->name)
 
 @push('styles')
+    <!-- Include Bootstrap CSS -->
     <style>
+        /*Thumbnail CSS*/
+        .main-square {
+            width: 100%;
+            max-width: 600px;
+            height: 600px;
+            object-fit: contain;
+            object-position: center;
+        }
+
+        .thumbnail-square {
+            width: 100px;
+            height: 100px;
+            object-fit: contain;
+            object-position: center;
+            border: 3px solid transparent;
+            transition: border-color 0.3s;
+            cursor: pointer;
+        }
+
+        /* Flexbox layout for thumbnails */
+        .thumbnails {
+            gap: 5px;
+        }
+
+        .thumbnail.active {
+            border-color: rgb(17, 16, 16);
+        }
+
+        /*END*/
+
         .breadcrumb-item+.breadcrumb-item::before {
             content: ' > ';
             padding: 0 0.5rem;
             color: #6c757d;
-            /* Adjust color if needed */
         }
 
         .product-detail-container {
@@ -32,35 +62,28 @@
 
         .product-info h1 {
             font-size: 2.5rem;
-            /* Increase font size for product name */
         }
 
         .product-info h4 {
             font-size: 1.5rem;
-            /* Increase font size for price */
         }
 
         .product-info h5 {
             font-size: 1.3rem;
-            /* Increase font size for product variation */
         }
 
         .product-info .d-flex {
             font-size: 1.2rem;
-            /* Increase font size for rating */
         }
 
         .product-details {
             margin-top: 10px;
-            /* Reduce space between product info and product details */
         }
 
         /* Variation Button Styling */
         .btn-variation,
         .btn-variation-2 {
-            /* Match border color to primary color */
             background-color: #ffffff;
-            /* White background for default state */
             padding: 10px 20px;
             margin-right: 10px;
             margin-bottom: 10px;
@@ -105,35 +128,26 @@
             display: flex;
             flex-direction: column;
             margin-bottom: 20px;
-            /* Adjust space below each item */
             padding-right: 30px;
-            /* Space for the plus symbol */
         }
 
         .bundle-item:not(:last-child)::after {
             content: '+';
             position: absolute;
             top: 25%;
-            /* Adjust this value to move the plus symbol higher */
             right: -3%;
             transform: translateY(0);
-            /* Remove vertical centering */
             font-size: 2.5rem;
-            /* Adjust the size of the plus symbol */
         }
 
         .bundle-image {
             max-width: 150px;
-            /* Adjust this value as needed to increase the image size */
             height: auto;
-            /* Maintain aspect ratio */
             object-fit: cover;
-            /* Ensure the image covers the area while maintaining aspect ratio */
         }
 
         .bundle-details {
             text-align: center;
-            /* Center-align text within the details section */
         }
 
         .price {
@@ -142,19 +156,15 @@
 
         .original-price {
             text-decoration: line-through;
-            /* Crosses out the original price */
         }
 
         .discounted-price {
             font-size: 1.3rem;
-            /* Larger size for the discounted price */
             color: #dc3545;
-            /* Make the discounted price stand out */
         }
 
         .bundle-summary {
             text-align: center;
-            /* Center-align the summary */
         }
 
         .bundle-deal,
@@ -184,8 +194,23 @@
 
 @section('top')
     <div class="container product-detail-container">
-        <div class="product-image">
-            <img src="{{ URL('storage/images/pokemon.png') }}" class="img-fluid" alt="Product Image">
+        <div class="container mt-4 product-image">
+            <!-- Main Image Display -->
+            <div class="main-image mb-3">
+                <img id="mainImage" src="{{ asset('storage/images/products/' . $product->product_id . '/' . $images[0]) }}"
+                    class="img-fluid main-square" alt="Main Product Image" draggable="false">
+            </div>
+
+            <!-- Thumbnail Images -->
+            <div class="thumbnails d-flex">
+                @foreach ($images as $image)
+                    <div class="thumbnail-wrapper">
+                        <img src="{{ asset('storage/images/products/' . $product->product_id . '/' . $image) }}"
+                            class="thumbnail img-thumbnail thumbnail-square" alt="Thumbnail Image"
+                            data-image="{{ asset('storage/images/products/' . $product->product_id . '/' . $image) }}" draggable="false">
+                    </div>
+                @endforeach
+            </div>
         </div>
 
         <div class="product-info">
@@ -296,7 +321,6 @@
                             <h5 style="display: inline; margin: 0;">Supplier:</h5>
                             {{ $product->collectible->supplier }}
                         </span>
-
                     @endif
 
                     @if ($product->consumable)
@@ -440,6 +464,26 @@
             if (currentQuantity < 1 || isNaN(currentQuantity)) {
                 quantityInput.value = 1;
             }
+        });
+
+        document.addEventListener("DOMContentLoaded", function() {
+            // Get all thumbnails and the main image element
+            const thumbnails = document.querySelectorAll('.thumbnail');
+            const mainImage = document.getElementById('mainImage');
+
+            // Add click event listener to each thumbnail
+            thumbnails.forEach(thumbnail => {
+                thumbnail.addEventListener('click', function() {
+                    // Get the image URL from the data-image attribute
+                    const imageUrl = this.getAttribute('data-image');
+                    // Update the src attribute of the main image
+                    mainImage.src = imageUrl;
+
+                    // Optionally update thumbnail styling to indicate the active state
+                    thumbnails.forEach(thumb => thumb.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
         });
     </script>
 @endpush
