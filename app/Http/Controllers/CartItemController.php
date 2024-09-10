@@ -2,27 +2,36 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Log;
+
 use Illuminate\Http\Request;
 use App\Models\CartItem;
+use App\Models\Product;
 use Illuminate\Support\Facades\DB;
 use Exception;
 
 class CartItemController extends Controller
 {
+
+    
    //product image upload
    public function addToCart(Request $request)
    {
        try {
            $request->validate([
-               'customer_id' => 'required|string',
-               'product_id' => 'required|string',
-               'promotion_id' => 'required|string',
-               'quantity' => 'required|numberic',
-               'subtotal' => 'required|numberic',
-               'discount' => 'required|numberic',
-               'total' => 'required|numberic',
+               'customer_id' => 'required|numeric',
+               'product_id' => 'required|numeric',
+               'promotion_id' => 'required|numeric',
+               'quantity' => 'required|numeric',
+               'subtotal' => 'required|numeric',
+               'discount' => 'required|numeric',
+               'total' => 'required|numeric',
            ]);
-           
+        
+       } catch (Exception $e) {
+           return response()->json(['faillure' => false, 'message' => $e->getMessage()], 400);
+
+       }finally{
         CartItem::create([
             'customer_id' => $request->customer_id,
             'product_id' => $request->product_id,
@@ -32,11 +41,102 @@ class CartItemController extends Controller
             'discount' => $request->discount,
             'total' => $request->total,
             ]);
-   
-           return response()->json(['success' => true, 'message' => 'You have successfully added a product.'], 200);
-       } catch (Exception $e) {
-           return response()->json(['faillure' => false, 'message' => $e->getMessage()], 400);
+
+            return response()->json(['success' => true, 'message' => 'You have successfully added a product.'], 200);
        }
    }
 
+   public function getCartItemByCustomerID($customerID)
+   {
+       try {
+           Log::info('Fetching cart items for Customer ID: ' . $customerID);
+   
+           // Find the cart items by customer_id
+           $cartItems = CartItem::where('customer_id', $customerID)->get();
+
+           $products = [];
+           $promotions= [];
+
+           if ($cartItems->isEmpty()) {
+               Log::warning('No cart items found for Customer ID: ' . $customerID);
+               return response()->json(['error' => 'No cart items found for this customer.'], 404);
+           }else{
+            
+            for ($i = 0; $i < $cartItems->count(); $i++) {
+                $cartItem = $cartItems[$i]; // Access the item in the collection
+
+                if($cartItem->promotion_id == null){
+                    $product = Product::where('product_id', $cartItem->product_id)->first(); // Use first() to get a single result
+                    $products[] = $product;
+                }else{
+                    $promotion = Product::where('promotion_id', $cartItem->product_id)->first(); 
+                    $promotions[] = $promotion;
+                }
+            }
+           }
+   
+
+           return response()->json(['cartItems'=>$cartItems, 'products'=>$products, 'promotions' => $promotions]);
+       } catch (Exception $e) {
+           Log::error('Fetching cart items failed: ' . $e->getMessage());
+           return response()->json(['error' => 'Fetching cart items failed.'], 500);
+       }
+   }
+   
+
+   
+
+//    public function getCartItem($id)
+//    {
+//        try {
+//            Log::info('Fetching cart item with ID: ' . $id);
+   
+//            $cartItem = CartItem::findOrFail($id);
+   
+//            Log::info('Cart item retrieved:', $cartItem->toArray());
+   
+//            return response()->json($cartItem);
+//        } catch (ModelNotFoundException $e) {
+//            Log::warning('Cart item not found for ID: ' . $id);
+//            return response()->json(['error' => 'Product not found.'], 404);
+//        } catch (Exception $e) {
+//            Log::error('Fetching product failed: ' . $e->getMessage());
+//            return response()->json(['error' => 'Fetching product failed.'], 500);
+//        }
+//    }
+
+// public function getCartItems(Request $request)
+// {
+//     try {
+//         // Retrieve an array of IDs from the request
+//         $ids = $request->input('ids');
+
+//         // Validate that 'ids' is an array
+//         if (!is_array($ids)) {
+//             throw new \InvalidArgumentException('IDs should be an array.');
+//         }
+
+//         // Log the incoming IDs
+//         Log::info('Fetching cart items with IDs: ' . implode(', ', $ids));
+
+//         // Retrieve the cart items with the given IDs
+//         $cartItems = CartItem::whereIn('id', $ids)->get();
+
+//         // Log the retrieved cart items
+//         Log::info('Cart items retrieved:', $cartItems->toArray());
+
+//         // Return the cart items directly as JSON
+//         return response()->json($cartItems);
+//     } catch (\InvalidArgumentException $e) {
+//         Log::warning('Invalid input for IDs: ' . $e->getMessage());
+//         return response()->json(['error' => 'Invalid input.'], 400);
+//     } catch (Exception $e) {
+//         Log::error('Fetching cart items failed: ' . $e->getMessage());
+//         return response()->json(['error' => 'Fetching cart items failed.'], 500);
+//     }
+// }
+
+
+ 
 }
+

@@ -54,6 +54,24 @@
         flex: 1;
 
     }
+
+
+
+    #cart-items-table td:nth-child(1),
+#cart-items-table td:nth-child(2) {
+    text-align: left !important;
+}
+
+/* Ensure the body and the main container fill the viewport height */
+body, html {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+
+
     </style>
 </head>
 
@@ -109,8 +127,8 @@
                 </thead>
             </table>
         </div>
-        <table class="table">
-            <tbody>
+        <table class="table" id="cart-items-table" >
+            <tbody >
 
                 <?php
 for ($x = 0; $x <= 10; $x++) {
@@ -149,8 +167,9 @@ for ($x = 0; $x <= 10; $x++) {
                 <tbody>
                     <tr>
 
-                        <td colspan=2 style="text-align:right!important;padding-top:0.5%!important;padding-bottom:0.5%!important;">Discount Details<button
-                                style="background-color: #ffffff;border:0" onclick=showDiscount()><i
+                        <td colspan=2
+                            style="text-align:right!important;padding-top:0.5%!important;padding-bottom:0.5%!important;">
+                            Discount Details<button style="background-color: #ffffff;border:0" onclick=showDiscount()><i
                                     id="show-discount-icon" style="display:inline">&#9650;</i><i id="hide-discount-icon"
                                     style="display:none;">&#9660;</i></button></td>
 
@@ -190,19 +209,50 @@ for ($x = 0; $x <= 10; $x++) {
 </html>
 
 <script>
-function add(quantityid) {
+function add(quantityid, i) {
+    // Get the quantity input element and update its value
     var quantityInput = document.getElementById(quantityid);
     var currentValue = parseInt(quantityInput.value, 10);
     var newValue = currentValue + 1;
     quantityInput.value = newValue;
+
+    // Get the total price and each price elements
+    var totalPrice = document.getElementById(`${i}totalPrice`);
+    var eachPrice = document.getElementById(`${i}eachPrice`);
+
+    // Get the numeric value of the product price (remove "RM" and convert to float)
+    var priceValue = parseFloat(eachPrice.textContent.replace('RM', ''));
+
+    // Calculate the new total price
+    var newTotalPrice = priceValue * newValue;
+
+    // Update the total price in the cell, formatted with RM
+    totalPrice.textContent = `RM${newTotalPrice.toFixed(2)}`;
 }
 
-function minus(quantityid) {
+function minus(quantityid, i) {
+    // Get the quantity input element and update its value
     var quantityInput = document.getElementById(quantityid);
     var currentValue = parseInt(quantityInput.value, 10);
-    var newValue = currentValue - 1;
+    
+    // Ensure quantity does not go below 1
+    var newValue = currentValue > 1 ? currentValue - 1 : 1;
     quantityInput.value = newValue;
+
+    // Get the total price and each price elements
+    var totalPrice = document.getElementById(`${i}totalPrice`);
+    var eachPrice = document.getElementById(`${i}eachPrice`);
+
+    // Get the numeric value of the product price (remove "RM" and convert to float)
+    var priceValue = parseFloat(eachPrice.textContent.replace('RM', ''));
+
+    // Calculate the new total price
+    var newTotalPrice = priceValue * newValue;
+
+    // Update the total price in the cell, formatted with RM
+    totalPrice.textContent = `RM${newTotalPrice.toFixed(2)}`;
 }
+
 
 function showDiscount() {
     var discountRows = document.getElementsByClassName("discount-row");
@@ -236,4 +286,131 @@ document.addEventListener('DOMContentLoaded', (event) => {
         row.classList.add('animate-row');
     });
 });
+
+document.addEventListener('DOMContentLoaded', function() {
+    const customerID = 1;
+    fetch(`/api/cartItem/getCartItemByCustomerID/${customerID}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.cartItems) {
+                const cartItems = data.cartItems;
+                const products = data.products;
+                
+                const tbody = document.querySelector('#cart-items-table tbody');
+                tbody.innerHTML = '';
+
+                for (let i = 0; i < cartItems.length; i++) {
+                    const cartItem = cartItems[i];
+                    const product = products[i];
+                    
+                    // Calculate delay for animation
+                    const animationDelay = 0.05 * i;
+
+                    // Create a new table row
+                    const row = document.createElement('tr');
+                    row.classList.add('animate-row');
+                    row.style.animationDelay = `${animationDelay}s`;
+
+                    // Create the first cell with an image
+                    const imgCell = document.createElement('td');
+                    imgCell.style.width = '15%';
+                    imgCell.style.textAlign = 'left';
+                    const img = document.createElement('img');
+                    img.src = 'storage/images/pika.jpg'; // Assuming all products use this image
+                    img.alt = product.name;
+                    img.width = 135;
+                    img.height = 135;
+                    imgCell.appendChild(img);
+                    row.appendChild(imgCell);
+
+                    // Create the second cell with product name
+                    const nameCell = document.createElement('td');
+                    nameCell.style.width = '25%';
+                    nameCell.style.textAlign = 'left';
+                    const nameP = document.createElement('p');
+                    nameP.textContent = product.name;
+                    nameCell.appendChild(nameP);
+                    row.appendChild(nameCell);
+
+                    // Create the third cell with product price
+                    const priceCell = document.createElement('td');
+                    priceCell.id=`${i}eachPrice`;
+                    priceCell.style.width = '15%';
+                    priceCell.textContent = `RM${parseFloat(product.price).toFixed(2)}`;
+                    row.appendChild(priceCell);
+
+                    // Create the fourth cell with quantity input and buttons
+                    const quantityCell = document.createElement('td');
+                    quantityCell.style.width = '15%';
+
+                    const inputGroupDiv = document.createElement('div');
+                    inputGroupDiv.classList.add('input-group', 'mb-3');
+                    inputGroupDiv.style.justifyContent = 'center';
+                    inputGroupDiv.style.marginBottom = '0';
+
+                    const decreaseBtn = document.createElement('button');
+                    decreaseBtn.id = `${i}decrease`;
+                    decreaseBtn.classList.add('btn', 'btn-outline-secondary', 'decrease-btn');
+                    decreaseBtn.setAttribute('onclick', `minus("${i}quantity",${i})`);
+                    decreaseBtn.type = 'button';
+                    decreaseBtn.style.borderRight = 'none';
+                    decreaseBtn.textContent = '-';
+                    inputGroupDiv.appendChild(decreaseBtn);
+
+                    const quantityInput = document.createElement('input');
+                    quantityInput.id = `${i}quantity`;
+                    quantityInput.value = cartItem.quantity;
+                    quantityInput.style.border = '#6c757d 1px solid';
+                    quantityInput.style.maxWidth = '60px';
+                    quantityInput.style.textAlign = 'center';
+                    quantityInput.type = 'text';
+                    quantityInput.classList.add('form-control');
+                    inputGroupDiv.appendChild(quantityInput);
+
+                    const increaseBtn = document.createElement('button');
+                    increaseBtn.id = `${i}increase`;
+                    increaseBtn.classList.add('btn', 'btn-outline-secondary', 'increase-btn');
+                    increaseBtn.setAttribute('onclick', `add("${i}quantity","${i}")`);
+                    increaseBtn.type = 'button';
+                    increaseBtn.style.borderLeft = 'none';
+                    increaseBtn.textContent = '+';
+                    inputGroupDiv.appendChild(increaseBtn);
+
+                    quantityCell.appendChild(inputGroupDiv);
+                    row.appendChild(quantityCell);
+
+                    // Create the fifth cell with the total price
+                    const totalCell = document.createElement('td');
+                    totalCell.style.width = '15%';
+                    totalCell.id=`${i}totalPrice`;
+                    totalCell.textContent = `RM${(parseFloat(product.price) * cartItem.quantity).toFixed(2)}`;
+                    row.appendChild(totalCell);
+
+                    // Create the sixth cell with the delete button
+                    const deleteCell = document.createElement('td');
+                    deleteCell.style.width = '15%';
+                    const deleteButton = document.createElement('button');
+                    deleteButton.type = 'button';
+                    deleteButton.classList.add('btn', 'btn-danger');
+                    deleteButton.textContent = 'DELETE';
+                    deleteCell.appendChild(deleteButton);
+                    row.appendChild(deleteCell);
+
+                    // Append the row to the table body
+                    tbody.appendChild(row);
+                }
+            } else if (data.error) {
+                console.error('Error:', data.error);
+                alert(data.error);
+            } else {
+                console.error('Unexpected response format.');
+                alert('Unexpected response format.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while fetching the cart items.');
+        });
+});
+
 </script>
