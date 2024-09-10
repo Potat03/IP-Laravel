@@ -55,6 +55,7 @@ class CartItemController extends Controller
            $cartItems = CartItem::where('customer_id', $customerID)->get();
 
            $products = [];
+           $promotions= [];
 
            if ($cartItems->isEmpty()) {
                Log::warning('No cart items found for Customer ID: ' . $customerID);
@@ -63,22 +64,26 @@ class CartItemController extends Controller
             
             for ($i = 0; $i < $cartItems->count(); $i++) {
                 $cartItem = $cartItems[$i]; // Access the item in the collection
-                $product = Product::where('product_id', $cartItem->product_id)->first(); // Use first() to get a single result
 
-                if ($product) {
-                    $products[] = $product; // Append the product to the array
+                if($cartItem->promotion_id == null){
+                    $product = Product::where('product_id', $cartItem->product_id)->first(); // Use first() to get a single result
+                    $products[] = $product;
+                }else{
+                    $promotion = Product::where('promotion_id', $cartItem->product_id)->first(); 
+                    $promotions[] = $promotion;
                 }
             }
            }
    
-           Log::info('Cart items retrieved:', $cartItems->toArray());
 
-           return response()->json(['cartItems'=>$cartItems, 'products'=>$products]);
+           return response()->json(['cartItems'=>$cartItems, 'products'=>$products, 'promotions' => $promotions]);
        } catch (Exception $e) {
            Log::error('Fetching cart items failed: ' . $e->getMessage());
            return response()->json(['error' => 'Fetching cart items failed.'], 500);
        }
    }
+   
+
    
 
 //    public function getCartItem($id)
@@ -134,3 +139,4 @@ class CartItemController extends Controller
 
  
 }
+

@@ -25,6 +25,8 @@
     <div id="cart-items-details"></div>
 
     <script>
+    
+    
     //handle form submit
     form = document.querySelector('form');
     form.addEventListener('submit', function(e) {
@@ -130,19 +132,27 @@
                     // Handle the response as an array of cart items
                     const cartItems = data.cartItems;
                     const products = data.products;
+                    const promotions = data.promotions;
+
                     const cartItemsDetailsDiv = document.getElementById(
                     'cart-items-details'); // Ensure this element exists
+                    
                     cartItemsDetailsDiv.innerHTML = ''; // Clear any existing content
 
                     // Iterate over the array and display prices
                     for (let i = 0; i < cartItems.length; i++) {
                         const cartItem = cartItems[i];
                         const product = products[i];
+                      
 
 
+                        if(cartItem.promotion_id == null){
+                        const nameDiv = document.createElement('div');
+                        nameDiv.textContent = `Name: ${product.name}`;
+                            
                         // Create a new div for each price
                         const quantityDiv = document.createElement('div');
-                        quantityDiv.textContent = `Quantity: $${cartItem.quantity}`;
+                        quantityDiv.textContent = `Quantity: ${cartItem.quantity}`;
 
                         
                         const price = parseFloat(product.price);
@@ -150,8 +160,10 @@
                         priceDiv.textContent = `Price: $${price.toFixed(2)}`;
 
                         // Append the new div to the container
+                        cartItemsDetailsDiv.appendChild(nameDiv);
                         cartItemsDetailsDiv.appendChild(quantityDiv);
                         cartItemsDetailsDiv.appendChild(priceDiv);
+                        }
 
                     }
                 } else if (data.error) {
