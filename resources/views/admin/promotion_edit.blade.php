@@ -71,7 +71,6 @@
                     <div class="container mx-0">
 
                         <div class="row" id="product_list">
-                            <!-- Product List -->
                         </div>
                     </div>
 
@@ -84,7 +83,7 @@
                     </select>
                 </div>
                 <button type="submit" class="btn btn-primary">Edit Promotion</button>
-                <button type="reset" class="btn btn-secondary">Reset</button>
+                <button type="button" class="btn btn-secondary">Cancel</button>
             </form>
         </div>
     </div>
@@ -93,10 +92,52 @@
 
 @section('js')
 <script>
+    let product_list = @json($products);
+    let selected_products = @json($promotion - > product_list);
+
+    function displayProducts() {
+        let display = document.getElementById('product_list');
+        display.innerHTML = '';
+        selected_products.forEach(product => {
+            let div = document.createElement('div');
+            div.classList.add('col-12');
+            div.innerHTML = `
+                <div class="card shadow-sm p-3 mt-3 w-75">
+                    <div class="d-flex justify-content-start gap-5">
+                        <input type="hidden" name="product_id" value="${product.product_id}">
+                        <div class="input-group">
+                            <span class="input-group-text">Name</span>
+                            <input type="text" class="form-control" id="product_name" name="product_name" value="${product.name}" required disabled>
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-text">Quantity</span>
+                            <input type="number" class="form-control" id="quantity" name="product_qty" placeholder="Quantity" value="${product.quantity}" min="1" max="${product.stock}" required>
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-text">Stock</span>
+                            <input type="text" class="form-control" id="stock" name="stock" value="${product.stock}" required disabled>
+                        </div>
+                        <button type="button" class="btn btn-danger" id="remove_product">X</button>
+                    </div>
+                </div>
+                `;
+            display.appendChild(div);
+
+            div.querySelector('#remove_product').addEventListener('click', function() {
+                let index = selected_products.findIndex(p => p.id == product.id);
+                selected_products.splice(index, 1);
+                div.remove();
+            });
+
+            div.querySelector('#quantity').addEventListener('change', function() {
+                let qty = parseInt(this.value);
+                let index = selected_products.findIndex(p => p.id == product.id);
+                selected_products[index].quantity = qty;
+            });
+        });
+    }
     document.addEventListener('DOMContentLoaded', function() {
 
-        let product_list = @json($products);
-        let selected_products = @json($promotion - > product_list);
         let productLimit = parseInt(document.getElementById('limit').value);
 
         displayProducts()
@@ -145,52 +186,15 @@
             this.value = -1;
         });
 
-        //display selected products
-        function displayProducts() {
-            let display = document.getElementById('product_list');
-            display.innerHTML = '';
-            selected_products.forEach(product => {
-                let div = document.createElement('div');
-                div.classList.add('col-12');
-                div.innerHTML = `
-                <div class="card shadow-sm p-3 mt-3 w-75">
-                    <div class="d-flex justify-content-start gap-5">
-                        <input type="hidden" name="product_id" value="${product.product_id}">
-                        <div class="input-group">
-                            <span class="input-group-text">Name</span>
-                            <input type="text" class="form-control" id="product_name" name="product_name" value="${product.name}" required disabled>
-                        </div>
-                        <div class="input-group">
-                            <span class="input-group-text">Quantity</span>
-                            <input type="number" class="form-control" id="quantity" name="product_qty" placeholder="Quantity" value="1" min="1" max="${product.stock}" required>
-                        </div>
-                        <div class="input-group">
-                            <span class="input-group-text">Stock</span>
-                            <input type="text" class="form-control" id="stock" name="stock" value="${product.stock}" required disabled>
-                        </div>
-                        <button type="button" class="btn btn-danger" id="remove_product">X</button>
-                    </div>
-                </div>
-                `;
-                display.appendChild(div);
 
-                //add event listener to remove product
-                div.querySelector('#remove_product').addEventListener('click', function() {
-                    let index = selected_products.findIndex(p => p.id == product.id);
-                    selected_products.splice(index, 1);
-                    div.remove();
-                });
+        document.querySelector('form').addEventListener('reset', function(e) {
+            if (!confirm('Are you sure you want to cancel?')) {
+                e.preventDefault();
+            }
+            window.location.href = "{{ route('admin.promotion') }}";
 
-                //add qty change event
-                div.querySelector('#quantity').addEventListener('change', function() {
-                    let qty = parseInt(this.value);
-                    let index = selected_products.findIndex(p => p.id == product.id);
-                    selected_products[index].quantity = qty;
-                });
-            });
-        }
+        });
 
-        //ajax request to edit promotion
         document.querySelector('form').addEventListener('submit', function(e) {
             e.preventDefault();
             let form = new FormData(this);
@@ -201,12 +205,12 @@
             }
             form.append('products', JSON.stringify(selected_products));
             fetch("{{ route('promotion.update', $promotion->promotion_id) }}", {
-                method: 'POST',
-                body: form
-            }).then(response => response.json())
+                    method: 'POST',
+                    body: form
+                }).then(response => response.json())
                 .then(data => {
-                    if (data.status == 'success') {
-                        window.location.href = "{{ route('promotion.index') }}";
+                    if (data.success) {
+                        window.location.href = "{{ route('admin.promotion') }}";
                     } else {
                         alert('Failed to update promotion');
                     }

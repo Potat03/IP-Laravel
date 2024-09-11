@@ -12,7 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('cart', function (Blueprint $table) {
-            $table->id('customer_id')->references('customer_id')->on('customer');
+            $table->id();
+            $table->unsignedBigInteger('customer_id')->references('customer_id')->on('customer')->unique();
             $table->decimal('subtotal', 8, 2);
             $table->decimal('total_discount', 8, 2);
             $table->decimal('total', 8, 2);

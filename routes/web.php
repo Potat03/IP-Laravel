@@ -65,13 +65,8 @@ Route::get('/testDB', function () {
 
 //promotion
 
-Route::get('/promotion', function(){
-    return view('promotion');
-});
-
-Route::get('/promotion/{id}', function(){
-    return view('promotionDetails');
-});
+Route::get('/promotion', [PromotionController::class, 'customerList'])->name('promotion');
+Route::get('/promotion/{id}', [PromotionController::class, 'promotionDetails'])->name('promotion.details');
 
 //admin side
 Route::get('/admin/login', function () {
@@ -95,9 +90,7 @@ Route::middleware([customAuth::class])->group(function () {
 
     Route::get('/admin/promotion/edit/{id}', [PromotionController::class, 'editPromotion'])->name('admin.promotion.edit');
 
-    Route::get('/admin/promotion/restore', function () {
-        return view('admin.promotion_restore');
-    });
+    Route::get('/admin/promotion/restore', [PromotionController::class, 'restorePromotion'])->name('admin.promotion.restore');
 });
 
 
