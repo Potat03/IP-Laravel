@@ -3,9 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class Customer extends Model
+class Customer extends Authenticatable implements UserInterface
 {
     use HasFactory;
 
@@ -14,9 +14,8 @@ class Customer extends Model
     protected $primaryKey = 'customer_id';
 
     protected $fillable = [
-        'customer_id',
-        'username', 
-        'tier', 
+        'username',
+        'tier',
         'phone_number',
         'email',
         'password',
@@ -42,5 +41,13 @@ class Customer extends Model
     public function Verification()
     {
         return $this->hasMany(Verification::class, 'customer_id', 'customer_id');
+    }
+
+    public function getId() {
+        return $this->customer_id;
+    }
+
+    public function getRole() {
+        return 'customer';
     }
 }

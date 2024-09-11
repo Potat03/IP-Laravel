@@ -1,8 +1,10 @@
 <?php
 
 use App\Http\Middleware\customAuth;
+use App\Http\Middleware\AdminAuth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\ChatMessageController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -103,16 +105,26 @@ Route::get('/template', function () {
     return view('admin.error');
 });
 
+use App\Http\Controllers\CustomerController;
+use App\Http\Middleware\CustomerAuth;
+use App\Http\Controllers\AuthController;
+
 //WK route
-Route::get('/userlogin', function () {
+Route::get('/userlogin', ['middleware' => 'guest:customer', function() {
     return view('userlogin');
+}])->name('user.login');
+
+Route::middleware([CustomerAuth::class])->group(function () {
+
+    Route::get('/profile', function () {
+        return view('userProfile');
+    })->name('user.profile');
+
+    Route::get('/userverify', function () {
+        return view('userVerification');
+    })->name('user.verify');
 });
-Route::get('/userverify', function () {
-    return view('userVerification');
-});
-Route::get('/userprofile', function () {
-    return view('userProfile');
-});
+
 
 Route::get('/chat', [ChatController::class, 'index']);
 Route::post('/chat', [ChatController::class, 'store']);

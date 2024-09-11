@@ -18,7 +18,7 @@
                     <div class="form sign-in">
                         <h1>Logo</h1>
                         <h2>Welcome to Futatabi</h2>
-                        <form action="{{ route('auth.login') }}" method="POST">
+                        <form id="loginForm" action="{{ route('auth.userLogin') }}" method="POST">
                             @csrf
                             <label>
                                 <span>Email</span>
@@ -47,7 +47,7 @@
                         </div>
                         <div class="form sign-up">
                             <h2>Create your Account</h2>
-                            <form action="{{ route('auth.register') }}" method="POST">
+                            <form id="registerForm" action="{{ route('auth.userRegister') }}" method="POST">
                                 @csrf
                                 <div class="form-row">
                                     <label>
@@ -90,36 +90,60 @@
     </div>
 
     <script>
-        //animation
+        // animation to toggle
         document.querySelector('.img__btn').addEventListener('click', function() {
             document.querySelector('.cont').classList.toggle('s--signup');
         });
 
-        //handle form
-        document.querySelectorAll('form').forEach(form => {
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-                let formData = new FormData(form);
-                let actionUrl = form.action;
+        // handle login
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
 
-                fetch(actionUrl, {
-                        method: 'POST',
-                        body: formData
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            alert('Operation Success');
-                        } else {
-                            alert('Operation Failed');
-                            console.log(data.message);
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Fetch error:', error);
-                        alert('An unexpected error occurred.');
-                    });
-            });
+            let formData = new FormData(this);
+
+            fetch(this.action, {
+                    method: 'POST',
+                    body: formData,
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Logged in');
+                        window.location.href = data.redirect_url;
+                    } else {
+                        alert(data.message || 'An unexpected error occurred.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Fetch error:', error);
+                    alert('An unexpected error occurred.');
+                });
+        });
+
+        // handle register
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            let formData = new FormData(this);
+
+            fetch(this.action, {
+                    method: 'POST',
+                    body: formData,
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Registration successful. Please log in.');
+                        window.location.href = "{{ route('user.login') }}";
+                    } else {
+                        alert('Registration Failed');
+                        console.log(data);
+                    }
+                })
+                .catch(error => {
+                    console.error('Fetch error:', error);
+                    alert('An unexpected error occurred.');
+                });
         });
     </script>
 </body>

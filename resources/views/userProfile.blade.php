@@ -4,79 +4,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Customer Profile</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css">
+    <title>Admin</title>
+    @vite(['resources/css/app.css','resources/sass/app.scss', 'resources/js/app.js', 'resources/css/admin-nav.css','resources/js/bootstrap.js'])
+
     <style>
         body {
-            font-family: "Poppins", sans-serif;
-            background-color: #f0f0f0;
-            margin: 0;
-            padding: 0;
+            background-color: #f8f9fa;
         }
 
-        .sidebar {
-            height: 100vh;
-            background-color: #343a40;
-            color: #fff;
-            padding-top: 20px;
-        }
-
-        .sidebar a {
-            color: #adb5bd;
-            display: block;
-            padding: 15px;
-            text-decoration: none;
-        }
-
-        .sidebar a:hover {
-            background-color: darkred;
-            color: #fff;
-        }
-
-        .content {
-            padding: 20px;
-            background-color: #fff;
+        main{
+            display: flex;
             min-height: 100vh;
         }
 
-        .nav-link:hover,
-        .nav-item:hover {
-            color: darkred !important;
+        .main-sidebar .btn:active {
+            border-color: transparent;
         }
     </style>
+    @yield('css')
 </head>
 
 <body>
-    <div class="container-fluid">
-        <div class="row">
-            <nav class="col-md-3 col-lg-2 d-md-block sidebar">
-                <ul class="nav flex-column">
-                    <li class="nav-item">
-                        <a class="nav-link" href="#!">Profile Overview</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#!">Orders</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#!">Settings</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#!">Log Out</a>
-                    </li>
-                </ul>
-            </nav>
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 content">
-                <h1>Welcome, [Customer Name]</h1>
-                <p>Here you can manage your profile information, view your orders, and update your account settings.</p>
-                <!-- Add more content here as needed -->
-            </main>
+    @include('header')
+    <main>
+        <div class="flex-shrink-0 p-3 bg-white d-flex flex-column main-sidebar" style="width: 270px;">
+            <a href="/" class="d-flex align-items-center pb-3 mb-3 link-dark text-decoration-none border-bottom">
+                <span class="fs-5 fw-semibold text-center">Profile</span>
+            </a>
+            <ul class="list-unstyled ps-0 d-flex flex-column flex-fill">
+                <li class="mb-1">
+                    <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#home-collapse" aria-expanded="false">
+                        Home
+                    </button>
+                </li>
+                <li class="mb-1">
+                    <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#dashboard-collapse" aria-expanded="false">
+                        Dashboard
+                    </button>
+                    <div class="collapse" id="dashboard-collapse">
+                        <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small ps-3">
+                            <li><a href="#" class="link-dark rounded text-decoration-none">Overview</a></li>
+                            <li><a href="#" class="link-dark rounded text-decoration-none">Weekly</a></li>
+                            <li><a href="#" class="link-dark rounded text-decoration-none">Monthly</a></li>
+                            <li><a href="#" class="link-dark rounded text-decoration-none">Annually</a></li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="mb-1">
+                    <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#orders-collapse" aria-expanded="false">
+                        Orders
+                    </button>
+                    <div class="collapse" id="orders-collapse">
+                        <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small ps-3">
+                            <li><a href="#" class="link-dark rounded text-decoration-none">New</a></li>
+                            <li><a href="#" class="link-dark rounded text-decoration-none">Processed</a></li>
+                            <li><a href="#" class="link-dark rounded text-decoration-none">Shipped</a></li>
+                            <li><a href="#" class="link-dark rounded text-decoration-none">Returned</a></li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="border-top mt-auto"></li>
+                <li class="mb-1">
+                    <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#account-collapse" aria-expanded="false">
+                        Hi, Husky
+                    </button>
+                </li>
+            </ul>
         </div>
-    </div>
+        <div class="flex-fill">
+            <div class="p-5">
+                @yield('content')
+            </div>
+        </div>
+    </main>
+    @yield('js')
 
-    <!-- Bootstrap JS and dependencies -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.min.js"></script>
+    <script>
+        //collapse other menu when one menu is clicked
+        let btns = document.querySelectorAll('.main-sidebar .btn-toggle');
+        btns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                btns.forEach(b => {
+                    if (b !== btn) {
+                        //click other btns to toggle collapse
+                        if(b.getAttribute('aria-expanded') === 'true'){
+                            b.click();
+                        }
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 
 </html>

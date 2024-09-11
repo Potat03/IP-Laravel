@@ -5,6 +5,7 @@
     use App\Http\Controllers\ProductController;
     use App\Http\Proxy\PromotionProxy;
     use App\Http\Middleware\customAuth;
+    use App\Http\Controllers\CustomerController;
 
     use App\Http\Controllers\CartItemController;
     // Route::get('/user', function (Request $request) {
@@ -19,12 +20,15 @@
 
     //pass login/register details
     use App\Http\Controllers\AuthController;
+    use App\Http\Middleware\CustomerAuth;
 
-    Route::get('/auth', [AuthController::class, 'showForm'])->name('auth.showForm');
-    Route::post('/login', [AuthController::class, 'login'])->name('auth.login');
-    Route::post('/register', [AuthController::class, 'register'])->name('auth.register');
-    Route::post('logout', [AuthController::class, 'logout'])->name('logout');
-    
+    Route::get('/auth', [AuthController::class, 'showCustomerForm'])->name('auth.showForm');
+    Route::post('/register', [AuthController::class, 'userRegister'])->name('auth.userRegister');
+    Route::group(['middleware' => ['web']], function () {
+        Route::post('/login', [AuthController::class, 'userLogin'])->name('auth.userLogin');
+        Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout');
+    });
+
     Route::post('/cartItem/upload', [CartItemController::class, 'addToCart']);
     Route::post('/product/image/upload', [ProductController::class, 'productImageUpload'])->middleware('customAuth');
     Route::get('/product/index', [ProductController::class, 'index'])->name('product.index');
@@ -37,4 +41,3 @@
         Route::put('/promotion/{id}', [PromotionProxy::class, 'updatePromotion']);
         Route::delete('/promotion/{id}', [PromotionProxy::class, 'deletePromotion']);
     });
-
