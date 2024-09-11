@@ -15,7 +15,7 @@
 
 @section('title', 'Promotion')
 @section('page_title', 'Promotion')
-@section('page_gm', 'Add a promotion')
+@section('page_gm', 'Edit promotion')
 
 @section('content')
 <div class="card shadow-sm p-3 mb-5 w-100">
@@ -25,36 +25,36 @@
                 @csrf
                 <div class="mb-3">
                     <label for="name" class="form-label">Promotion Title</label>
-                    <input type="text" class="form-control" id="title" name="title" value="1" required>
+                    <input type="text" class="form-control" id="title" name="title" value="{{ $promotion->title }}" required>
                 </div>
                 <div class="mb-3">
                     <label for="description" class="form-label">Description</label>
-                    <textarea class="form-control" id="description" name="description" value="1" required></textarea>
+                    <textarea class="form-control" id="description" name="description" required>{{ $promotion->description }}</textarea>
                 </div>
                 <div class="mb-3">
                     <label for="discount" class="form-label">Discount (%)</label>
-                    <input type="number" class="form-control" id="discount" name="discount" value="1" required>
+                    <input type="number" class="form-control" id="discount" name="discount" value="{{ $promotion->discount }}" required>
                 </div>
                 <div class="mb-3">
                     <label for="product_id" class="form-label">Type</label>
-                    <select class="form-select" id="type" name="type" required>
+                    <select class="form-select" id="type" name="type" value="{{ $promotion->type }}" required>
                         <option value="1">Single</option>
                         <option value="2">Bundle</option>
                     </select>
                 </div>
                 <div class="mb-3">
                     <label for="limit" class="form-label">Limit</label>
-                    <input type="number" class="form-control" id="limit" name="limit" value="1" required>
+                    <input type="number" class="form-control" id="limit" name="limit" value="{{ $promotion->limit }}" required>
                 </div>
                 <div class="mb-3">
                     <div class="row">
                         <div class="col-6">
                             <label for="start_date" class="form-label">Start Date</label>
-                            <input type="date" class="form-control" id="start_date" name="start_date" required>
+                            <input type="date" class="form-control" id="start_date" name="start_date" value="{{ $promotion->start_at }}" required>
                         </div>
                         <div class="col-6">
                             <label for="end_date" class="form-label">End Date</label>
-                            <input type="date" class="form-control" id="end_date" name="end_date" required>
+                            <input type="date" class="form-control" id="end_date" name="end_date" value="{{ $promotion->end_at }}" required>
                         </div>
                     </div>
                 </div>
@@ -71,7 +71,6 @@
                     <div class="container mx-0">
 
                         <div class="row" id="product_list">
-                            <!-- Product List -->
                         </div>
                     </div>
 
@@ -83,8 +82,8 @@
                         <option value="inactive">Inactive</option>
                     </select>
                 </div>
-                <button type="submit" class="btn btn-primary">Add Promotion</button>
-                <button type="reset" class="btn btn-secondary">Reset</button>
+                <button type="submit" class="btn btn-primary">Edit Promotion</button>
+                <button type="button" class="btn btn-secondary">Cancel</button>
             </form>
         </div>
     </div>
@@ -94,7 +93,7 @@
 @section('js')
 <script>
     let product_list = @json($products);
-    let selected_products = [];
+    let selected_products = @json($promotion - > product_list);
 
     function displayProducts() {
         let display = document.getElementById('product_list');
@@ -112,7 +111,7 @@
                         </div>
                         <div class="input-group">
                             <span class="input-group-text">Quantity</span>
-                            <input type="number" class="form-control" id="quantity" name="product_qty" placeholder="Quantity" value="1" min="1" max="${product.stock}" required>
+                            <input type="number" class="form-control" id="quantity" name="product_qty" placeholder="Quantity" value="${product.quantity}" min="1" max="${product.stock}" required>
                         </div>
                         <div class="input-group">
                             <span class="input-group-text">Stock</span>
@@ -124,13 +123,11 @@
                 `;
             display.appendChild(div);
 
-
             div.querySelector('#remove_product').addEventListener('click', function() {
                 let index = selected_products.findIndex(p => p.id == product.id);
                 selected_products.splice(index, 1);
                 div.remove();
             });
-
 
             div.querySelector('#quantity').addEventListener('change', function() {
                 let qty = parseInt(this.value);
@@ -139,9 +136,11 @@
             });
         });
     }
-
     document.addEventListener('DOMContentLoaded', function() {
-        let productLimit = document.getElementById('limit').value;
+
+        let productLimit = parseInt(document.getElementById('limit').value);
+
+        displayProducts()
 
         $('#start_date').on('change', function() {
             $('#end_date').attr('min', this.value);
@@ -150,7 +149,6 @@
         $('#end_date').on('change', function() {
             $('#start_date').attr('max', this.value);
         });
-
 
         document.getElementById('type').addEventListener('change', function() {
             let type = this.value;
@@ -165,7 +163,6 @@
 
         document.getElementById('product_select').addEventListener('change', function() {
             let product_id = this.value;
-
             if (product_id == -1) {
                 return;
             }
@@ -175,8 +172,8 @@
                 this.value = -1;
                 return;
             }
-            let product = product_list.find(product => product.product_id == product_id);
-            if (selected_products.find(p => p.product_id == product.product_id)) {
+            let product = product_list.find(p => p.product_id == product_id);
+            if (selected_products.find(p => p.product_id == product_id)) {
                 alert('Product already selected');
                 this.value = -1;
                 return;
@@ -185,21 +182,19 @@
                 selected_products.push(product);
                 displayProducts();
 
-                console.log(selected_products);
             }
             this.value = -1;
         });
 
+
         document.querySelector('form').addEventListener('reset', function(e) {
-            if (!confirm('Are you sure you want to reset the form?')) {
+            if (!confirm('Are you sure you want to cancel?')) {
                 e.preventDefault();
             }
-            selected_products = [];
-            document.getElementById('product_list').innerHTML = '';
+            window.location.href = "{{ route('admin.promotion') }}";
 
         });
 
-        //ajax request to add promotion
         document.querySelector('form').addEventListener('submit', function(e) {
             e.preventDefault();
             let form = new FormData(this);
@@ -209,16 +204,15 @@
                 return;
             }
             form.append('products', JSON.stringify(selected_products));
-            fetch("{{ route('promotion.create') }}", {
+            fetch("{{ route('promotion.update', $promotion->promotion_id) }}", {
                     method: 'POST',
                     body: form
-                })
-                .then(response => response.json())
+                }).then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        window.location.href = "../promotion";
+                        window.location.href = "{{ route('admin.promotion') }}";
                     } else {
-                        alert(data.message);
+                        alert('Failed to update promotion');
                     }
                 });
         });

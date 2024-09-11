@@ -31,16 +31,11 @@
                     </button>
                 </div>
             </div>
-            <div class="ms-auto">
-                <button class="btn btn-secondary me-2" onclick="window.location.href='{{ route('admin.promotion.restore') }}'"><i class="fa-regular fa-trash-undo pe-2"></i>Restore</button>
-                <button class="btn btn-primary" onclick="window.location.href='{{ route('admin.promotion.add') }}'"><i class="fa-regular fa-plus pe-2"></i>Create</button>
-            </div>
         </div>
         <table class="table">
             <thead>
                 <tr>
                     <th scope="col">#</th>
-                    <th scope="col"></th>
                     <th scope="col">Name</th>
                     <th scope="col">Effect</th>
                     <th scope="col">Items</th>
@@ -55,14 +50,8 @@
                 $index = 1;
                 @endphp
                 @foreach ($promotions as $promotion)
-                    @if($promotion->status != 'deleted')
-                        <tr id="promotion_{{$promotion->promotion_id}}">
+                <tr id="promotion_{{$promotion->promotion_id}}">
                             <th scope="row">{{$index++}}</th>
-                            <td>
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" {{$promotion->status=="active" ? "checked" :""}}>
-                                </div>
-                            </td>
                             <td>{{$promotion->title}}</td>
                             <td><i class="fa-solid {{$promotion->status == " bundle" ? "fa-cubes" :"fa-cube"}}"></i><span class="ps-2">{{$promotion->type}}</span></td>
                             <td>{{count($promotion->product_list)}} product(s)
@@ -74,11 +63,9 @@
                                 <span class="badge {{$promotion->status == 'active' ? 'bg-success' : 'bg-danger'}}">{{$promotion->status}}</span>
                             </td>
                             <td>
-                                <button class="btn btn-warning" onclick="window.location.href='{{ route('admin.promotion.edit', $promotion->promotion_id) }}'"><i class="fa-regular fa-edit pe-2"></i>Edit</button>
-                                <button class="btn btn-danger" onclick="confirmation({{$promotion->promotion_id}})"><i class="fa-regular fa-trash pe-2"></i>Delete</button>
+                                <button class="btn btn-success" onclick="confirmation({{$promotion->promotion_id}})"><i class="fa-regular fa-trash-can-undo pe-2"></i>Restore</button>
                             </td>
                         </tr>
-                    @endif
                 @endforeach
             </tbody>
         </table>
@@ -125,7 +112,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
-                <button type="button" class="btn btn-danger" id="confirm-delete" onclick="confirmDelete()">Yes</button>
+                <button type="button" class="btn btn-danger" id="confirm-delete">Yes</button>
             </div>
         </div>
     </div>
@@ -134,66 +121,40 @@
 @endsection
 
 @section('js')
-<script defer>
-    function displayProducts($products) {
-        let html = '';
-        $products.forEach((product, index) => {
-            html += `
-            <tr>
-                <th scope="row">${index+1}</th>
+<script>
+
+    function displayProducts(products) {
+        let tbody = document.querySelector('#viewProducts tbody');
+        tbody.innerHTML = '';
+        products.forEach((product, index) => {
+            let tr = document.createElement('tr');
+            tr.innerHTML = `
+                <th scope="row">${index + 1}</th>
                 <td>${product.name}</td>
                 <td>${product.price}</td>
                 <td>${product.stock}</td>
-            </tr>
             `;
+            tbody.appendChild(tr);
         });
-        document.querySelector('#viewProducts tbody').innerHTML = html;
     }
-    //delete promotion
+
     function confirmation(promotion_id) {
-        document.querySelector('#promotion_id').value = promotion_id;
+        $('#promotion_id').val(promotion_id);
         $('#deletePromotion').modal('show');
     }
 
-    function confirmDelete() {
+    document.querySelector('#confirm-delete').addEventListener('click', function() {
         let promotion_id = document.querySelector('#promotion_id').value;
-        //ajax request to delete promotion
-        fetch(`http://127.0.0.1:8000/api/promotion/${promotion_id}`, {
-                method: 'DELETE',
+        fetch(`http://127.0.0.1:8000/api/promotion/restore/${promotion_id}`, {
+                method: 'POST',
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    //delete row from table
+                    $('#promotion_' + promotion_id).remove();
                     $('#deletePromotion').modal('hide');
-                    document.querySelector(`#promotion_${promotion_id}`).remove();
                 }
             });
-    }
-
-    $(document).ready(function() {
-        //change promotion status
-        $('.form-check-input').on('change', function() {
-            let status = this.checked ? 'active' : 'inactive';
-            let promotion_id = $(this).closest('tr').attr('id').split('_')[1];
-            //ajax request to change promotion status
-            fetch(`http://127.0.0.1:8000/api/promotion/edit/status/${promotion_id}`, {
-                    method: 'PUT',
-                    body: JSON.stringify({
-                        status: status
-                    }),
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        //change badge color
-                        $(this).closest('tr').find('.badge').removeClass('bg-success bg-danger').addClass(`bg-${status == 'active' ? 'success' : 'danger'}`).text(status);
-                    }
-                });
-        });
     });
 </script>
 

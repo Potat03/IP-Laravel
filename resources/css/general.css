@@ -3,9 +3,10 @@
 }
 
 .content-div {
+    flex: 1;
     align-self: center;
-    margin-bottom: 2%;
-    margin-top: 2%;
+    margin-bottom: 1%;
+    margin-top: 1%;
     padding: 1%;
     border: #d3d3d3fa 2px solid;
     border-radius: 10px;
@@ -31,6 +32,15 @@ th {
     bottom: 0;
     z-index: 2;
     background-color: white;
+    width: 100%;
+    margin-top: auto; /* Pushes the sticky-bottom div to the bottom */
+}
+
+.sticky-bottom {
+    width: 100%;
+    margin-top: auto; /* Pushes the sticky-bottom div to the bottom */
+    background-color: #fff; /* Optional: Set a background color */
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1); /* Optional: Add a shadow */
 }
 
 .sticky-top {
@@ -42,7 +52,6 @@ th {
 
 .test{
     border-bottom: #b90f0f 1px solid;
-
 }
 
   

@@ -332,6 +332,23 @@
     </div>
 
     <script>
+        //get details of promotion
+        fetch('/api/promotion/1')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Display promotion details
+                    // got id
+                } else {
+                    console.log(data.data);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+
+
+
         function selectVariation(element) {
             // Remove active class from all variation buttons
             var buttons = document.querySelectorAll('.btn-variation');
