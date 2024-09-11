@@ -177,6 +177,7 @@
             }
         }
     </style>
+
 </head>
 
 <body>
@@ -223,7 +224,7 @@
     <script src="https://code.jquery.com/jquery-migrate-3.3.2.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
-    <script></script>
+    @yield('scripts')
 </body>
 
 </html>

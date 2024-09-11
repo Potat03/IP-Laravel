@@ -26,6 +26,10 @@
     Route::post('/promotion/update/{id}', [PromotionController::class, 'updatePromotion'])->name('promotion.update');
     Route::delete('/promotion/{id}', [PromotionController::class, 'deletePromotion']);
     Route::put('/promotion/edit/status/{id}', [PromotionController::class, 'togglePromotion']);
+    Route::post('/promotion/restore/{id}', [PromotionController::class, 'undoDeletePromotion']);
+
+
+    
     Route::post('/product/image/upload', [ProductController::class, 'productImageUpload']);
     Route::get('/product/generateTable', [ProductController::class, 'generateTable']);
 

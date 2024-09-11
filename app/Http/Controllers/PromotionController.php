@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use App\Models\Promotion;
@@ -185,7 +186,7 @@ class PromotionController extends Controller
     public function undoDeletePromotion($id){
         try{
             $promotion = Promotion::find($id);
-            $promotion->status = 'active';
+            $promotion->status = 'deactive';
             $promotion->save();
             return response()->json(['success' => true, 'data' => $promotion], 200);
         }
@@ -220,6 +221,35 @@ class PromotionController extends Controller
         }
     }
 
+    public function customerList(){
+        try{
+            $promotions = Promotion::where('status', 'active')->get();
+            foreach($promotions as $promotion){
+                $promotion->product_list = Promotion::find($promotion->promotion_id)->product;
+
+                //see if promotion is new (less than 3 days)
+                if($promotion->created_at->diffInDays(now()) < 3){
+                    $promotion->is_new = true;
+                }else{
+                    $promotion->is_new = false;
+                }
+
+                //quantity of each product
+                foreach($promotion->product_list as $product){
+                    $product->quantity = PromotionItem::where('product_id', $product->product_id)->where('promotion_id', $promotion->promotion_id)->first()->quantity;
+                }
+            }
+
+            //get all category
+            $categories = Category::all();
+            
+            return view('promotion', ['promotions' => $promotions, 'categories' => $categories]);
+        }
+        catch(Exception $e){
+            return view('errors.404');
+        }
+    }
+
     public function addPromotion(){
         $products = Product::all();
         return view('admin.promotion_add', ['products' => $products]);
@@ -230,7 +260,26 @@ class PromotionController extends Controller
             $promotion = Promotion::find($id);
             $promotion->product_list = Promotion::find($id)->product;
             $products = Product::all();
+
+            //quantity of each product
+            foreach($promotion->product_list as $product){
+                $product->quantity = PromotionItem::where('product_id', $product->product_id)->where('promotion_id', $id)->first()->quantity;
+            }
             return view('admin.promotion_edit', ['promotion' => $promotion, 'products' => $products]);
+        }
+        catch(Exception $e){
+            return view('errors.404');
+        }
+    }
+
+    public function restorePromotion(){
+        try{
+            //get promotion where status = deleted
+            $promotions = Promotion::where('status', 'deleted')->get();
+            foreach($promotions as $promotion){
+                $promotion->product_list = Promotion::find($promotion->promotion_id)->product;
+            }
+            return view('admin.promotion_restore', ['promotions' => $promotions]);
         }
         catch(Exception $e){
             return view('errors.404');
