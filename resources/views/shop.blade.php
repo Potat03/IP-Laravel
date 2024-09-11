@@ -1,6 +1,7 @@
 @extends('layout.shop')
 
 @section('title', 'Shop')
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 @section('content')
     <div class="flex-shrink-0 p-3 bg-white d-flex flex-column">
@@ -14,37 +15,44 @@
                                 class="fa-solid fa-magnifying-glass"></i></button>
                     </div>
                 </div>
+
                 <div class="card-body">
+                    <!-- Price and Rating Range -->
+                    <div class="mb-3">
+                        <label for="sort-by" class="form-label">Sort By</label>
+                        <select class="form-select" id="sort-by" name="sort-by">
+                            <option value="">Select</option>
+                            <option value="price-low-high">Price: Low to High</option>
+                            <option value="price-high-low">Price: High to Low</option>
+                            <option value="rating-high-low">Rating: Highest to Lowest</option>
+                            <option value="rating-low-high">Rating: Lowest to Highest</option>
+                        </select>
+                    </div>
+
+                    <!-- Availability -->
                     <div class="input-group mb-3">
                         <div class="input-group-text">
-                            <input class="form-check-input mt-0" type="checkbox" value=""
-                                aria-label="Checkbox for following text input">
+                            <input class="form-check-input mt-0" type="checkbox" value="available" id="available"
+                                aria-label="Checkbox for available products">
                         </div>
-                        <input type="text" class="form-control" aria-label="Text input with checkbox" value="category"
-                            disabled>
+                        <label class="form-control" for="available">Available Only</label>
                     </div>
+
+                    <!-- New Arrivals -->
                     <div class="input-group mb-3">
                         <div class="input-group-text">
-                            <input class="form-check-input mt-0" type="checkbox" value=""
-                                aria-label="Checkbox for following text input">
+                            <input class="form-check-input mt-0" type="checkbox" value="new" id="new-arrival"
+                                aria-label="Checkbox for new arrivals">
                         </div>
-                        <input type="text" class="form-control" aria-label="Text input with checkbox" value="category"
-                            disabled>
+                        <label class="form-control" for="new-arrival">New Arrivals</label>
                     </div>
-                    <div class="input-group mb-3">
-                        <div class="input-group-text">
-                            <input class="form-check-input mt-0" type="checkbox" value=""
-                                aria-label="Checkbox for following text input">
-                        </div>
-                        <input type="text" class="form-control" aria-label="Text input with checkbox" value="category"
-                            disabled>
-                    </div>
+
                 </div>
             </div>
         </div>
     </div>
     <div class="col-md-9">
-        <div class="row">
+        <div class="row" id="product-list">
             @forelse ($products as $product)
                 @if ($product->status == 'active')
                     <div class="col-md-2-4 mb-4">
@@ -93,3 +101,39 @@
         </div>
     </div>
 @endsection
+
+<script>
+    $(document).ready(function() {
+        // Listen for filter changes
+        $('#price-sort, #available, #rating-filter, #new-arrival, #search').on('change keyup', function() {
+            filterProducts();
+        });
+
+        // AJAX function to get filtered products
+        function filterProducts() {
+            let priceSort = $('#price-sort').val();
+            let available = $('#available').is(':checked') ? 1 : 0;
+            let rating = $('#rating-filter').val();
+            let newArrival = $('#new-arrival').is(':checked') ? 1 : 0;
+            let search = $('#search').val();
+
+            console.log('Search:', search);  // Debugging line
+
+            $.ajax({
+                url: '/shop',
+                method: 'GET',
+                data: {
+                    price_sort: priceSort,
+                    available: available,
+                    rating: rating,
+                    new_arrival: newArrival,
+                    search: search
+                },
+                success: function(response) {
+                    $('#product-list').html(response);
+                }
+            });
+        }
+    });
+</script>
+

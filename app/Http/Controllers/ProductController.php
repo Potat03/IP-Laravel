@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Product;
+use App\Models\Rating;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Exception;
 use Illuminate\Support\Facades\Log;
@@ -34,7 +35,7 @@ class ProductController extends Controller
             if (!file_exists(public_path($folderPath))) {
                 mkdir(public_path($folderPath), 0777, true);
             }
-            
+
             $images = $request->file('images');
             foreach ($images as $index => $image) {
                 if ($index === 0) {
@@ -120,20 +121,56 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         try {
-            $query = $request->input('search');
-            $isNew = $request->input('is_new');
+            $query = trim($request->input('search'));
+            $priceSort = $request->input('price_sort');
+            $rating = $request->input('rating');
+            $available = $request->input('available');
+            $newArrival = $request->input('new_arrival');
+
+            // Debugging lines
+            Log::info('Search Query:', ['query' => $query]);
+            Log::info('Price Sort:', ['price_sort' => $priceSort]);
+            Log::info('Rating:', ['rating' => $rating]);
+            Log::info('Available:', ['available' => $available]);
+            Log::info('New Arrival:', ['new_arrival' => $newArrival]);
 
             $queryBuilder = Product::query();
 
+            // Search query
             if ($query) {
                 $queryBuilder->where('name', 'LIKE', "%$query%");
             }
 
-            if ($isNew) {
+            // Availability filter
+            if ($available) {
+                $queryBuilder->where('availability', true); // Assuming there's an 'availability' field
+            }
+
+            // Rating filter
+            if ($rating) {
+                $queryBuilder->where('rating', '>=', $rating); // Assuming there's a 'rating' field
+            }
+
+            // New arrivals filter
+            if ($newArrival) {
                 $queryBuilder->where('is_new', true);
             }
 
+            // Price sorting
+            if ($priceSort) {
+                if ($priceSort === 'low-high') {
+                    $queryBuilder->orderBy('price', 'asc');
+                } else if ($priceSort === 'high-low') {
+                    $queryBuilder->orderBy('price', 'desc');
+                }
+            }
+
             $products = $queryBuilder->paginate(20);
+
+            // Return a view or JSON response based on request type
+            if ($request->ajax()) {
+                return view('partials.products', ['products' => $products])->render();
+            }
 
             return view('shop', ['products' => $products]);
         } catch (Exception $e) {
@@ -142,7 +179,7 @@ class ProductController extends Controller
         }
     }
 
-    //home page new arrival
+    //from home to shop page new arrival category
     public function newArrivals()
     {
         try {
@@ -161,19 +198,19 @@ class ProductController extends Controller
     {
         try {
             $products = Product::all();
-            
+
             return response()->json(['success' => true, 'data' => $products], 200);
         } catch (Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
         }
     }
 
-    public function getOne($id){
-        try{
+    public function getOne($id)
+    {
+        try {
             $product = Product::find($id);
             return response()->json(['success' => true, 'data' => $product], 200);
-        }
-        catch(Exception $e){
+        } catch (Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
         }
     }
@@ -196,15 +233,31 @@ class ProductController extends Controller
     public function show($id)
     {
         try {
+            // Fetch the product by ID
             $product = Product::findOrFail($id);
 
-            if (!$product || $product->status != 'active') {
+            // Check if the product is active
+            if ($product->status != 'active') {
                 return response()->view('errors.404', [], 404);
             }
 
-            return view('product', ['product' => $product]);
+            // Fetch ratings for the product
+            $ratings = Rating::where('product_id', $id)
+                ->where('status', 'approved')
+                ->get();
+
+            // Calculate average rating and number of reviews
+            $averageRating = $ratings->avg('star_rating') ?? 0;
+            $reviewsCount = $ratings->count();
+
+            // Return view with product and rating information
+            return view('product', [
+                'product' => $product,
+                'averageRating' => $averageRating,
+                'reviewsCount' => $reviewsCount,
+            ]);
         } catch (ModelNotFoundException $e) {
-            return view('errors.404');
+            return response()->view('errors.404');
             // return response()->json(['error' => 'Product not found.'], 404);
         } catch (Exception $e) {
             // Log the error
@@ -272,13 +325,46 @@ class ProductController extends Controller
         }
     }
 
+    // public function showNewArrivals()
+    // {
+    //     try {
+    //         // Fetch new arrivals
+    //         $newArrivals = Product::where('created_at', '>=', now()->subDays(30))
+    //             ->orderBy('created_at', 'desc')
+    //             ->take(10)
+    //             ->get();
+
+    //         return view('home', [
+    //             'newArrivals' => $newArrivals,
+    //         ]);
+    //     } catch (Exception $e) {
+    //         Log::error('Fetching new arrivals failed: ' . $e->getMessage());
+    //         return response()->json(['error' => 'Fetching new arrivals failed.'], 500);
+    //     }
+    // }
+
     public function showNewArrivals()
     {
-        $newArrivals = Product::where('created_at', '>=', now()->subDays(30))
-            ->orderBy('created_at', 'desc')
-            ->take(10)
-            ->get();
+        try {
+            // Fetch new arrivals
+            $newArrivals = Product::where('created_at', '>=', now()->subDays(30))
+                ->orderBy('created_at', 'desc')
+                ->take(10)
+                ->get();
 
-        return view('home', compact('newArrivals'));
+            // Get the IDs of new arrivals
+            $newArrivalsId = $newArrivals->pluck('product_id');
+
+            return $this->fetchRatingsForProducts($newArrivalsId, $newArrivals);
+        } catch (Exception $e) {
+            Log::error('Fetching new arrivals failed: ' . $e->getMessage());
+            return response()->json(['error' => 'Fetching new arrivals failed.'], 500);
+        }
+    }
+
+    private function fetchRatingsForProducts($newArrivalsId, $newArrivals)
+    {
+        // Redirect to the RatingController method or handle it here
+        return app('App\Http\Controllers\RatingController')->fetchRatings($newArrivalsId, $newArrivals);
     }
 }
