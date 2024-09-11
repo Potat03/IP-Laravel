@@ -234,7 +234,7 @@
                             <div class="m-5 py-5">
                                 <h5 class="card-title fw-bold display-4 mb-0">Collectible</h5>
                                 <p class="card-text display-5">収集品</p>
-                                <a href="#" class="btn btn-outline-light btn-lg mt-4 custom-btn fw-bold fs-3">View
+                                <a href="{{ url('/shop/collectible') }}" class="btn btn-outline-light btn-lg mt-4 custom-btn fw-bold fs-3">View
                                     More</a>
                             </div>
                         </div>
@@ -248,7 +248,7 @@
                             <div class="m-5 py-5">
                                 <h5 class="card-title fw-bold display-4 mb-0">Consumable</h5>
                                 <p class="card-text display-5">消耗品</p>
-                                <a href="#" class="btn btn-outline-light btn-lg mt-4 custom-btn fw-bold fs-3">View
+                                <a href="{{ url('/shop/consumable') }}" class="btn btn-outline-light btn-lg mt-4 custom-btn fw-bold fs-3">View
                                     More</a>
                             </div>
                         </div>
@@ -262,7 +262,7 @@
                             <div class="m-5 py-5">
                                 <h5 class="card-title fw-bold display-4 mb-0">Wearable</h5>
                                 <p class="card-text display-5">着用可能</p>
-                                <a href="#" class="btn btn-outline-light btn-lg mt-4 custom-btn fw-bold fs-3">View
+                                <a href="{{ url('/shop/wearable') }}" class="btn btn-outline-light btn-lg mt-4 custom-btn fw-bold fs-3">View
                                     More</a>
                             </div>
                         </div>
@@ -281,7 +281,7 @@
                     <h1 class="pb-4 text-uppercase" style="padding-left: 25px;">New Arrivals</h1>
                 </div>
                 <div class="col-auto">
-                    <a href="{{ url('/shop') }}" class="btn btn-link fs-4">View all</a>
+                    <a href="{{ route('shop.newArrivals') }}" class="btn btn-link fs-4">View all</a>
                 </div>
             </div>
 

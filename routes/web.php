@@ -33,10 +33,11 @@ Route::get('/home', function() {
 
 Route::get('/home', [ProductController::class, 'showNewArrivals']);
 
-Route::get('/shop', [ProductController::class, 'index'])->name('shop.index');;
+Route::get('/shop', [ProductController::class, 'index'])->name('shop.index');
 Route::get('/shop/wearable', [WearableController::class, 'index'])->name('shop.wearable');
 Route::get('/shop/consumable', [ConsumablesController::class, 'index'])->name('shop.consumable');
 Route::get('/shop/collectible', [CollectiblesController::class, 'index'])->name('shop.collectible');
+Route::get('/shop/new-arrivals', [ProductController::class, 'newArrivals'])->name('shop.newArrivals');
 
 Route::get('/product/{id}', [ProductController::class, 'show'])->name('product');
 Route::get('/product/{id}', [ProductController::class, 'showProductImages']);

@@ -103,21 +103,43 @@ class ProductController extends Controller
         }
     }
 
-    // Read all products
     public function index(Request $request)
     {
         try {
             $query = $request->input('search');
+            $isNew = $request->input('is_new');
+
+            $queryBuilder = Product::query();
 
             if ($query) {
-                $products = Product::where('name', 'LIKE', "%$query%")->paginate(20);
-            } else {
-                $products = Product::paginate(20);
+                $queryBuilder->where('name', 'LIKE', "%$query%");
             }
+
+            if ($isNew) {
+                $queryBuilder->where('is_new', true);
+            }
+
+            $products = $queryBuilder->paginate(20);
+
             return view('shop', ['products' => $products]);
         } catch (Exception $e) {
             Log::error('Fetching products failed: ' . $e->getMessage());
             return response()->json(['error' => 'Fetching products failed.'], 500);
+        }
+    }
+
+    //home page new arrival
+    public function newArrivals()
+    {
+        try {
+            $newArrivals = Product::where('created_at', '>=', now()->subDays(30))
+                ->orderBy('created_at', 'desc')
+                ->paginate(20);
+
+            return view('shop.new-arrivals', ['newArrivals' => $newArrivals]);
+        } catch (Exception $e) {
+            Log::error('Fetching new arrivals failed: ' . $e->getMessage());
+            return response()->json(['error' => 'Fetching new arrivals failed.'], 500);
         }
     }
 

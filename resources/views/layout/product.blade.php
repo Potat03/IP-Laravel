@@ -45,11 +45,17 @@
     <main>
         @if (isset($product) && $product->status == 'active')
             @yield('top')
+
             @hasSection('variation')
                 @yield('variation')
             @endif
+
             @yield('mid')
-            @yield('bundle')
+
+            @hasSection('bundle')
+                @yield('bundle')
+            @endif
+
             @yield('bottom')
         @else
             @include('errors.404')
