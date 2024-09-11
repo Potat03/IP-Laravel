@@ -6,10 +6,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use App\Models\Promotion;
 use App\Models\PromotionItem;
+use App\Models\Product;
 use Exception;
 
 class PromotionController extends Controller
 {
+    //api method
     public function getPromotion(){
         try{
             $promotion = Promotion::all();
@@ -52,12 +54,21 @@ class PromotionController extends Controller
 
             //json to array
             $productList = json_decode($request->products);
+            $originalPrice = 0;
 
+            //get original price
+            foreach($productList as $product){
+                $originalPrice += Product::find($product->product_id)->price * $product->quantity;
+            }
+
+            $discountAmount = $originalPrice - ($originalPrice * $request->discount / 100);
 
             $newPromo = Promotion::create([
                 'title' => $request->title,
                 'description' => $request->description,
                 'discount' => $request->discount,
+                'discount_amount' => $discountAmount,
+                'original_price' => $originalPrice,
                 'type' => $request->type,
                 'limit' => $request->limit,
                 'start_at' => $request->start_date,
@@ -87,9 +98,21 @@ class PromotionController extends Controller
             //store old data in cache for 1 day
             Cache::put('promotion_'.$id, $promotion, 86400);
 
+            $originalPrice = 0;
+            $productList = json_decode($request->products);
+            
+            //get original price
+            foreach($productList as $product){
+                $originalPrice += Product::find($product->product_id)->price * $product->quantity;
+            }
+
+            $discountAmount = $originalPrice - ($originalPrice * $request->discount / 100);
+
             $promotion->title = $request->title;
             $promotion->description = $request->description;
             $promotion->discount = $request->discount;
+            $promotion->discount_amount = $discountAmount;
+            $promotion->original_price = $originalPrice;
             $promotion->type = $request->type;
             $promotion->limit = $request->limit;
             $promotion->start_at = $request->start_date;
@@ -176,6 +199,38 @@ class PromotionController extends Controller
             $ids = explode(',', $ids);
             $promotion = Promotion::whereIn('promotion_id', $ids)->get();
             return view('promotion', ['promotion' => $promotion]);
+        }
+        catch(Exception $e){
+            return view('errors.404');
+        }
+    }
+
+    //admin side
+    
+    public function adminList(){
+        try{
+            $promotions = Promotion::all();
+            foreach($promotions as $promotion){
+                $promotion->product_list = Promotion::find($promotion->promotion_id)->product;
+            }
+            return view('admin.promotion', ['promotions' => $promotions]);
+        }
+        catch(Exception $e){
+            return view('errors.404');
+        }
+    }
+
+    public function addPromotion(){
+        $products = Product::all();
+        return view('admin.promotion_add', ['products' => $products]);
+    }
+
+    public function editPromotion($id){
+        try{
+            $promotion = Promotion::find($id);
+            $promotion->product_list = Promotion::find($id)->product;
+            $products = Product::all();
+            return view('admin.promotion_edit', ['promotion' => $promotion, 'products' => $products]);
         }
         catch(Exception $e){
             return view('errors.404');

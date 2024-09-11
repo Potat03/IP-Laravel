@@ -25,36 +25,36 @@
                 @csrf
                 <div class="mb-3">
                     <label for="name" class="form-label">Promotion Title</label>
-                    <input type="text" class="form-control" id="title" name="title" required>
+                    <input type="text" class="form-control" id="title" name="title" value="{{ $promotion->title }}" required>
                 </div>
                 <div class="mb-3">
                     <label for="description" class="form-label">Description</label>
-                    <textarea class="form-control" id="description" name="description" required></textarea>
+                    <textarea class="form-control" id="description" name="description" required>{{ $promotion->description }}</textarea>
                 </div>
                 <div class="mb-3">
                     <label for="discount" class="form-label">Discount (%)</label>
-                    <input type="number" class="form-control" id="discount" name="discount" required>
+                    <input type="number" class="form-control" id="discount" name="discount" value="{{ $promotion->discount }}" required>
                 </div>
                 <div class="mb-3">
                     <label for="product_id" class="form-label">Type</label>
-                    <select class="form-select" id="type" name="type" required>
+                    <select class="form-select" id="type" name="type" value="{{ $promotion->type }}" required>
                         <option value="1">Single</option>
                         <option value="2">Bundle</option>
                     </select>
                 </div>
                 <div class="mb-3">
                     <label for="limit" class="form-label">Limit</label>
-                    <input type="number" class="form-control" id="limit" name="limit" required>
+                    <input type="number" class="form-control" id="limit" name="limit" value="{{ $promotion->limit }}" required>
                 </div>
                 <div class="mb-3">
                     <div class="row">
                         <div class="col-6">
                             <label for="start_date" class="form-label">Start Date</label>
-                            <input type="date" class="form-control" id="start_date" name="start_date" required>
+                            <input type="date" class="form-control" id="start_date" name="start_date" value="{{ $promotion->start_at }}" required>
                         </div>
                         <div class="col-6">
                             <label for="end_date" class="form-label">End Date</label>
-                            <input type="date" class="form-control" id="end_date" name="end_date" required>
+                            <input type="date" class="form-control" id="end_date" name="end_date" value="{{ $promotion->end_at }}" required>
                         </div>
                     </div>
                 </div>
@@ -62,6 +62,11 @@
                     <label for="product_id" class="form-label">Product</label>
                     <select class="form-select" id="product_select" name="product_select">
                         <option value="-1">-- Select Product --</option>
+                        @foreach ($products as $product)
+                        @if ($product->stock != 0 && $product->status != 'inactive')
+                        <option value="{{ $product->product_id }}">{{ $product->name }}</option>
+                        @endif
+                        @endforeach
                     </select>
                     <div class="container mx-0">
 
@@ -89,61 +94,21 @@
 @section('js')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        
-        fetch("{{route('promotion.get', $id)}}")
-            .then(response => response.json())
-            .then(data => {
-                if (!data.success) {
-                    //redirect to promotion page
-                    window.location.href = "../../promotion";
-                } else {
-                    $promotion = data.data;
-                    document.getElementById('title').value = $promotion.title;
-                    document.getElementById('description').value = $promotion.description;
-                    document.getElementById('discount').value = $promotion.discount;
-                    document.getElementById('type').value = $promotion.type;
-                    document.getElementById('limit').value = $promotion.limit;
-                    document.getElementById('start_date').value = $promotion.start_at;
-                    document.getElementById('end_date').value = $promotion.end_at;
-                    document.getElementById('status').value = $promotion.status;
-                    selected_products = $promotion.product_list;
-                    displayProducts();
-                }
 
-            });
+        let product_list = @json($products);
+        let selected_products = @json($promotion - > product_list);
+        let productLimit = parseInt(document.getElementById('limit').value);
 
+        displayProducts()
 
-
-        document.getElementById('start_date').addEventListener('change', function() {
-            document.getElementById('end_date').setAttribute('min', this.value);
+        $('#start_date').on('change', function() {
+            $('#end_date').attr('min', this.value);
         });
 
-        document.getElementById('end_date').addEventListener('change', function() {
-            document.getElementById('start_date').setAttribute('max', this.value);
+        $('#end_date').on('change', function() {
+            $('#start_date').attr('max', this.value);
         });
 
-        let product_list = [];
-        let selected_products = [];
-        let productLimit = 1;
-        //set options for product select
-        fetch("{{ route('product.index') }}")
-            .then(response => response.json())
-            .then(data => {
-                let product_select = document.getElementById('product_select');
-
-                data.forEach(product => {
-                    if (product.stock != 0 && product.status != 'inactive') {
-                        product_list.push(product);
-                        let option = document.createElement('option');
-                        option.value = product.product_id;
-                        option.text = product.name;
-                        product_select.appendChild(option);
-                    }
-                });
-                console.log(product_list);
-            });
-
-        //allow only one product to be selected if type is single
         document.getElementById('type').addEventListener('change', function() {
             let type = this.value;
             if (type == 1) {
@@ -157,7 +122,6 @@
 
         document.getElementById('product_select').addEventListener('change', function() {
             let product_id = this.value;
-
             if (product_id == -1) {
                 return;
             }
@@ -167,8 +131,8 @@
                 this.value = -1;
                 return;
             }
-            let product = product_list.find(product => product.product_id == product_id);
-            if (selected_products.find(p => p.product_id == product.product_id)) {
+            let product = product_list.find(p => p.product_id == product_id);
+            if (selected_products.find(p => p.product_id == product_id)) {
                 alert('Product already selected');
                 this.value = -1;
                 return;
@@ -177,7 +141,6 @@
                 selected_products.push(product);
                 displayProducts();
 
-                console.log(selected_products);
             }
             this.value = -1;
         });
@@ -226,17 +189,8 @@
                 });
             });
         }
-        //confirm reset
-        document.querySelector('form').addEventListener('reset', function(e) {
-            if (!confirm('Are you sure you want to reset the form?')) {
-                e.preventDefault();
-            }
-            selected_products = [];
-            document.getElementById('product_list').innerHTML = '';
 
-        });
-
-        //ajax request to add promotion
+        //ajax request to edit promotion
         document.querySelector('form').addEventListener('submit', function(e) {
             e.preventDefault();
             let form = new FormData(this);
@@ -246,16 +200,15 @@
                 return;
             }
             form.append('products', JSON.stringify(selected_products));
-            fetch("{{ route('promotion.update', $id) }}", {
-                    method: 'POST',
-                    body: form
-                })
-                .then(response => response.json())
+            fetch("{{ route('promotion.update', $promotion->promotion_id) }}", {
+                method: 'POST',
+                body: form
+            }).then(response => response.json())
                 .then(data => {
-                    if (data.success) {
-                        window.location.href = "../";
+                    if (data.status == 'success') {
+                        window.location.href = "{{ route('promotion.index') }}";
                     } else {
-                        alert(data.message);
+                        alert('Failed to update promotion');
                     }
                 });
         });
