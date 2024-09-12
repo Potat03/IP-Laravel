@@ -121,6 +121,8 @@ class PromotionController extends Controller
             $promotion->status = $request->status;
             $promotion->save();
 
+
+
             //product list
             $productList = json_decode($request->products);
 
@@ -206,24 +208,11 @@ class PromotionController extends Controller
         }
     }
 
-    //admin side
-    
-    public function adminList(){
-        try{
-            $promotions = Promotion::all();
-            foreach($promotions as $promotion){
-                $promotion->product_list = Promotion::find($promotion->promotion_id)->product;
-            }
-            return view('admin.promotion', ['promotions' => $promotions]);
-        }
-        catch(Exception $e){
-            return view('errors.404');
-        }
-    }
+    //views
 
     public function customerList(){
         try{
-            $promotions = Promotion::where('status', 'active')->get();
+            $promotions = Promotion::where('status', 'active')->paginate(12);
             foreach($promotions as $promotion){
                 $promotion->product_list = Promotion::find($promotion->promotion_id)->product;
 
@@ -244,6 +233,49 @@ class PromotionController extends Controller
             $categories = Category::all();
             
             return view('promotion', ['promotions' => $promotions, 'categories' => $categories]);
+        }
+        catch(Exception $e){
+            return view('errors.404');
+        }
+    }
+
+    public function viewDetails($id){
+        try{
+            $promotion = Promotion::find($id);
+            $promotion->product_list = Promotion::find($id)->product;
+            //|| $promotion->end_at < now()
+            if($promotion->status == 'deleted' || $promotion->status == 'inactive' ){
+                return view('errors.404');
+            }else if ($promotion->type == 'single'){
+                return redirect()->route('product', ['id' => $promotion->product_list[0]->product_id]);
+            }
+
+
+            foreach($promotion->product_list as $product){
+                $product->quantity = PromotionItem::where('product_id', $product->product_id)->where('promotion_id', $id)->first()->quantity;
+            }
+
+            $promotion->bought_count = 0;
+            //check if user has bought this promotion
+            // if(auth()->check()){
+            //     $promotion->bought_count = Promotion::find($id)->order->where('customer_id', auth()->user()->customer_id)->count();
+            // }else{
+            //     $promotion->bought_count = $promotion->limit;
+            // }
+
+            return view('promotionDetails', ['promotion' => $promotion]);
+        }
+        catch(Exception $e){
+            return view('errors.404');
+        }
+    }
+    public function adminList(){
+        try{
+            $promotions = Promotion::whereNot('status', 'deleted')->paginate(12);
+            foreach($promotions as $promotion){
+                $promotion->product_list = Promotion::find($promotion->promotion_id)->product;
+            }
+            return view('admin.promotion', ['promotions' => $promotions]);
         }
         catch(Exception $e){
             return view('errors.404');

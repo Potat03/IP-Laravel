@@ -41,7 +41,6 @@ Route::get('/shop/consumable', [ConsumablesController::class, 'index'])->name('s
 Route::get('/shop/collectible', [CollectiblesController::class, 'index'])->name('shop.collectible');
 
 Route::get('/product/{id}', [ProductController::class, 'show'])->name('product');
-Route::get('/product/{id}', [ProductController::class, 'showProductImages']);
 
 
 // Route::get('/cart', function () {
@@ -66,7 +65,7 @@ Route::get('/testDB', function () {
 //promotion
 
 Route::get('/promotion', [PromotionController::class, 'customerList'])->name('promotion');
-Route::get('/promotion/{id}', [PromotionController::class, 'promotionDetails'])->name('promotion.details');
+Route::get('/promotion/{id}', [PromotionController::class, 'viewDetails'])->name('promotion.details');
 
 //admin side
 Route::get('/admin/login', function () {

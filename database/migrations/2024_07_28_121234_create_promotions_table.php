@@ -19,7 +19,7 @@ return new class extends Migration
             $table->decimal('discount_amount', 8, 2);
             $table->decimal('original_price', 8, 2);
             $table->string('type');
-            $table->decimal('limit', 8, 2);
+            $table->integer('limit');
             $table->date('start_at');
             $table->date('end_at');
             $table->string('status');

@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Customer;
 use App\Models\Product;
 use App\Models\Cart;
+use App\Models\Promotion;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -63,6 +64,32 @@ class DatabaseSeeder extends Seeder
             'subtotal' => '10000',
             'total_discount' => '0',
             'total' => '10000',
+        ]);
+
+        Promotion::create([
+            'title' => 'promotion1',
+            'description' => 'promotion1 description',
+            'discount' => '10%',
+            'discount_amount' => '1000',
+            'original_price' => '10000',
+            'type' => 'single',
+            'limit' => '10000',
+            'start_at' => '2024-07-28',
+            'end_at' => '2024-07-30',
+            'status' => 'active',
+        ]);
+
+        Promotion::create([
+            'title' => 'promotion2',
+            'description' => 'promotion2 description',
+            'discount' => '1000',
+            'discount_amount' => '1000',
+            'original_price' => '10000',
+            'type' => 'bundle',
+            'limit' => '10000',
+            'start_at' => '2024-07-28',
+            'end_at' => '2024-07-30',
+            'status' => 'active',
         ]);
 
     }

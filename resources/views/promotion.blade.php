@@ -94,5 +94,10 @@
         </div>
         @endforelse
     </div>
+    <div class="justify-content-center mt-4">
+                {{ $promotions->links() }}
+            </div>
 </div>
 @endsection
+
+
