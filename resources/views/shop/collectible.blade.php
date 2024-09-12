@@ -67,10 +67,23 @@
                                     <p class="card-text mb-1 fs-5 fs-lg-5 fs-xl-3">{{ $product->name }}</p>
                                     <h4 class="card-text fw-bold mb-2 fs-5 fs-xl-3">RM {{ $product->price }}</h4>
                                     <div class="d-flex justify-content align-items-center small text-warning">
-                                        @for ($i = 0; $i < 5; $i++)
+                                        @php
+                                            $averageRating = $product->averageRating ?? 0;
+                                            $reviewsCount = $product->reviewsCount ?? 0;
+
+                                            $fullStars = floor($averageRating);
+                                            $halfStar = $averageRating - $fullStars >= 0.5;
+                                        @endphp
+                                        @for ($i = 0; $i < $fullStars; $i++)
                                             <i class="bi bi-star-fill me-1"></i>
                                         @endfor
-                                        <span class="text-dark ms-lg-2">(20)</span>
+                                        @if ($halfStar)
+                                            <i class="bi bi-star-half me-1"></i>
+                                        @endif
+                                        @for ($i = $fullStars + ($halfStar ? 1 : 0); $i < 5; $i++)
+                                            <i class="bi bi-star me-1"></i>
+                                        @endfor
+                                        <span class="text-dark ms-lg-2">({{ $reviewsCount }})</span>
                                     </div>
                                 </div>
                                 <div class="card-footer p-3 pt-0 border-top-0 bg-transparent">

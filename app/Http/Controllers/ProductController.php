@@ -167,30 +167,21 @@ class ProductController extends Controller
 
             $products = $queryBuilder->paginate(20);
 
-            // Return a view or JSON response based on request type
-            if ($request->ajax()) {
-                return view('partials.products', ['products' => $products])->render();
-            }
+            // Get the IDs
+            $productsCollection = collect($products->items());
+            $productsId = $productsCollection->pluck('product_id');
 
-            return view('shop', ['products' => $products]);
+            // Return a view or JSON response based on request type
+            // if ($request->ajax()) {
+            //     return view('partials.products', ['products' => $products])->render();
+            // }
+
+            // return view('shop', ['products' => $products]);
+
+            return $this->fetchRatingsForShop($productsId, $products);
         } catch (Exception $e) {
             Log::error('Fetching products failed: ' . $e->getMessage());
             return response()->json(['error' => 'Fetching products failed.'], 500);
-        }
-    }
-
-    //from home to shop page new arrival category
-    public function newArrivals()
-    {
-        try {
-            $newArrivals = Product::where('created_at', '>=', now()->subDays(30))
-                ->orderBy('created_at', 'desc')
-                ->paginate(20);
-
-            return view('shop.new-arrivals', ['newArrivals' => $newArrivals]);
-        } catch (Exception $e) {
-            Log::error('Fetching new arrivals failed: ' . $e->getMessage());
-            return response()->json(['error' => 'Fetching new arrivals failed.'], 500);
         }
     }
 
@@ -343,6 +334,7 @@ class ProductController extends Controller
     //     }
     // }
 
+    //at home page new arrival section
     public function showNewArrivals()
     {
         try {
@@ -355,7 +347,28 @@ class ProductController extends Controller
             // Get the IDs of new arrivals
             $newArrivalsId = $newArrivals->pluck('product_id');
 
+            // Pass the view name to `fetchRatings`
             return $this->fetchRatingsForProducts($newArrivalsId, $newArrivals);
+        } catch (Exception $e) {
+            Log::error('Fetching new arrivals failed: ' . $e->getMessage());
+            return response()->json(['error' => 'Fetching new arrivals failed.'], 500);
+        }
+    }
+
+    //from home to shop page new arrival category
+    public function newArrivals()
+    {
+        try {
+            $newArrivals = Product::where('created_at', '>=', now()->subDays(30))
+                ->orderBy('created_at', 'desc')
+                ->paginate(20);
+
+            // return view('shop.new-arrivals', ['newArrivals' => $newArrivals]);
+
+            // Get the IDs of new arrivals
+            $newArrivalsId = $newArrivals->pluck('product_id');
+
+            return $this->fetchRatingsForNewArrivals($newArrivalsId, $newArrivals);
         } catch (Exception $e) {
             Log::error('Fetching new arrivals failed: ' . $e->getMessage());
             return response()->json(['error' => 'Fetching new arrivals failed.'], 500);
@@ -366,5 +379,17 @@ class ProductController extends Controller
     {
         // Redirect to the RatingController method or handle it here
         return app('App\Http\Controllers\RatingController')->fetchRatings($newArrivalsId, $newArrivals);
+    }
+
+    private function fetchRatingsForNewArrivals($newArrivalsId, $newArrivals)
+    {
+        // Redirect to the RatingController method or handle it here
+        return app('App\Http\Controllers\RatingController')->fetchRatingsForNewArrival($newArrivalsId, $newArrivals);
+    }
+
+    private function fetchRatingsForShop($productsId, $products)
+    {
+        // Redirect to the RatingController method or handle it here
+        return app('App\Http\Controllers\RatingController')->fetchRatingsForShop($productsId, $products);
     }
 }

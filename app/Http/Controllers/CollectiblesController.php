@@ -47,10 +47,18 @@ class CollectiblesController extends Controller
             }
 
             $products = Product::whereIn('product_id', $collectibleIds)->paginate(20);
-            return view('shop.collectible', ['products' => $products]);
+            // return view('shop.collectible', ['products' => $products]);
+
+            return $this->fetchRatingsForCollectible($collectibleIds, $products);
         } catch (Exception $e) {
             Log::error('Fetching collectibles failed: ' . $e->getMessage());
             return response()->json(['error' => 'Fetching collectibles failed.'], 500);
         }
+    }
+
+    private function fetchRatingsForCollectible($collectibleIds, $products)
+    {
+        // Redirect to the RatingController method or handle it here
+        return app('App\Http\Controllers\RatingController')->fetchRatingsForCollectible($collectibleIds, $products);
     }
 }
