@@ -4,97 +4,140 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin</title>
-    @vite(['resources/css/app.css','resources/sass/app.scss', 'resources/js/app.js', 'resources/css/admin-nav.css','resources/js/bootstrap.js'])
+    <title>@yield('title')</title>
 
+    @vite(['resources/css/app.css', 'resources/sass/app.scss', 'resources/js/app.js', 'resources/js/bootstrap.js'])
+    @include('partials.fontawesome')
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <style>
-        body {
-            background-color: #f8f9fa;
-        }
-
-        main{
+        .profile_content {
             display: flex;
-            min-height: 100vh;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            min-height: 500px;
         }
 
-        .main-sidebar .btn:active {
-            border-color: transparent;
+        .content {
+            display: flex;
+            height: 100%;
+            flex-grow: 1;
+        }
+
+        .left_bar {
+            display: flex;
+            flex-direction: column;
+            width: 250px;
+            background-color: #800000;
+            color: white;
+            padding: 20px;
+            gap: 20px;
+            box-shadow: 0px 2px 10px 0px rgba(0, 0, 0, 0.60);
+        }
+
+        .left_bar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            gap: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+
+
+        .left_bar li {
+            list-style: none;
+            padding: 10px;
+            cursor: pointer;
+            transition: all 0.1s;
+            font-weight: 600;
+            border-radius: 5px;
+        }
+
+        .left_bar a {
+            color: white;
+            text-decoration: none;
+            transition: all 0.1s;
+        }
+
+        .left_bar i {
+            font-size: 20px;
+            width: 25px;
+            text-align: center;
+        }
+
+        .left_bar li:hover {
+            background-color: black;
+        }
+
+        .left_bar li:active {
+            scale: 0.9;
+        }
+
+        .left_bar li.active {
+            background-color: white;
+        }
+
+        .left_bar li.active a {
+            color: #800000;
+        }
+
+        .right_content {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            font-family: "Open Sans", Helvetica, Arial, sans-serif;
+            background: #f0f0f0;
+            overflow-y: hidden;
         }
     </style>
-    @yield('css')
 </head>
 
 <body>
     @include('header')
-    <main>
-        <div class="flex-shrink-0 p-3 bg-white d-flex flex-column main-sidebar" style="width: 270px;">
-            <a href="/" class="d-flex align-items-center pb-3 mb-3 link-dark text-decoration-none border-bottom">
-                <span class="fs-5 fw-semibold text-center">Profile</span>
-            </a>
-            <ul class="list-unstyled ps-0 d-flex flex-column flex-fill">
-                <li class="mb-1">
-                    <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#home-collapse" aria-expanded="false">
-                        Home
-                    </button>
-                </li>
-                <li class="mb-1">
-                    <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#dashboard-collapse" aria-expanded="false">
-                        Dashboard
-                    </button>
-                    <div class="collapse" id="dashboard-collapse">
-                        <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small ps-3">
-                            <li><a href="#" class="link-dark rounded text-decoration-none">Overview</a></li>
-                            <li><a href="#" class="link-dark rounded text-decoration-none">Weekly</a></li>
-                            <li><a href="#" class="link-dark rounded text-decoration-none">Monthly</a></li>
-                            <li><a href="#" class="link-dark rounded text-decoration-none">Annually</a></li>
-                        </ul>
-                    </div>
-                </li>
-                <li class="mb-1">
-                    <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#orders-collapse" aria-expanded="false">
-                        Orders
-                    </button>
-                    <div class="collapse" id="orders-collapse">
-                        <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small ps-3">
-                            <li><a href="#" class="link-dark rounded text-decoration-none">New</a></li>
-                            <li><a href="#" class="link-dark rounded text-decoration-none">Processed</a></li>
-                            <li><a href="#" class="link-dark rounded text-decoration-none">Shipped</a></li>
-                            <li><a href="#" class="link-dark rounded text-decoration-none">Returned</a></li>
-                        </ul>
-                    </div>
-                </li>
-                <li class="border-top mt-auto"></li>
-                <li class="mb-1">
-                    <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#account-collapse" aria-expanded="false">
-                        Hi, Husky
-                    </button>
-                </li>
-            </ul>
-        </div>
-        <div class="flex-fill">
-            <div class="p-5">
+    <div class="profile_content">
+        <div class="content">
+            <div class="left_bar">
+                <ul>
+                    <li>
+                        <a href="#">
+                            <i class="fa-solid fa-square-poll-vertical"></i>
+                            Profile</a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fa-regular fa-teddy-bear"></i>
+                            Order History</a>
+                    </li>
+                    <a href="#">
+                        <li class="active">
+                            <i class="fa-regular fa-box"></i>
+                            Shipping
+                    </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fa-brands fa-rocketchat"></i>
+                            Support Chat</a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fa-regular fa-user"></i>
+                            Settings</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="right_content">
+                <div class="title">
+                    <h1>@yield('page_title')</h1>
+                    <p>@yield('page_gm')</p>
+                </div>
+            </div>
+            <div class="lower_content overflow-auto">
                 @yield('content')
             </div>
         </div>
-    </main>
-    @yield('js')
-
-    <script>
-        //collapse other menu when one menu is clicked
-        let btns = document.querySelectorAll('.main-sidebar .btn-toggle');
-        btns.forEach(btn => {
-            btn.addEventListener('click', function() {
-                btns.forEach(b => {
-                    if (b !== btn) {
-                        //click other btns to toggle collapse
-                        if(b.getAttribute('aria-expanded') === 'true'){
-                            b.click();
-                        }
-                    }
-                });
-            });
-        });
-    </script>
 </body>
 
 </html>

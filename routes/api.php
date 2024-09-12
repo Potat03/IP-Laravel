@@ -3,7 +3,7 @@
     use Illuminate\Http\Request;
     use Illuminate\Support\Facades\Route;
     use App\Http\Controllers\ProductController;
-    use App\Http\Proxy\PromotionProxy;
+    use App\Http\Controllers\PromotionController;
     use App\Http\Middleware\customAuth;
     use App\Http\Controllers\CustomerController;
 
@@ -30,14 +30,31 @@
     });
 
     Route::post('/cartItem/upload', [CartItemController::class, 'addToCart']);
-    Route::post('/product/image/upload', [ProductController::class, 'productImageUpload'])->middleware('customAuth');
+    Route::post('/product/image/upload/{id}', [ProductController::class, 'productImageUpload']);
     Route::get('/product/index', [ProductController::class, 'index'])->name('product.index');
+    Route::get('/product/all', [ProductController::class, 'getAll'])->name('product.getAll');
+    Route::get('/product/get/{id}', [ProductController::class, 'getOne'])->name('product.get');
 
     //promotion
-    Route::get('/promotion', [PromotionProxy::class, 'getPromotion'])->name('promotion.index');
-    Route::post('/promotion/{id}', [PromotionProxy::class, 'getPromotionById']);
-    Route::middleware([customAuth::class])->group(function () {
-        Route::post('/promotion/create', [PromotionProxy::class, 'createPromotion'])->name('promotion.create');
-        Route::put('/promotion/{id}', [PromotionProxy::class, 'updatePromotion']);
-        Route::delete('/promotion/{id}', [PromotionProxy::class, 'deletePromotion']);
-    });
+    Route::get('/promotion/all', [PromotionController::class, 'getPromotion']);
+    Route::get('/promotion/get/{id}', [PromotionController::class, 'getPromotionById']);
+    Route::post('/promotion/create', [PromotionController::class, 'createPromotion'])->name('promotion.create');
+    Route::post('/promotion/update/{id}', [PromotionController::class, 'updatePromotion'])->name('promotion.update');
+    Route::delete('/promotion/{id}', [PromotionController::class, 'deletePromotion']);
+    Route::put('/promotion/edit/status/{id}', [PromotionController::class, 'togglePromotion']);
+    Route::post('/promotion/restore/{id}', [PromotionController::class, 'undoDeletePromotion']);
+
+
+    
+    Route::post('/product/image/upload', [ProductController::class, 'productImageUpload']);
+    Route::get('/product/generateTable', [ProductController::class, 'generateTable']);
+
+    Route::post('/cartItem/upload', [CartItemController::class, 'addToCart']);
+
+    //cart
+    Route::get('/cartItem/getCartItemByCustomerID/{customerID}', [CartItemController::class, 'getCartItemByCustomerID']);
+
+    // Route::get('/cartItem/getCartItem/{id}', [CartItemController::class, 'getCartItem']);
+    // Route::post('/cartItems/get', [CartItemController::class, 'getCartItems']);
+
+

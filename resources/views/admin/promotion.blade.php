@@ -13,13 +13,11 @@
 </style>
 @endsection
 
+@section('title', 'Promotion')
+@section('page_title', 'Promotion')
+@section('page_gm', 'Prmotion bring smiles to faces')
+
 @section('content')
-<div>
-    <div class="px-2 py-3">
-        <h1>Promotion</h1>
-        <div class="nav-status text-muted fw-bold">Home > Promotion</div>
-    </div>
-</div>
 <div class="card shadow-sm p-3">
     <div class="card-body">
         <div class="card-title d-flex px-3">
@@ -34,7 +32,8 @@
                 </div>
             </div>
             <div class="ms-auto">
-                <button class="btn btn-primary" onclick="window.location.href='/admin/promotion/add'"><i class="fa-solid fa-plus pe-2"></i>Add</button>
+                <button class="btn btn-secondary me-2" onclick="window.location.href='{{ route('admin.promotion.restore') }}'"><i class="fa-regular fa-trash-undo pe-2"></i>Restore</button>
+                <button class="btn btn-primary" onclick="window.location.href='{{ route('admin.promotion.add') }}'"><i class="fa-regular fa-plus pe-2"></i>Create</button>
             </div>
         </div>
         <table class="table">
@@ -52,50 +51,35 @@
                 </tr>
             </thead>
             <tbody id="data-holder">
-                <tr>
-                    <th scope="row">1</th>
-                    <td>
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" checked>
-                        </div>
-                    </td>
-                    <td>Christmas Sale</td>
-                    <td><i class="fa-solid fa-cubes"></i><span class="ps-2">Bundle</span></td>
-                    <td>3 products
-                        <a class="text-decoration-none text-secondary ps-1" data-bs-toggle="modal" data-bs-target="#viewProducts"><i class="fa-solid fa-eye"></i></a>
-                    </td>
-                    <td> Feb 1, 2024</td>
-                    <td> Feb 1, 2024</td>
-                    <td>
-                        <span class="badge bg-success">Active</span>
-                    </td>
-                    <td>
-                        <button class="btn btn-warning"><i class="fa-regular fa-pen-to-square pe-2"></i>Edit</button>
-                        <button class="btn btn-danger"><i class="fa-solid fa-trash-can pe-2"></i>Delete</button>
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row">2</th>
-                    <td>
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" checked>
-                        </div>
-                    </td>
-                    <td>Christmas Sale</td>
-                    <td><i class="fa-solid fa-cube"></i><span class="ps-2">Single</span></td>
-                    <td>3 products
-                        <a class="text-decoration-none text-secondary ps-1" data-bs-toggle="modal" data-bs-target="#viewProducts"><i class="fa-solid fa-eye"></i></a>
-                    </td>
-                    <td> Feb 1, 2024</td>
-                    <td> Feb 1, 2024</td>
-                    <td>
-                        <span class="badge bg-success">Active</span>
-                    </td>
-                    <td>
-                        <button class="btn btn-warning"><i class="fa-regular fa-pen-to-square pe-2"></i>Edit</button>
-                        <button class="btn btn-danger"><i class="fa-solid fa-trash-can pe-2"></i>Delete</button>
-                    </td>
-                </tr>
+                @php
+                $index = 1;
+                @endphp
+                @foreach ($promotions as $promotion)
+                    @if($promotion->status != 'deleted')
+                        <tr id="promotion_{{$promotion->promotion_id}}">
+                            <th scope="row">{{$index++}}</th>
+                            <td>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" {{$promotion->status=="active" ? "checked" :""}}>
+                                </div>
+                            </td>
+                            <td>{{$promotion->title}}</td>
+                            <td><i class="fa-solid {{$promotion->status == " bundle" ? "fa-cubes" :"fa-cube"}}"></i><span class="ps-2">{{$promotion->type}}</span></td>
+                            <td>{{count($promotion->product_list)}} product(s)
+                                <a class="text-decoration-none text-secondary ps-1" data-bs-toggle="modal" data-bs-target="#viewProducts" onclick="displayProducts({{ json_encode($promotion->product_list) }})"><i class="fa-solid fa-eye"></i></a>
+                            </td>
+                            <td> {{$promotion->start_at}}</td>
+                            <td> {{$promotion->end_at}}</td>
+                            <td>
+                                <span class="badge {{$promotion->status == 'active' ? 'bg-success' : 'bg-danger'}}">{{$promotion->status}}</span>
+                            </td>
+                            <td>
+                                <button class="btn btn-warning" onclick="window.location.href='{{ route('admin.promotion.edit', $promotion->promotion_id) }}'"><i class="fa-regular fa-edit pe-2"></i>Edit</button>
+                                <button class="btn btn-danger" onclick="confirmation({{$promotion->promotion_id}})"><i class="fa-regular fa-trash pe-2"></i>Delete</button>
+                            </td>
+                        </tr>
+                    @endif
+                @endforeach
             </tbody>
         </table>
         <div class="modal fade" id="viewProducts" tabindex="-1" aria-labelledby="viewProductsLabel" aria-hidden="true">
@@ -128,82 +112,87 @@
     </div>
 </div>
 
+<div class="modal fade" id="deletePromotion" tabindex="-1" aria-labelledby="deletePromotionLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <input type="hidden" id="promotion_id">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="deletePromotionLabel">Delete Promotion</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete this promotion?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                <button type="button" class="btn btn-danger" id="confirm-delete" onclick="confirmDelete()">Yes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @section('js')
-<script>
-    promotion_list = []
-    //when page complete load
-    document.addEventListener('DOMContentLoaded', function() {
-        fetch("{{ route('promotion.index') }}")
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    let dataHolder = document.getElementById('data-holder');
-                    dataHolder.innerHTML = '';
-                    $count = 1;
-                    console.log(data);
-                    data.data.forEach(promotion => {
-                        promotion_list.push(promotion);
-                        let tr = document.createElement('tr');
-                        tr.innerHTML = `
-                            <tr>
-                                <th scope="row">${$count++}</th>
-                                <td>
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" ${promotion.status == "active" ? "checked":""}>
-                                    </div>
-                                </td>
-                                <td>Christmas Sale</td>
-                                <td><i class="fa-solid ${promotion.status == "bundle" ? "fa-cube":"fa-cubes"}"></i><span class="ps-2">${promotion.type}</span></td>
-                                <td>${promotion.product_list.length} product(s)
-                                    <a class="text-decoration-none text-secondary ps-1" data-bs-toggle="modal" data-bs-target="#viewProducts"><i class="fa-solid fa-eye"></i></a>
-                                </td>
-                                <td> ${promotion.start_at}</td>
-                                <td> ${promotion.end_at}</td>
-                                <td>
-                                    <span class="badge bg-success">${promotion.status}</span>
-                                </td>
-                                <td>
-                                    <button class="btn btn-warning"><i class="fa-regular fa-pen-to-square pe-2"></i>Edit</button>
-                                    <button class="btn btn-danger"><i class="fa-solid fa-trash-can pe-2"></i>Delete</button>
-                                </td>
-                            </tr>
-                            `;
-                        dataHolder.appendChild(tr);
-                    });
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred while fetching the product data.');
-            });
-    });
-
-    //view product modal
-    document.getElementById('viewProducts').addEventListener('show.bs.modal', function(event) {
-        let button = event.relatedTarget;
-        let modal = this;
-        let modalBody = modal.querySelector('.modal-body');
-        let modalTitle = modal.querySelector('.modal-title');
-        let modalFooter = modal.querySelector('.modal-footer');
-        let modalBodyTable = modalBody.querySelector('table tbody');
-        let promotionIndex = button.closest('tr').rowIndex - 1;
-        let promotion = promotion_list[promotionIndex];
-        console.log(promotion);
-        modalTitle.textContent = promotion.title;
-        modalBodyTable.innerHTML = '';
-        promotion.product_list.forEach((product, index) => {
-            let tr = document.createElement('tr');
-            tr.innerHTML = `
+<script defer>
+    function displayProducts($products) {
+        let html = '';
+        $products.forEach((product, index) => {
+            html += `
             <tr>
-                <th scope="row">${index + 1}</th>
+                <th scope="row">${index+1}</th>
                 <td>${product.name}</td>
                 <td>${product.price}</td>
                 <td>${product.stock}</td>
             </tr>
             `;
-            modalBodyTable.appendChild(tr);
+        });
+        document.querySelector('#viewProducts tbody').innerHTML = html;
+    }
+    //delete promotion
+    function confirmation(promotion_id) {
+        document.querySelector('#promotion_id').value = promotion_id;
+        $('#deletePromotion').modal('show');
+    }
+
+    function confirmDelete() {
+        let promotion_id = document.querySelector('#promotion_id').value;
+        //ajax request to delete promotion
+        fetch(`http://127.0.0.1:8000/api/promotion/${promotion_id}`, {
+                method: 'DELETE',
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    //delete row from table
+                    $('#deletePromotion').modal('hide');
+                    document.querySelector(`#promotion_${promotion_id}`).remove();
+                }
+            });
+    }
+
+    $(document).ready(function() {
+        //change promotion status
+        $('.form-check-input').on('change', function() {
+            let status = this.checked ? 'active' : 'inactive';
+            let promotion_id = $(this).closest('tr').attr('id').split('_')[1];
+            //ajax request to change promotion status
+            fetch(`http://127.0.0.1:8000/api/promotion/edit/status/${promotion_id}`, {
+                    method: 'PUT',
+                    body: JSON.stringify({
+                        status: status
+                    }),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        //change badge color
+                        $(this).closest('tr').find('.badge').removeClass('bg-success bg-danger').addClass(`bg-${status == 'active' ? 'success' : 'danger'}`).text(status);
+                    }
+                });
         });
     });
 </script>

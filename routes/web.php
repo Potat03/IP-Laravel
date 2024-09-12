@@ -5,6 +5,12 @@ use App\Http\Middleware\AdminAuth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\ChatMessageController;
+use App\Http\Controllers\CollectiblesController;
+use App\Http\Controllers\ConsumablesController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\WearableController;
+use App\Http\Controllers\CartItemController;
+use App\Http\Controllers\PromotionController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -27,17 +33,23 @@ Route::get('/home', function () {
     return view('home');
 });
 
-Route::get('/shop', function () {
-    return view('shop');
-});
+Route::get('/home', [ProductController::class, 'showNewArrivals']);
 
-Route::get('/product', function () {
-    return view('product');
-});
+Route::get('/shop', [ProductController::class, 'index'])->name('shop.index');
+Route::get('/shop/wearable', [WearableController::class, 'index'])->name('shop.wearable');
+Route::get('/shop/consumable', [ConsumablesController::class, 'index'])->name('shop.consumable');
+Route::get('/shop/collectible', [CollectiblesController::class, 'index'])->name('shop.collectible');
+Route::get('/shop/new-arrivals', [ProductController::class, 'newArrivals'])->name('shop.newArrivals');
 
-Route::get('/cart', function () {
-    return view('cart');
-});
+Route::get('/product/{id}', [ProductController::class, 'show'])->name('product');
+Route::get('/product/{id}', [ProductController::class, 'showProductImages']);
+
+
+// Route::get('/cart', function () {
+//     return view('cart');
+// });
+
+Route::get('/cart', [CartItemController::class, 'getCartItemByCustomerID']);    
 
 Route::get('/payment', function () {
     return view('payment');
@@ -54,13 +66,8 @@ Route::get('/testDB', function () {
 
 //promotion
 
-Route::get('/promotion', function () {
-    return view('promotion');
-});
-
-Route::get('/promotion/{id}', function () {
-    return view('promotionDetails');
-});
+Route::get('/promotion', [PromotionController::class, 'customerList'])->name('promotion');
+Route::get('/promotion/{id}', [PromotionController::class, 'promotionDetails'])->name('promotion.details');
 
 //admin side
 Route::get('/admin/login', function () {
@@ -77,14 +84,14 @@ Route::middleware([customAuth::class])->group(function () {
     Route::get('/admin/product', function () {
         return view('admin.product');
     });
+    
+    Route::get('/admin/promotion', [PromotionController::class, 'adminList'])->name('admin.promotion');
 
-    Route::get('/admin/promotion', function () {
-        return view('admin.promotion');
-    });
+    Route::get('/admin/promotion/add', [PromotionController::class, 'addPromotion'])->name('admin.promotion.add');
 
-    Route::get('/admin/promotion/add', function () {
-        return view('admin.promotion_add');
-    });
+    Route::get('/admin/promotion/edit/{id}', [PromotionController::class, 'editPromotion'])->name('admin.promotion.edit');
+
+    Route::get('/admin/promotion/restore', [PromotionController::class, 'restorePromotion'])->name('admin.promotion.restore');
 });
 
 
