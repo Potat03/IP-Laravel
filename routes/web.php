@@ -35,6 +35,7 @@ Route::get('/home', function () {
 
 Route::get('/home', [ProductController::class, 'showNewArrivals']);
 
+Route::get('/shop', [ProductController::class, 'index'])->name('shop');
 Route::get('/shop', [ProductController::class, 'index'])->name('shop.index');
 Route::get('/shop/wearable', [WearableController::class, 'index'])->name('shop.wearable');
 Route::get('/shop/consumable', [ConsumablesController::class, 'index'])->name('shop.consumable');
