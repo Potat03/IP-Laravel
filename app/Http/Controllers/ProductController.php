@@ -52,6 +52,10 @@ class ProductController extends Controller
         }
     }
 
+
+
+        //display success message
+
     //add product to database
     public function addProduct(Request $request)
     {
@@ -309,11 +313,7 @@ class ProductController extends Controller
             return response()->json(null, 204);
         } catch (ModelNotFoundException $e) {
             return response()->json(['error' => 'Product not found.'], 404);
-        } catch (Exception $e) {
-            // Log the error
-            Log::error('Deleting product failed: ' . $e->getMessage());
-            return response()->json(['error' => 'Deleting product failed.'], 500);
-        }
+        } 
     }
 
     // public function showNewArrivals()

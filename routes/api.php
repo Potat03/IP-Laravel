@@ -5,6 +5,7 @@
     use App\Http\Controllers\ProductController;
     use App\Http\Controllers\PromotionController;
     use App\Http\Middleware\customAuth;
+    use App\Http\Controllers\CustomerController;
 
     use App\Http\Controllers\CartItemController;
     // Route::get('/user', function (Request $request) {
@@ -13,6 +14,21 @@
 
 
     //upload product image
+    Route::post('/product/image/upload', [ProductController::class, 'productImageUpload']);
+    Route::get('/product/generateTable', [ProductController::class, 'generateTable']);
+    Route::post('product/image/upload', [ProductController::class, 'productImageUpload'])->name('product.image.upload');
+
+    //pass login/register details
+    use App\Http\Controllers\AuthController;
+    use App\Http\Middleware\CustomerAuth;
+
+    Route::get('/auth', [AuthController::class, 'showCustomerForm'])->name('auth.showForm');
+    Route::post('/register', [AuthController::class, 'userRegister'])->name('auth.userRegister');
+    Route::group(['middleware' => ['web']], function () {
+        Route::post('/login', [AuthController::class, 'userLogin'])->name('auth.userLogin');
+        Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout');
+    });
+
     Route::post('/cartItem/upload', [CartItemController::class, 'addToCart']);
     Route::post('/product/image/upload/{id}', [ProductController::class, 'productImageUpload']);
     Route::get('/product/index', [ProductController::class, 'index'])->name('product.index');
