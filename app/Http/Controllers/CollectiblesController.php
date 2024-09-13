@@ -56,6 +56,29 @@ class CollectiblesController extends Controller
         }
     }
 
+    public function update(Request $request, $id)
+    {
+        try {
+            $validatedData = $request->validate([
+                'supplier' => 'required|string',
+            ]);
+
+            $collectible = Collectible::where('product_id', $id)->firstOrFail();
+
+            $supplier = $validatedData['supplier'] ?? '';
+
+            $collectible->update(['supplier' => $supplier]);
+
+            $collectible->updated_at = now()->addHours(8);
+            $collectible->save();
+
+            return response()->json(['success' => true, 'message' => 'Collectible product updated successfully.'], 200);
+        } catch (Exception $e) {
+            Log::error('Updating collectible failed: ' . $e->getMessage());
+            return response()->json(['error' => 'Updating collectible failed.'], 500);
+        }
+    }
+
     private function fetchRatingsForCollectible($collectibleIds, $products)
     {
         // Redirect to the RatingController method or handle it here
