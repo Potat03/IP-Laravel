@@ -5,8 +5,13 @@
     use App\Http\Controllers\ProductController;
     use App\Http\Controllers\PromotionController;
     use App\Http\Middleware\customAuth;
-
+    use App\Http\Controllers\PaymentController;
     use App\Http\Controllers\CartItemController;
+    use App\Http\Controllers\CartController;
+    use App\Http\Controllers\StripePaymentController;
+    use App\Http\Controllers\StripeTestController;
+
+
     // Route::get('/user', function (Request $request) {
     //     return $request->user();
     // })->middleware('auth:sanctum');
@@ -33,12 +38,31 @@
     Route::post('/product/image/upload', [ProductController::class, 'productImageUpload']);
     Route::get('/product/generateTable', [ProductController::class, 'generateTable']);
 
-    Route::post('/cartItem/upload', [CartItemController::class, 'addToCart']);
 
-    //cart
+    //Cart Item
     Route::get('/cartItem/getCartItemByCustomerID/{customerID}', [CartItemController::class, 'getCartItemByCustomerID']);
+    Route::post('/cartItem/updateQuantity/{id}', [CartItemController::class, 'updateQuantity']);
+    Route::post('/cartItem/updateDiscount/{id}', [CartItemController::class, 'updateDiscount']);
+    Route::post('/cartItem/updateSubtotal/{id}', [CartItemController::class, 'updateSubtotal']);
+    Route::post('/cartItem/updateTotal/{id}', [CartItemController::class, 'updateTotal']);
+    Route::post('/cartItem/removeCartItem/{id}', [CartItemController::class, 'removeCartItem']);
 
-    // Route::get('/cartItem/getCartItem/{id}', [CartItemController::class, 'getCartItem']);
-    // Route::post('/cartItems/get', [CartItemController::class, 'getCartItems']);
+
+    //Cart
+    Route::post('/cart/updateSubtotal', [CartController::class, 'updateSubtotal']);
+    Route::post('/cart/updateTotal', [CartController::class, 'updateTotal']);
+    Route::post('/cart/updateDiscount', [CartController::class, 'updateDiscount']);
+
+    //Payment
+    Route::post('/checkout', [PaymentController::class, 'processCheckout']);
+
+
+    //Stripe API
+    Route::get('stripe', [StripePaymentController::class, 'stripe']);
+    Route::post('stripe', [StripePaymentController::class, 'stripePost'])->name('stripe.post');
+
+    // In web.php or api.php
+    Route::get('/stripe/test', [StripeTestController::class, 'testConnection']);
+
 
 

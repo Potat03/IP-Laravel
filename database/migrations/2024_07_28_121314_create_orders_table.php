@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('status');
             $table->string('delivery_address');
             $table->string('delivery_method');
-            $table->string('tracking_number');
+            $table->string('tracking_number')->nullable()->default(null);
             $table->timestamps();
         });
     }

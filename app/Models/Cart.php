@@ -16,6 +16,7 @@ class Cart extends Model
     protected $fillable = [
         'customer_id',
         'subtotal',
+        'delivery_fee',
         'total_discount',
         'total',
     ];

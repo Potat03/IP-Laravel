@@ -22,6 +22,7 @@ class Order extends Model
         'status',
         'delivery_address',
         'delivery_method',
+        'tracking_number',
         'created_at',
     ];
 

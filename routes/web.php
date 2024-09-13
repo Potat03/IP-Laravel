@@ -11,6 +11,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\WearableController;
 use App\Http\Controllers\CartItemController;
 use App\Http\Controllers\PromotionController;
+use App\Http\Controllers\StripeTestController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -43,10 +44,6 @@ Route::get('/shop/collectible', [CollectiblesController::class, 'index'])->name(
 Route::get('/product/{id}', [ProductController::class, 'show'])->name('product');
 Route::get('/product/{id}', [ProductController::class, 'showProductImages']);
 
-
-// Route::get('/cart', function () {
-//     return view('cart');
-// });
 
 Route::get('/cart', [CartItemController::class, 'getCartItemByCustomerID']);    
 
@@ -138,3 +135,7 @@ Route::middleware([AdminAuth::class])->group(function () {
     Route::post('/send-message', [ChatMessageController::class, 'sendMessage'])->name('send.message');
     Route::get('/get-messages', [ChatMessageController::class, 'getMessages'])->name('get.messages');
 });
+
+
+
+Route::get('/stripe/test', [StripeTestController::class, 'testConnection']);
