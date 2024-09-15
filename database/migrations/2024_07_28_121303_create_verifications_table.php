@@ -12,10 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('verification', function (Blueprint $table) {
-            $table->id('customer_id')->references('customer_id')->on('customer');
+            $table->id();
+            $table->unsignedBigInteger('customer_id')->references('customer_id')->on('customer');
             $table->string('code');
             $table->string('status');
-            $table->date('expired_date');
+            $table->dateTime('expired_date');
             $table->timestamps();
         });
     }

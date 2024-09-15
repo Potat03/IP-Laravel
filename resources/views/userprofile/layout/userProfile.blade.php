@@ -10,6 +10,10 @@
     @include('partials.fontawesome')
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <style>
+        body {
+            overflow: hidden;
+        }
+
         .profile_content {
             display: flex;
             flex-direction: column;
@@ -100,42 +104,43 @@
         <div class="content">
             <div class="left_bar">
                 <ul>
-                    <li>
-                        <a href="#">
+                    <li onclick = "window.location.href = '{{ route('profile.profileSec') }}'">
+                        <a class="load-content">
                             <i class="fa-solid fa-square-poll-vertical"></i>
-                            Profile</a>
+                            Profile
+                        </a>
                     </li>
-                    <li>
-                        <a href="#">
+                    <li onclick = "window.location.href = '{{ route('profile.orderHistorySec') }}'">
+                        <a class="load-content">
                             <i class="fa-regular fa-teddy-bear"></i>
-                            Order History</a>
+                            Order History
+                        </a>
                     </li>
-                    <a href="#">
-                        <li class="active">
+                    <li onclick = "window.location.href = '{{ route('profile.shippingSec') }}'">
+                        <a class="load-content">
                             <i class="fa-regular fa-box"></i>
                             Shipping
-                    </a>
+                        </a>
                     </li>
-                    <li>
-                        <a href="#">
+                    <li onclick = "window.location.href = '{{ route('profile.supportChatSec') }}'">
+                        <a class="load-content">
                             <i class="fa-brands fa-rocketchat"></i>
-                            Support Chat</a>
+                            Support Chat
+                        </a>
                     </li>
-                    <li>
-                        <a href="#">
+                    <li onclick = "window.location.href = '{{ route('profile.settingSec') }}'">
+                        <a class="load-content">
                             <i class="fa-regular fa-user"></i>
-                            Settings</a>
+                            Settings
+                        </a>
                     </li>
                 </ul>
             </div>
+
             <div class="right_content">
-                <div class="title">
-                    <h1>@yield('page_title')</h1>
-                    <p>@yield('page_gm')</p>
+                <div class="lower_content overflow-auto">
+                    @yield('allcontent')
                 </div>
-            </div>
-            <div class="lower_content overflow-auto">
-                @yield('content')
             </div>
         </div>
 </body>

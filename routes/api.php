@@ -23,11 +23,14 @@
     use App\Http\Middleware\CustomerAuth;
 
     Route::get('/auth', [AuthController::class, 'showCustomerForm'])->name('auth.showForm');
-    Route::post('/register', [AuthController::class, 'userRegister'])->name('auth.userRegister');
     Route::group(['middleware' => ['web']], function () {
+        //login content
         Route::post('/login', [AuthController::class, 'userLogin'])->name('auth.userLogin');
         Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout');
+        Route::post('/register', [AuthController::class, 'userRegister'])->name('auth.userRegister');
+        Route::post('/verify', [AuthController::class, 'verify'])->name('auth.verify');
     });
+    Route::post('/resendOtp', [AuthController::class, 'resendOtp'])->name('auth.resendOtp');
 
     Route::post('/cartItem/upload', [CartItemController::class, 'addToCart']);
     Route::post('/product/image/upload/{id}', [ProductController::class, 'productImageUpload']);

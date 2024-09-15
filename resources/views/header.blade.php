@@ -5,19 +5,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Header</title>
-    @vite(['resources/sass/app.scss'])
     @include('partials.fontawesome')
 
     <style>
-        .header{
-            background-color: #f0f0f0;; 
-        }
+
         .nav-link:hover,
         .nav-item:hover {
             color: darkred !important;
         }
     </style>
 </head>
+
 
 <body class="headerBody">
     <nav class="navbar navbar-expand-lg navbar-light sticky-top">
@@ -42,17 +40,6 @@
                             <li><a class="dropdown-item" href="#!">Popular Items</a></li>
                             <li><a class="dropdown-item" href="#!">New Arrivals</a></li>
                         </ul>
-                    </li>
-                    <li>
-                        <form class="d-flex">
-                            <div class="input-group">
-                                <input type="text" class="form-control" id="search" name="search"
-                                    placeholder="Search" aria-label="Search" aria-describedby="search-btn">
-                                <button class="btn btn-outline-secondary" type="button" id="search-btn">
-                                    <i class="fa-solid fa-magnifying-glass"></i>
-                                </button>
-                            </div>
-                        </form>
                     </li>
                 </ul>
 

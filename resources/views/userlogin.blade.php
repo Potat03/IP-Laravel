@@ -1,6 +1,7 @@
 <!-- resources/views/auth.blade.php -->
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -126,7 +127,8 @@
             e.preventDefault();
 
             let formData = new FormData(this);
-
+            console.log(formData);
+            console.log(this.action);
             fetch(this.action, {
                     method: 'POST',
                     body: formData,
@@ -134,8 +136,8 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        alert('Registration successful. Please log in.');
-                        window.location.href = "{{ route('user.login') }}";
+                        alert('Registration successful. Please proceed to verification.');
+                        window.location.href = data.redirect_url;
                     } else {
                         alert('Registration Failed');
                         console.log(data);

@@ -12,6 +12,31 @@ class CustomerController extends Controller
     {
         $customer = Auth::guard('customer')->user();
 
-        return view('userProfile', compact('customer'));
+        return view('userprofile/layout/userProfile', compact('customer'));
     }
+    public function profileSec()
+    {
+        return view('userprofile/profile');
+    }
+
+    public function orderHistorySec()
+    {
+        return view('userprofile/orderHistorySec');
+    }
+
+    public function shippingSec()
+    {
+        return view('userprofile/shippingSec');
+    }
+
+    public function supportChatSec()
+    {
+        return view('userprofile/supportChatSec');
+    }
+
+    public function settingSec()
+    {
+        return view('userprofile/settingSec');
+    }
+    
 }
