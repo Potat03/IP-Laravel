@@ -50,7 +50,7 @@ Route::get('/product/{id}', [ProductController::class, 'showProductImages']);
 //     return view('cart');
 // });
 
-Route::get('/cart', [CartItemController::class, 'getCartItemByCustomerID']);    
+Route::get('/cart', [CartItemController::class, 'getCartItemByCustomerID']);
 
 Route::get('/payment', function () {
     return view('payment');
@@ -85,7 +85,7 @@ Route::middleware([customAuth::class])->group(function () {
     Route::get('/admin/product', function () {
         return view('admin.product');
     });
-    
+
     Route::get('/admin/promotion', [PromotionController::class, 'adminList'])->name('admin.promotion');
 
     Route::get('/admin/promotion/add', [PromotionController::class, 'addPromotion'])->name('admin.promotion.add');
@@ -118,21 +118,21 @@ use App\Http\Middleware\CustomerAuth;
 use App\Http\Controllers\AuthController;
 
 //WK route
-Route::get('/userlogin', ['middleware' => 'guest:customer', function() {
+Route::get('/userlogin', ['middleware' => 'guest:customer', function () {
     return view('userlogin');
 }])->name('user.login');
 
 Route::middleware([CustomerAuth::class])->group(function () {
 
     Route::get('/profile', function () {
-        return view('userProfile');
+        return view('userprofile/layout/userProfile');
     })->name('user.profile');
-
-    Route::get('/userverify', function () {
-        return view('userVerification');
-    })->name('user.verify');
+    
 });
 
+Route::get('/userverify', function () {
+    return view('userVerification');
+})->name('user.verify');
 
 Route::get('/chat', [ChatController::class, 'index']);
 Route::post('/chat', [ChatController::class, 'store']);

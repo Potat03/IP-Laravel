@@ -44,12 +44,6 @@
             margin-bottom: 25px;
         }
 
-        p span.phone-number {
-            display: block;
-            color: #093030;
-            font-weight: 600;
-        }
-
         .wrapper {
             width: 100%;
             display: grid;
@@ -74,16 +68,29 @@
             outline: none;
         }
 
-        button.resend {
-            background-color: transparent;
+        .verifyOtp {
+            background-color: red;
             border: none;
             font-weight: 600;
-            color: #c0392b;
+            color: white;
             cursor: pointer;
+            font-size: 20px;
+            padding: 12px 12px;
+            margin-top: 10px;
+            border-radius: 25px;
+            text-align: center;
         }
 
-        button.resend i {
-            margin-left: 5px;
+        .centerbtn {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .sendAgn {
+            border: none;
+            color: red;
+            background: none;
         }
     </style>
 </head>
@@ -94,7 +101,7 @@
         <p class="sub-title">
             Enter the OTP sent to your email
         </p>
-        <form method="POST" action="{{ url('verify') }}">
+        <form method="POST" action="{{ route('auth.verify') }}">
             @csrf
             <input type="hidden" name="email" value="{{ request('email') }}">
             <div class="wrapper">
@@ -105,10 +112,12 @@
                 <input type="text" name="otp5" maxlength="1" class="field 5" required>
                 <input type="text" name="otp6" maxlength="1" class="field 6" required>
             </div>
-            <p class="sub-title">
-                Send again in 60s..
-            </p>
-            <button type="submit">Verify OTP</button>
+            <button id="resend-btn" class="sendAgn" type="button" disabled>
+                Send again in <span id="countdown">60</span>s..
+            </button>
+            <div class="centerbtn">
+                <button class="verifyOtp" type="submit">Verify OTP</button>
+            </div>
         </form>
     </div>
 </body>
@@ -130,15 +139,70 @@
 
     function handleKeyDown(e, index) {
         let inputField = e.target;
-
-        if (e.key === "Backspace" || e.key === "Delete") {
-            if (inputField.value.length === 0 && index > 0) {
-                let previousField = inputFields[index - 1];
-                previousField.value = ''; // clear the previous field
-                previousField.focus();
-            }
+        if ((e.key === "Backspace" || e.key === "Delete") && inputField.value.length === 0 && index > 0) {
+            let previousField = inputFields[index - 1];
+            previousField.value = ''; // clear the previous field
+            previousField.focus();
         }
     }
+
+    const countdownElement = document.getElementById('countdown');
+    const resendBtn = document.getElementById('resend-btn');
+    let countdown = 60;
+
+    const interval = setInterval(() => {
+        countdown--;
+        countdownElement.innerText = countdown;
+
+        if (countdown === 0) {
+            clearInterval(interval);
+            resendBtn.innerText = "Resend OTP";
+            resendBtn.disabled = false; // Enable the button
+        }
+    }, 1000);
+
+    resendBtn.addEventListener('click', function() {
+        resendBtn.innerText = 'Sending...';
+        resendBtn.disabled = true;
+        fetch('{{ url('resend-otp') }}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                        'content')
+                },
+                body: JSON.stringify({
+                    email: '{{ request('email') }}'
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    countdown = 60;
+                    resendBtn.innerText = `Send again in ${countdown}s..`;
+                    resendBtn.disabled = true;
+
+                    const newInterval = setInterval(() => {
+                        countdown--;
+                        countdownElement.innerText = countdown;
+
+                        if (countdown === 0) {
+                            clearInterval(newInterval);
+                            resendBtn.innerText = "Resend OTP";
+                            resendBtn.disabled = false;
+                        }
+                    }, 1000);
+                } else {
+                    resendBtn.innerText = 'Resend OTP';
+                    resendBtn.disabled = false;
+                    alert('Failed to resend OTP. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                resendBtn.innerText = 'Resend OTP';
+                resendBtn.disabled = false;
+            });
+    });
 </script>
 
 </html>

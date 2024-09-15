@@ -10,29 +10,55 @@ use Exception;
 
 class AuthFacade
 {
-    public static function login($credentials)
+    public static function login($credentials, $guard = 'customer')
     {
-        if (Auth::attempt($credentials)) {
+        if (Auth::guard($guard)->attempt($credentials)) {
             return true;
         }
 
         return false;
     }
 
+    public static function isLoggedIn($guard = 'customer')
+    {
+        return Auth::guard($guard)->check();
+    }
+
+    public static function regenerateSession($request)
+    {
+        $request->session()->regenerate();
+    }
+
+    public static function getUser($guard = 'customer')
+    {
+        return Auth::guard($guard)->user();
+    }
+
     public static function register($data)
     {
         try {
-            Customer::create([
+            // Create a new customer and capture the instance
+            $customer = Customer::create([
                 'username' => $data['username'],
                 'tier' => 'Basic',
                 'phone_number' => $data['phone'],
                 'email' => $data['email'],
                 'password' => Hash::make($data['password']),
-                'status' => 'Unverified',
+                'status' => 'inactive',
             ]);
-            return ['success' => true, 'message' => 'You have successfully registered an account'];
+
+            if ($customer) {
+                $customer_id = $customer->getId();
+
+                return [
+                    'success' => true,
+                    'customer_id' => $customer_id
+                ];
+            } else {
+                return ['success' => false, 'message' => 'Customer creation failed'];
+            }
         } catch (Exception $e) {
-            return ['failure' => false, 'message' => $e->getMessage()];
+            return ['success' => false, 'message' => $e->getMessage()];
         }
     }
 

@@ -11,14 +11,11 @@ class Verification extends Model
 
     protected $table = 'verification';
 
-    protected $primaryKey = ['customer_id', 'code', 'created_at'];
-
     protected $fillable = [
         'customer_id',
         'code',
         'status',
-        'created_at',
-        'expired_at',
+        'expired_date',
     ];
 
     public function customer()

@@ -23,11 +23,21 @@
     use App\Http\Middleware\CustomerAuth;
 
     Route::get('/auth', [AuthController::class, 'showCustomerForm'])->name('auth.showForm');
-    Route::post('/register', [AuthController::class, 'userRegister'])->name('auth.userRegister');
     Route::group(['middleware' => ['web']], function () {
+        //login content
         Route::post('/login', [AuthController::class, 'userLogin'])->name('auth.userLogin');
         Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout');
+        Route::post('/register', [AuthController::class, 'userRegister'])->name('auth.userRegister');
+        Route::post('/verify', [AuthController::class, 'verify'])->name('auth.verify');
+
+        //profile content
+        Route::get('/profileSec', [CustomerController::class, 'profileSec'])->name('profile.profileSec');
+        Route::get('/orderHistorySec', [CustomerController::class, 'orderHistorySec'])->name('profile.orderHistorySec');
+        Route::get('/shippingSec', [CustomerController::class, 'shippingSec'])->name('profile.shippingSec');
+        Route::get('/supportChatSec', [CustomerController::class, 'supportChatSec'])->name('profile.supportChatSec');
+        Route::get('/settingSec', [CustomerController::class, 'settingSec'])->name('profile.settingSec');
     });
+    Route::post('/resendOtp', [AuthController::class, 'resendOtp'])->name('auth.resendOtp');
 
     Route::post('/cartItem/upload', [CartItemController::class, 'addToCart']);
     Route::post('/product/image/upload/{id}', [ProductController::class, 'productImageUpload']);
@@ -45,7 +55,7 @@
     Route::post('/promotion/restore/{id}', [PromotionController::class, 'undoDeletePromotion']);
 
 
-    
+
     Route::post('/product/image/upload', [ProductController::class, 'productImageUpload']);
     Route::get('/product/generateTable', [ProductController::class, 'generateTable']);
 
@@ -56,5 +66,3 @@
 
     // Route::get('/cartItem/getCartItem/{id}', [CartItemController::class, 'getCartItem']);
     // Route::post('/cartItems/get', [CartItemController::class, 'getCartItems']);
-
-
