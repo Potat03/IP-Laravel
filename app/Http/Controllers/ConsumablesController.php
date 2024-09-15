@@ -21,7 +21,7 @@ class ConsumablesController extends Controller
         ]);
 
         $builder = new ConsumableBuilder();
-        
+
         $director = new ProductDirector($builder);
 
         $consumable = $director->construct(
@@ -33,7 +33,6 @@ class ConsumablesController extends Controller
             $request->specificAttributes
         );
 
-        // Save the product
         $consumable->save();
 
         return response()->json(['success' => true, 'message' => 'Consumable product added successfully.'], 200);
@@ -43,7 +42,7 @@ class ConsumablesController extends Controller
     {
         try {
             $query = $request->input('search');
-            
+
             if ($query) {
                 $consumableIds = Consumable::where('name', 'LIKE', "%$query%")->pluck('product_id');
             } else {
@@ -51,11 +50,36 @@ class ConsumablesController extends Controller
             }
 
             $products = Product::whereIn('product_id', $consumableIds)->paginate(20);
-            return view('shop.consumable', ['products' => $products]);
+            // return view('shop.consumable', ['products' => $products]);
+
+            return $this->fetchRatingsForConsumable($consumableIds, $products);
         } catch (Exception $e) {
             Log::error('Fetching consumables failed: ' . $e->getMessage());
             return response()->json(['error' => 'Fetching consumables failed.'], 500);
         }
     }
-}
 
+    public function update(Request $request, $id)
+    {
+        try {
+            $request->validate([
+                'expiry_date' => 'nullable|date',
+                'portion' => 'nullable|string',
+                'halal' => 'nullable|boolean',
+            ]);
+
+            $consumable = Consumable::where('product_id', $id)->firstOrFail();
+            $consumable->update($request->only(['expiry_date', 'portion', 'halal']));
+
+            return response()->json(['success' => true, 'message' => 'Consumable product updated successfully.'], 200);
+        } catch (Exception $e) {
+            Log::error('Updating consumable failed: ' . $e->getMessage());
+            return response()->json(['error' => 'Updating consumable failed.'], 500);
+        }
+    }
+
+    private function fetchRatingsForConsumable($consumableIds, $products)
+    {
+        return app('App\Http\Controllers\RatingController')->fetchRatingsForConsumable($consumableIds, $products);
+    }
+}

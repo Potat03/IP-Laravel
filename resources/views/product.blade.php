@@ -263,7 +263,7 @@
                                 @foreach ($sizes as $size)
                                     @php
                                         // Capitalize the first letter of each size and trim any extra spaces
-                                        $size = ucfirst(trim($size));
+                                        $size = strtoupper(trim($size));
                                     @endphp
                                     <button type="button" class="btn btn-variation btn-outline-dark fw-bold"
                                         onclick="selectVariation(this)">{{ trim($size) }}</button>

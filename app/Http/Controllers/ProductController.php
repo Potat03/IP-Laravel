@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Product;
+use App\Models\Wearable;
+use App\Models\Collectible;
 use App\Models\Rating;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Exception;
@@ -54,7 +56,7 @@ class ProductController extends Controller
 
 
 
-        //display success message
+    //display success message
 
     //add product to database
     public function addProduct(Request $request)
@@ -122,6 +124,17 @@ class ProductController extends Controller
         }
     }
 
+    public function editProduct($id)
+    {
+        try {
+            $product = Product::findOrFail($id);
+
+            return view('admin.product_edit', ['product' => $product]);
+        } catch (Exception $e) {
+            return view('errors.404');
+        }
+    }
+
     public function index(Request $request)
     {
         try {
@@ -132,11 +145,11 @@ class ProductController extends Controller
             $newArrival = $request->input('new_arrival');
 
             // Debugging lines
-            Log::info('Search Query:', ['query' => $query]);
-            Log::info('Price Sort:', ['price_sort' => $priceSort]);
-            Log::info('Rating:', ['rating' => $rating]);
-            Log::info('Available:', ['available' => $available]);
-            Log::info('New Arrival:', ['new_arrival' => $newArrival]);
+            // Log::info('Search Query:', ['query' => $query]);
+            // Log::info('Price Sort:', ['price_sort' => $priceSort]);
+            // Log::info('Rating:', ['rating' => $rating]);
+            // Log::info('Available:', ['available' => $available]);
+            // Log::info('New Arrival:', ['new_arrival' => $newArrival]);
 
             $queryBuilder = Product::query();
 
@@ -171,30 +184,21 @@ class ProductController extends Controller
 
             $products = $queryBuilder->paginate(20);
 
-            // Return a view or JSON response based on request type
-            if ($request->ajax()) {
-                return view('partials.products', ['products' => $products])->render();
-            }
+            // Get the IDs
+            $productsCollection = collect($products->items());
+            $productsId = $productsCollection->pluck('product_id');
 
-            return view('shop', ['products' => $products]);
+            // Return a view or JSON response based on request type
+            // if ($request->ajax()) {
+            //     return view('partials.products', ['products' => $products])->render();
+            // }
+
+            // return view('shop', ['products' => $products]);
+
+            return $this->fetchRatingsForShop($productsId, $products);
         } catch (Exception $e) {
             Log::error('Fetching products failed: ' . $e->getMessage());
             return response()->json(['error' => 'Fetching products failed.'], 500);
-        }
-    }
-
-    //from home to shop page new arrival category
-    public function newArrivals()
-    {
-        try {
-            $newArrivals = Product::where('created_at', '>=', now()->subDays(30))
-                ->orderBy('created_at', 'desc')
-                ->paginate(20);
-
-            return view('shop.new-arrivals', ['newArrivals' => $newArrivals]);
-        } catch (Exception $e) {
-            Log::error('Fetching new arrivals failed: ' . $e->getMessage());
-            return response()->json(['error' => 'Fetching new arrivals failed.'], 500);
         }
     }
 
@@ -203,7 +207,7 @@ class ProductController extends Controller
         try {
             $products = Product::all();
 
-            return response()->json(['success' => true, 'data' => $products], 200);
+            return view('admin.product', ['products' => $products]);
         } catch (Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
         }
@@ -285,7 +289,7 @@ class ProductController extends Controller
     }
 
     // Update a product
-    public function update(Request $request, $id)
+    public function updateProduct(Request $request, $id)
     {
         try {
             // Validate the request data
@@ -294,21 +298,82 @@ class ProductController extends Controller
                 'description' => 'nullable|string',
                 'price' => 'required|numeric',
                 'stock' => 'required|integer',
-                'created_at' => 'required|date'
+                'status' => 'required|string|in:active,inactive',
+                'isWearable' => 'nullable|numeric',
+                'isConsumable' => 'nullable|numeric',
+                'isCollectible' => 'nullable|numeric',
+                'sizes' => 'nullable|string',
+                'colors' => 'nullable|string',
+                'expiry_date' => 'nullable|date',
+                'portion' => 'nullable|string',
+                'halal' => 'nullable|boolean',
+                'supplier' => 'nullable|string',
+                'selected_groups' => 'nullable|string',
             ]);
 
-            // Find the product and update it
             $product = Product::findOrFail($id);
             $product->update($validatedData);
 
-            // Return a response
-            return response()->json($product);
+            $product->updated_at = now()->addHours(8);
+            $product->save();
+
+            if ($request->has('isWearable') && $request->input('isWearable')) {
+
+                $this->updateWearableAttributes($product, $request);
+            }
+
+            if ($request->has('isConsumable') && $request->input('isConsumable')) {
+                $this->updateConsumableAttributes($product, $request);
+            }
+
+            if ($request->has('isCollectible') && $request->input('isCollectible')) {
+                $this->updateCollectibleAttributes($product, $request);
+            }
+
+            return response()->json(['success' => true, 'message' => 'Product updated successfully.'], 200);
         } catch (ModelNotFoundException $e) {
             return response()->json(['error' => 'Product not found.'], 404);
         } catch (Exception $e) {
             // Log the error
             Log::error('Updating product failed: ' . $e->getMessage());
             return response()->json(['error' => 'Updating product failed.'], 500);
+        }
+    }
+
+    protected function updateWearableAttributes($product, Request $request)
+    {
+        $sizes = $request->input('sizes', []);
+        $colors = $request->input('colors', []);
+        $userGroups = $request->input('selected_groups', '');
+
+        $sizesString = is_array($sizes) ? implode(',', $sizes) : $sizes;
+        $colorsString = is_array($colors) ? implode(',', $colors) : $colors;
+
+        $wearable = $product->wearable;
+        $wearableObj = new WearableController();
+
+        if ($wearable) {
+            $wearableObj->update($request, $product->product_id);
+        } else {
+            Log::warning('Wearable not found for product ID: ' . $product->product_id);
+        }
+    }
+
+    protected function updateConsumableAttributes($product, Request $request)
+    {
+        $consumableAttributes = $request->only(['expiry_date', 'portion', 'halal']);
+        $product->consumable->update($consumableAttributes);
+    }
+
+    protected function updateCollectibleAttributes($product, Request $request)
+    {
+        $collectible = $product->collectible;
+        $collectibleObj = new CollectiblesController();
+
+        if ($collectible) {
+            $collectibleObj->update($request, $product->product_id);
+        } else {
+            Log::warning('Collectible not found for product ID: ' . $product->product_id);
         }
     }
 
@@ -322,7 +387,7 @@ class ProductController extends Controller
             return response()->json(null, 204);
         } catch (ModelNotFoundException $e) {
             return response()->json(['error' => 'Product not found.'], 404);
-        } 
+        }
     }
 
     // public function showNewArrivals()
@@ -343,16 +408,15 @@ class ProductController extends Controller
     //     }
     // }
 
+    //at home page new arrival section
     public function showNewArrivals()
     {
         try {
-            // Fetch new arrivals
             $newArrivals = Product::where('created_at', '>=', now()->subDays(30))
                 ->orderBy('created_at', 'desc')
                 ->take(10)
                 ->get();
 
-            // Get the IDs of new arrivals
             $newArrivalsId = $newArrivals->pluck('product_id');
 
             return $this->fetchRatingsForProducts($newArrivalsId, $newArrivals);
@@ -362,9 +426,35 @@ class ProductController extends Controller
         }
     }
 
+    //from home to shop page new arrival category
+    public function newArrivals()
+    {
+        try {
+            $newArrivals = Product::where('created_at', '>=', now()->subDays(30))
+                ->orderBy('created_at', 'desc')
+                ->paginate(20);
+
+            $newArrivalsId = $newArrivals->pluck('product_id');
+
+            return $this->fetchRatingsForNewArrivals($newArrivalsId, $newArrivals);
+        } catch (Exception $e) {
+            Log::error('Fetching new arrivals failed: ' . $e->getMessage());
+            return response()->json(['error' => 'Fetching new arrivals failed.'], 500);
+        }
+    }
+
     private function fetchRatingsForProducts($newArrivalsId, $newArrivals)
     {
-        // Redirect to the RatingController method or handle it here
         return app('App\Http\Controllers\RatingController')->fetchRatings($newArrivalsId, $newArrivals);
+    }
+
+    private function fetchRatingsForNewArrivals($newArrivalsId, $newArrivals)
+    {
+        return app('App\Http\Controllers\RatingController')->fetchRatingsForNewArrival($newArrivalsId, $newArrivals);
+    }
+
+    private function fetchRatingsForShop($productsId, $products)
+    {
+        return app('App\Http\Controllers\RatingController')->fetchRatingsForShop($productsId, $products);
     }
 }

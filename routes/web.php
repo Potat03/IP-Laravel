@@ -36,7 +36,6 @@ Route::get('/home', function () {
 Route::get('/home', [ProductController::class, 'showNewArrivals']);
 
 Route::get('/shop', [ProductController::class, 'index'])->name('shop');
-Route::get('/shop', [ProductController::class, 'index'])->name('shop.index');
 Route::get('/shop/wearable', [WearableController::class, 'index'])->name('shop.wearable');
 Route::get('/shop/consumable', [ConsumablesController::class, 'index'])->name('shop.consumable');
 Route::get('/shop/collectible', [CollectiblesController::class, 'index'])->name('shop.collectible');
@@ -86,6 +85,10 @@ Route::middleware([customAuth::class])->group(function () {
         return view('admin.product');
     });
 
+    Route::get('/admin/product', action: [ProductController::class, 'getAll'])->name('admin.product');
+    Route::get('/admin/product/add', action: [ProductController::class, 'addProduct'])->name('admin.product.add');
+    Route::get('/admin/product/edit/{id}', [ProductController::class, 'editProduct'])->name('admin.product.edit');
+    
     Route::get('/admin/promotion', [PromotionController::class, 'adminList'])->name('admin.promotion');
 
     Route::get('/admin/promotion/add', [PromotionController::class, 'addPromotion'])->name('admin.promotion.add');
