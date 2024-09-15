@@ -101,43 +101,70 @@
             <div class="left_bar">
                 <ul>
                     <li>
-                        <a href="#">
+                        <a href="javascript:void(0);" class="load-content" data-url="{{ route('profile.profileSec') }}">
                             <i class="fa-solid fa-square-poll-vertical"></i>
-                            Profile</a>
+                            Profile
+                        </a>
                     </li>
                     <li>
-                        <a href="#">
+                        <a href="javascript:void(0);" class="load-content"
+                            data-url="{{ route('profile.orderHistorySec') }}">
                             <i class="fa-regular fa-teddy-bear"></i>
-                            Order History</a>
+                            Order History
+                        </a>
                     </li>
-                    <a href="#">
-                        <li class="active">
+                    <li>
+                        <a href="javascript:void(0);" class="load-content"
+                            data-url="{{ route('profile.shippingSec') }}">
                             <i class="fa-regular fa-box"></i>
                             Shipping
-                    </a>
+                        </a>
                     </li>
                     <li>
-                        <a href="#">
+                        <a href="javascript:void(0);" class="load-content"
+                            data-url="{{ route('profile.supportChatSec') }}">
                             <i class="fa-brands fa-rocketchat"></i>
-                            Support Chat</a>
+                            Support Chat
+                        </a>
                     </li>
                     <li>
-                        <a href="#">
+                        <a href="javascript:void(0);" class="load-content" data-url="{{ route('profile.settingSec') }}">
                             <i class="fa-regular fa-user"></i>
-                            Settings</a>
+                            Settings
+                        </a>
                     </li>
                 </ul>
             </div>
+
             <div class="right_content">
-                <div class="title">
-                    <h1>@yield('page_title')</h1>
-                    <p>@yield('page_gm')</p>
+                <div class="lower_content overflow-auto">
+                    @yield('content')
                 </div>
-            </div>
-            <div class="lower_content overflow-auto">
-                @yield('content')
             </div>
         </div>
 </body>
+<script>
+    $(document).ready(function() {
+        $('.load-content').on('click', function(e) {
+            e.preventDefault();
+
+            var url = $(this).data('url');
+            console.log('Requesting URL:', url);
+
+            $.ajax({
+                url: url,
+                method: 'GET',
+                success: function(response) {
+                    console.log('Response received:', response);
+                    $('.right_content').html(response);
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error loading content:', error, xhr
+                        .responseText);
+                }
+            });
+        });
+    });
+</script>
 
 </html>
