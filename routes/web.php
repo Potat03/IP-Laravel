@@ -131,7 +131,6 @@ Route::middleware([CustomerAuth::class])->group(function () {
         return view('userprofile/layout/userProfile');
     })->name('user.profile');
 
-    //profile content
     Route::get('/profileSec', [CustomerController::class, 'profileSec'])->name('profile.profileSec');
     Route::get('/orderHistorySec', [CustomerController::class, 'orderHistorySec'])->name('profile.orderHistorySec');
     Route::get('/shippingSec', [CustomerController::class, 'shippingSec'])->name('profile.shippingSec');
