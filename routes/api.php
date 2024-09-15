@@ -34,6 +34,9 @@
     Route::get('/product/index', [ProductController::class, 'index'])->name('product.index');
     Route::get('/product/all', [ProductController::class, 'getAll'])->name('product.getAll');
     Route::get('/product/get/{id}', [ProductController::class, 'getOne'])->name('product.get');
+    Route::post('/product/create', [ProductController::class, 'createProduct'])->name('product.create');
+    Route::post('/product/update/{id}', [ProductController::class, 'updateProduct'])->name('product.update');
+    // Route::delete('/product/{id}', [ProductController::class, 'deleteProduct']);
 
     //promotion
     Route::get('/promotion/all', [PromotionController::class, 'getPromotion']);

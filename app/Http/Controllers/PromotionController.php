@@ -251,6 +251,7 @@ class PromotionController extends Controller
             if($promotion->status == 'deleted' || $promotion->status == 'inactive' ){
                 return view('errors.404');
             }else if ($promotion->type == 'single'){
+                //redirect url to product page
                 return redirect()->route('product', ['id' => $promotion->product_list[0]->product_id]);
             }
 

@@ -268,6 +268,40 @@
                     <button type="button" class="btn btn-variation btn-outline-dark fw-bold"
                         onclick="selectVariation(this)">{{ trim($size) }}</button>
                     @endforeach
+                        <div class="mb-2">
+                            <h5>Select Size:</h5>
+                            <div class="btn-group" role="group" aria-label="Product Variations">
+                                @foreach ($sizes as $size)
+                                    @php
+                                        // Capitalize the first letter of each size and trim any extra spaces
+                                        $size = strtoupper(trim($size));
+                                    @endphp
+                                    <button type="button" class="btn btn-variation btn-outline-dark fw-bold"
+                                        onclick="selectVariation(this)">{{ trim($size) }}</button>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+
+                    @if ($product->wearable->color)
+                        @php
+                            $colors = explode(',', $product->wearable->color);
+                        @endphp
+
+                        <div class="mt-2">
+                            <h5>Select Color:</h5>
+                            <div class="btn-group" role="group" aria-label="Product Variations">
+                                @foreach ($colors as $color)
+                                    @php
+                                        // Capitalize the first letter of each size and trim any extra spaces
+                                        $color = ucfirst(trim($color));
+                                    @endphp
+                                    <button type="button" class="btn btn-variation-2 btn-outline-dark fw-bold"
+                                        onclick="selectVariation2(this)">{{ trim($color) }}</button>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
                 </div>
             </div>
             @endif
@@ -293,7 +327,6 @@
             @endif
         </div>
         @endsection
-        @endif
 
         @section('mid')
         <div class="quantity-selector mt-4">

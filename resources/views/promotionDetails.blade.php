@@ -319,12 +319,12 @@
             </div>
             <div class="col">
                 <div class="container">
-                    <h5>{{ $product->name }}</h5>
-                    <div>
+                    <h4>{{ $product->name }}</h4>
+                    <div class="pt-1">
                         <span>Quantity:</span>
                         <span>{{ $product->quantity }}</span>
                     </div>
-                    <a href="{{ route('product', ['id' => $product->product_id]) }}" class="btn btn-outline-dark mt-3">View Product</a>
+                    <a href="{{ url('/product/' . $product->product_id) }}" class="btn btn-outline-dark mt-4">View Product</a>
                 </div>
             </div>
         </div>

@@ -22,7 +22,7 @@ class WearableController extends Controller
 
         // Create a WearableBuilder instance
         $builder = new WearableBuilder();
-        
+
         // Create a director with the builder
         $director = new ProductDirector($builder);
 
@@ -36,7 +36,6 @@ class WearableController extends Controller
             $request->specificAttributes
         );
 
-        // Save the product
         $wearable->save();
 
         return response()->json(['success' => true, 'message' => 'Wearable product added successfully.'], 200);
@@ -64,9 +63,39 @@ class WearableController extends Controller
         }
     }
 
+    public function update(Request $request, $id)
+    {
+        try {
+            $validatedData = $request->validate([
+                'sizes' => 'nullable|string',
+                'colors' => 'nullable|string',
+                'selected_groups' => 'required|string',
+            ]);
+
+            $wearable = Wearable::where('product_id', $id)->firstOrFail();
+
+            $sizes = $validatedData['sizes'] ?? '';
+            $colors = $validatedData['colors'] ?? '';
+            $userGroups = $validatedData['selected_groups'] ?? '';
+
+            $wearable->update([
+                'size' => $sizes,
+                'color' => $colors,
+                'user_group' => $userGroups,
+            ]);
+
+            $wearable->updated_at = now()->addHours(8);
+            $wearable->save();
+
+            return response()->json(['success' => true, 'message' => 'Wearable product updated successfully.'], 200);
+        } catch (Exception $e) {
+            Log::error('Updating wearable failed: ' . $e->getMessage());
+            return response()->json(['error' => 'Updating wearable failed.'], 500);
+        }
+    }
+
     private function fetchRatingsForWearable($wearableIds, $products)
     {
-        // Redirect to the RatingController method or handle it here
         return app('App\Http\Controllers\RatingController')->fetchRatingsForWearable($wearableIds, $products);
     }
 }
