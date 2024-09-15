@@ -1,6 +1,6 @@
 @extends('layout.shop')
 
-@section('title', 'Collectible')
+@section('title', 'New Arrivals')
 
 @section('content')
     <div class="flex-shrink-0 p-3 bg-white d-flex flex-column">
@@ -44,9 +44,10 @@
         </div>
     </div>
     <div class="col-md-9">
-        <h1 class="mb-4">Collectible</h1>
+        <h1 class="mb-4">New Arrivals</h1>
+
         <div class="row">
-            @forelse ($products as $product)
+            @forelse ($newArrivals as $product)
                 @if ($product->status == 'active')
                     <div class="col-md-2-4 mb-4">
                         <a href="{{ url('product/' . $product->product_id) }}" class="text-decoration-none text-dark">
@@ -98,11 +99,11 @@
                     </div>
                 @endif
             @empty
-                <p>No products found.</p>
+                <p>No new product found.</p>
             @endforelse
 
             <div class="justify-content-center mt-4">
-                {{ $products->links() }}
+                {{ $newArrivals->links() }}
             </div>
         </div>
     </div>

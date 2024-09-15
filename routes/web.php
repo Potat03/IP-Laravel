@@ -29,19 +29,21 @@ Route::get('/upload', function () {
     return view('upload');
 });
 
-Route::get('/home', function() {
+Route::get('/home', function () {
     return view('home');
 });
 
 Route::get('/home', [ProductController::class, 'showNewArrivals']);
 
-Route::get('/shop', [ProductController::class, 'index'])->name('shop.index');;
+Route::get('/shop', [ProductController::class, 'index'])->name('shop');
+Route::get('/shop', [ProductController::class, 'index'])->name('shop.index');
 Route::get('/shop/wearable', [WearableController::class, 'index'])->name('shop.wearable');
 Route::get('/shop/consumable', [ConsumablesController::class, 'index'])->name('shop.consumable');
 Route::get('/shop/collectible', [CollectiblesController::class, 'index'])->name('shop.collectible');
+Route::get('/shop/new-arrivals', [ProductController::class, 'newArrivals'])->name('shop.newArrivals');
 
 Route::get('/product/{id}', [ProductController::class, 'show'])->name('product');
-
+//Route::get('/product/{id}', [ProductController::class, 'showProductImages']);
 
 // Route::get('/cart', function () {
 //     return view('cart');
@@ -78,7 +80,7 @@ Route::middleware([customAuth::class])->group(function () {
     Route::get('/admin/dashboard', function () {
         return view('admin.dashboard');
     });
-    
+
     Route::get('/admin/product', function () {
         return view('admin.product');
     });
@@ -106,34 +108,31 @@ Route::get('/cc2', function () {
     return view('adminChat');
 });
 
+Route::get('/template', function () {
+    return view('admin.error');
+});
+
+use App\Http\Controllers\CustomerController;
+use App\Http\Middleware\CustomerAuth;
+use App\Http\Controllers\AuthController;
+
+//WK route
+Route::get('/userlogin', ['middleware' => 'guest:customer', function() {
+    return view('userlogin');
+}])->name('user.login');
+
+Route::middleware([CustomerAuth::class])->group(function () {
+
+    Route::get('/profile', function () {
+        return view('userProfile');
+    })->name('user.profile');
+
+    Route::get('/userverify', function () {
+        return view('userVerification');
+    })->name('user.verify');
+});
 
 
 Route::get('/chat', [ChatController::class, 'index']);
 Route::post('/chat', [ChatController::class, 'store']);
 Route::get('/chat/{chatId}', [ChatController::class, 'show']);
-
-
-
-
-
-use App\Http\Controllers\AuthController;
-
-
-
-
-use App\Http\Controllers\AdminController;
-Route::post('/admin', [AdminController::class, 'create'])->name('admin.create');
-
-
-Route::get('login2', [AuthController::class, 'showLoginForm'])->name('login2');
-
-Route::middleware([AdminAuth::class])->group(function () {
-    Route::get('/testchat', function () {
-        return view('chatConnectionTest');
-    }); 
-    
-    Route::post('login2', [AuthController::class, 'login']);
-    Route::post('logout2', [AuthController::class, 'logout'])->name('logout2');
-    Route::post('/send-message', [ChatMessageController::class, 'sendMessage'])->name('send.message');
-    Route::get('/get-messages', [ChatMessageController::class, 'getMessages'])->name('get.messages');
-});

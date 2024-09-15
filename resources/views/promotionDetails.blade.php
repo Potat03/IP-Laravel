@@ -179,34 +179,20 @@
 <div class="container product-detail-container">
     <div class="container mt-4 product-image">
         <!-- Main Image Display -->
-        <div class="main-image mb-3" style="
+        <div class="main-image border p-3 rounded mb-3" style="
     width: 500px;
     height: 500px;">
             <div class="row">
+                @foreach ($promotion->product_list as $product)
+                @if ($loop->index >= 4)
+                @break
+                @endif
                 <div class="col-6 p-0">
-                    <img src={{ URL('storage/images/pokemon.png') }}
+                    <img src="{{ asset('storage/images/products/' . $product->product_id . '/main.png') }}"
                         class="d-block img-thumbnail border-0" alt="product image">
                 </div>
-
-                <div class="col-6 p-0">
-                    <img src={{ URL('storage/images/consumable.png') }}
-                        class="d-block img-thumbnail border-0" alt="product image">
-                </div>
-
-                <div class="col-6 p-0">
-                    <img src={{ URL('storage/images/collectible.png') }}
-                        class="d-block img-thumbnail border-0" alt="product image">
-                </div>
-
-                <div class="col-6 p-0">
-                    <img src={{ URL('storage/images/pika.jpg') }}
-                        class="d-block img-thumbnail border-0" alt="product image">
-                </div>
+                @endforeach
             </div>
-        </div>
-
-        <!-- Thumbnail Images -->
-        <div class="thumbnails d-flex">
         </div>
     </div>
 
@@ -247,7 +233,7 @@
         <div class="pt-5 border-top-0 bg-transparent">
             <div class="text-center text-uppercase">
                 <a class="btn btn-outline-dark btn-add-to-cart mt-auto w-100 fw-bold {{ $promotion->limit > 0 ? '' : 'disabled' }}"
-                    href="#">Add to Cart</a>
+                    data-bs-toggle="modal" data-bs-target="#selectModal">Add to Cart</a>
             </div>
         </div>
 
@@ -256,6 +242,65 @@
             <p style="font-size: 1.2rem;">
                 {{ $promotion->description }}
             </p>
+        </div>
+    </div>
+</div>
+<div class="modal fade modal-xl" id="selectModal" tabindex="-1" aria-labelledby="selectModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="selectModalLabel">Select Variation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="container">
+                    <div class="row">
+                        @foreach ($promotion->product_list as $product)
+                        @for ($i = 0; $i < $product->quantity; $i++)
+                            <div class="card mb-3 col-12">
+                                <div class="row g-0">
+                                    <div class="col-md-2 border-end">
+                                        <img src="{{ asset('storage/images/products/' . $product->product_id . '/main.png') }}"
+                                            class="img-fluid p-5" alt="product image">
+                                    </div>
+                                    <div class="col-md-10">
+                                        <div class="card-body">
+                                            <h5 class="card-title"><span class="h4">Name : </span>{{ $product->name }}</h5>
+                                            @if(strtoupper($product->type) == strtoupper('wearable'))
+                                            @php
+                                            $sizes = explode(',', $product->wearable->size);
+                                            $colors = explode(',', $product->wearable->color);
+                                            @endphp
+                                            <div class="d-flex flex-wrap pt-3 align-items-center">
+                                                <h5 class="col-1 text-secondary m-0">Color :</h5>
+                                                @foreach ($colors as $color)
+                                                <button class="btn btn-color"
+                                                    onclick="selectColor(this, {{$product->product_id}}, {{($product->quantity > 1) ? $i : '-1'}})">{{ $color }}</button>
+                                                @endforeach
+                                            </div>
+                                            <div class="d-flex flex-wrap pt-3 align-items-center">
+                                                <h5 class="col-1 text-secondary m-0">Size :</h5>
+
+                                                @foreach ($sizes as $size)
+                                                <button class="btn btn-size"
+                                                    onclick="selectSize(this, {{$product->product_id}}, {{($product->quantity > 1) ? $i : '-1'}})">{{ $size }}</button>
+                                                @endforeach
+                                            </div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            @endfor
+                            @endforeach
+                    </div>
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="btn-submit-cart">Save changes</button>
+            </div>
         </div>
     </div>
 </div>
@@ -312,25 +357,74 @@
 <script>
     let limit = @json($promotion->limit);
     let bought_count = @json($promotion->bought_count);
+    let promo_content = @json($promotion->product_list);
 
-    function selectVariation(element) {
-        var buttons = document.querySelectorAll('.btn-variation');
+    function selectSize(element, id, index = -1) {
+        if (element.classList.contains('active')) {
+            element.classList.remove('active');
+            let product = promo_content.find(product => product.product_id == id);
+            if (index != -1) {
+                if (product.size == null) {
+                    product.size = [];
+                }
+                product.size[index] = null;
+            } else {
+                product.size = null;
+            }
+            return;
+        }
+
+        var buttons = element.parentElement.querySelectorAll('.btn-size');
 
         buttons.forEach(function(button) {
             button.classList.remove('active');
         });
 
         element.classList.add('active');
+        let product = promo_content.find(product => product.product_id == id);
+        if (index != -1) {
+            if (product.size == null) {
+                product.size = [];
+            }
+            product.size[index] = element.innerText;
+        } else {
+            product.size = element.innerText;
+        }
+        console.log(promo_content);
     }
 
-    function selectVariation2(element) {
-        var buttons = document.querySelectorAll('.btn-variation-2');
+    function selectColor(element, id, index = -1) {
+        if (element.classList.contains('active')) {
+            element.classList.remove('active');
+            let product = promo_content.find(product => product.product_id == id);
+            if (index != -1) {
+                if (product.color == null) {
+                    product.color = [];
+                }
+                product.color[index] = null;
+            } else {
+                product.color = null;
+            }
+            return;
+        }
+
+        var buttons = element.parentElement.querySelectorAll('.btn-color');
 
         buttons.forEach(function(button) {
             button.classList.remove('active');
         });
 
         element.classList.add('active');
+        let product = promo_content.find(product => product.product_id == id);
+        if (index != -1) {
+            if (product.color == null) {
+                product.color = [];
+            }
+            product.color[index] = element.innerText;
+        } else {
+            product.color = element.innerText;
+        }
+        console.log(promo_content);
     }
 
     function changeQuantity(amount) {
@@ -349,33 +443,65 @@
         quantityInput.value = newQuantity;
     }
 
-    document.getElementById('quantity').addEventListener('change', function() {
+    function addToCart() {
         var quantityInput = document.getElementById('quantity');
-        var currentQuantity = parseInt(quantityInput.value);
+        var quantity = parseInt(quantityInput.value);
 
-        if (currentQuantity < 1 || isNaN(currentQuantity)) {
-            quantityInput.value = 1;
+        if (quantity < 1) {
+            alert('Please select a quantity greater than 0');
+            return;
         }
-    });
+
+        if (limit > 0 && quantity > limit - bought_count) {
+            alert('You have exceeded the limit for this promotion');
+            return;
+        }
+
+        alert('Added to cart');
+    }
+
 
     document.addEventListener("DOMContentLoaded", function() {
-        // Get all thumbnails and the main image element
-        const thumbnails = document.querySelectorAll('.thumbnail');
-        const mainImage = document.getElementById('mainImage');
 
-        // Add click event listener to each thumbnail
-        thumbnails.forEach(thumbnail => {
-            thumbnail.addEventListener('click', function() {
-                // Get the image URL from the data-image attribute
-                const imageUrl = this.getAttribute('data-image');
-                // Update the src attribute of the main image
-                mainImage.src = imageUrl;
+        document.getElementById('quantity').addEventListener('change', function() {
+            var quantityInput = document.getElementById('quantity');
+            var currentQuantity = parseInt(quantityInput.value);
 
-                // Optionally update thumbnail styling to indicate the active state
-                thumbnails.forEach(thumb => thumb.classList.remove('active'));
-                this.classList.add('active');
-            });
+            if (currentQuantity < 1 || isNaN(currentQuantity)) {
+                quantityInput.value = 1;
+            }
         });
+
+        document.querySelector('#btn-submit-cart').addEventListener('click', function() {
+            let allSelected = true;
+            promo_content.forEach(product => {
+                if (product.quantity > 1) {
+                    if (product.size == null || product.color == null) {
+                        allSelected = false;
+                    } else {
+                        try {
+                            for (let i = 0; i < product.quantity; i++) {
+                                if (product.size[i] == null || product.color[i] == null) {
+                                    allSelected = false;
+                                }
+                            }
+                        } catch (e) {
+                            allSelected = false;
+                        }
+
+                    }
+                } else if (product.size == null || product.color == null) {
+                    allSelected = false;
+                }
+            });
+
+            if (allSelected) {9
+                addToCart();
+            } else {
+                alert('Please select a size and color for each product');
+            }
+        });
+
     });
 </script>
 @endpush

@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\Cache;
 use App\Models\Promotion;
 use App\Models\PromotionItem;
 use App\Models\Product;
+use App\Models\Wearable;
+use App\Models\Consumable;
+use App\Models\Collectible;
 use Exception;
 
 class PromotionController extends Controller
@@ -32,6 +35,7 @@ class PromotionController extends Controller
         try{
             $promotion = Promotion::find($id);
             $promotion->product_list = Promotion::find($id)->product;
+
             return response()->json(['success' => true, 'data' => $promotion], 200);
         }
         catch(Exception $e){
@@ -253,6 +257,24 @@ class PromotionController extends Controller
 
             foreach($promotion->product_list as $product){
                 $product->quantity = PromotionItem::where('product_id', $product->product_id)->where('promotion_id', $id)->first()->quantity;
+                //check variable type and assign value
+                switch($product->getProductType()) {
+                    case 'Wearable':
+                        $product->type = 'wearable';
+                        $product->wearable = Wearable::find($product->product_id);
+                        break;
+                    case 'Consumable':
+                        $product->type = 'consumable';
+                        $product->consumable = Consumable::find($product->product_id);
+                        break;
+                    case 'Collectible':
+                        $product->type = 'collectible';
+                        $product->collectible = Collectible::find($product->product_id);
+                        break;
+                    default:
+                        $product->type = 'wearable';
+                        $product->wearable = Wearable::find($product->product_id);
+                }
             }
 
             $promotion->bought_count = 0;

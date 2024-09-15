@@ -51,11 +51,19 @@ class ConsumablesController extends Controller
             }
 
             $products = Product::whereIn('product_id', $consumableIds)->paginate(20);
-            return view('shop.consumable', ['products' => $products]);
+            // return view('shop.consumable', ['products' => $products]);
+
+            return $this->fetchRatingsForConsumable($consumableIds, $products);
         } catch (Exception $e) {
             Log::error('Fetching consumables failed: ' . $e->getMessage());
             return response()->json(['error' => 'Fetching consumables failed.'], 500);
         }
+    }
+
+    private function fetchRatingsForConsumable($consumableIds, $products)
+    {
+        // Redirect to the RatingController method or handle it here
+        return app('App\Http\Controllers\RatingController')->fetchRatingsForConsumable($consumableIds, $products);
     }
 }
 

@@ -157,7 +157,7 @@
         });
         document.querySelector('#viewProducts tbody').innerHTML = html;
     }
-    //delete promotion
+
     function confirmation(promotion_id) {
         document.querySelector('#promotion_id').value = promotion_id;
         $('#deletePromotion').modal('show');
@@ -165,14 +165,12 @@
 
     function confirmDelete() {
         let promotion_id = document.querySelector('#promotion_id').value;
-        //ajax request to delete promotion
         fetch(`http://127.0.0.1:8000/api/promotion/${promotion_id}`, {
                 method: 'DELETE',
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    //delete row from table
                     $('#deletePromotion').modal('hide');
                     document.querySelector(`#promotion_${promotion_id}`).remove();
                 }
@@ -180,11 +178,9 @@
     }
 
     $(document).ready(function() {
-        //change promotion status
         $('.form-check-input').on('change', function() {
             let status = this.checked ? 'active' : 'inactive';
             let promotion_id = $(this).closest('tr').attr('id').split('_')[1];
-            //ajax request to change promotion status
             fetch(`http://127.0.0.1:8000/api/promotion/edit/status/${promotion_id}`, {
                     method: 'PUT',
                     body: JSON.stringify({
@@ -197,7 +193,6 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        //change badge color
                         $(this).closest('tr').find('.badge').removeClass('bg-success bg-danger').addClass(`bg-${status == 'active' ? 'success' : 'danger'}`).text(status);
                     }
                 });

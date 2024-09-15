@@ -15,7 +15,6 @@ class CartItemController extends Controller
 {
 
     
-   //product image upload
    public function addToCart(Request $request)
    {
        try {
@@ -68,8 +67,9 @@ class CartItemController extends Controller
                 $cartItem = $cartItems[$i]; // Access the item in the collection
 
                 if($cartItem->promotion_id == null){
-                    $product = Product::where('product_id', $cartItem->product_id)->first(); // Use first() to get a single result
-                    $products[] = $product;
+                    $cartItem->product = Product::where('product_id', $cartItem->product_id)->first();
+                    // $product = Product::where('product_id', $cartItem->product_id)->first(); // Use first() to get a single result
+                    // $products[] = $product;
                 }else{
                     $promotion = Product::where('promotion_id', $cartItem->product_id)->first(); 
                     $promotions[] = $promotion;
@@ -143,4 +143,3 @@ class CartItemController extends Controller
 
  
 }
-

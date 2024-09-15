@@ -38,33 +38,22 @@
                     @if ($promotion->is_new)
                     <div class="badge bg-dark text-white position-absolute w-50 d-flex align-items-center justify-content-center fs-5"
                         style="top: 0.5rem; left: 0rem; border-radius: 0 5px 5px 0;">
-                        {{-- <span class="fs-5">Best Seller</span> --}}
                         <span class="fs-5">New</span>
                     </div>
                     @endif
 
                     <div class="card-img-top">
                         <div class="container">
-                            <div class="row pt-3 p-2">
-                                <div class="col-6 p-0">
-                                    <img src={{ URL('storage/images/pokemon.png') }}
+                            <div class="row pt-3 p-2" style="min-height:250px;">
+                                @foreach ($promotion->product_list as $product)
+                                @if ($loop->index >= 4)
+                                @break
+                                @endif
+                                <div class="{{count($promotion->product_list) == 1 ? 'col-12' : 'col-6'}} p-0">
+                                    <img src="{{ asset('storage/images/products/' . $product->product_id . '/main.png') }}"
                                         class="d-block img-thumbnail border-0" alt="product image">
                                 </div>
-
-                                <div class="col-6 p-0">
-                                    <img src={{ URL('storage/images/consumable.png') }}
-                                        class="d-block img-thumbnail border-0" alt="product image">
-                                </div>
-
-                                <div class="col-6 p-0">
-                                    <img src={{ URL('storage/images/collectible.png') }}
-                                        class="d-block img-thumbnail border-0" alt="product image">
-                                </div>
-
-                                <div class="col-6 p-0">
-                                    <img src={{ URL('storage/images/pika.jpg') }}
-                                        class="d-block img-thumbnail border-0" alt="product image">
-                                </div>
+                                @endforeach
                             </div>
                         </div>
                     </div>
@@ -95,9 +84,7 @@
         @endforelse
     </div>
     <div class="justify-content-center mt-4">
-                {{ $promotions->links() }}
-            </div>
+        {{ $promotions->links() }}
+    </div>
 </div>
 @endsection
-
-
