@@ -8,15 +8,14 @@
     @include('partials.fontawesome')
 
     <style>
-        .header{
-            background-color: #f0f0f0;; 
-        }
+
         .nav-link:hover,
         .nav-item:hover {
             color: darkred !important;
         }
     </style>
 </head>
+
 
 <body class="headerBody">
     <nav class="navbar navbar-expand-lg navbar-light sticky-top">

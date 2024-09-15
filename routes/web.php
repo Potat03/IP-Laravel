@@ -87,7 +87,7 @@ Route::middleware([customAuth::class])->group(function () {
     Route::get('/admin/product', action: [ProductController::class, 'getAll'])->name('admin.product');
     Route::get('/admin/product/add', action: [ProductController::class, 'addProduct'])->name('admin.product.add');
     Route::get('/admin/product/edit/{id}', [ProductController::class, 'editProduct'])->name('admin.product.edit');
-    
+
     Route::get('/admin/promotion', [PromotionController::class, 'adminList'])->name('admin.promotion');
 
     Route::get('/admin/promotion/add', [PromotionController::class, 'addPromotion'])->name('admin.promotion.add');
@@ -129,7 +129,13 @@ Route::middleware([CustomerAuth::class])->group(function () {
     Route::get('/profile', function () {
         return view('userprofile/layout/userProfile');
     })->name('user.profile');
-    
+
+    //profile content
+    Route::get('/profileSec', [CustomerController::class, 'profileSec'])->name('profile.profileSec');
+    Route::get('/orderHistorySec', [CustomerController::class, 'orderHistorySec'])->name('profile.orderHistorySec');
+    Route::get('/shippingSec', [CustomerController::class, 'shippingSec'])->name('profile.shippingSec');
+    Route::get('/supportChatSec', [CustomerController::class, 'supportChatSec'])->name('profile.supportChatSec');
+    Route::get('/settingSec', [CustomerController::class, 'settingSec'])->name('profile.settingSec');
 });
 
 Route::get('/userverify', function () {
