@@ -9,6 +9,8 @@ use App\Models\Promotion;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
+use function Symfony\Component\String\b;
+
 class DatabaseSeeder extends Seeder
 {
     /**
@@ -23,7 +25,7 @@ class DatabaseSeeder extends Seeder
             'tier' => 'gold',
             'phone_number' => '081234567890',
             'email' => 'customer@gmail.com',
-            'password' => 'password',
+            'password' =>  bcrypt('password'),
             'status' => 'active',
         ]);
 
