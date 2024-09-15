@@ -97,7 +97,7 @@ class AuthController extends Controller
 
             return response()->json(['success' => true, 'redirect_url' => route('user.verify')]);
         } else {
-            return redirect()->back()->withErrors($response['message']);
+            return response()->json(['success' => false, 'message' => $response['message']]);
         }
     }
 

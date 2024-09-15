@@ -104,35 +104,32 @@
         <div class="content">
             <div class="left_bar">
                 <ul>
-                    <li>
-                        <a href="javascript:void(0);" class="load-content" data-url="{{ route('profile.profileSec') }}">
+                    <li onclick = "window.location.href = '{{ route('profile.profileSec') }}'">
+                        <a class="load-content">
                             <i class="fa-solid fa-square-poll-vertical"></i>
                             Profile
                         </a>
                     </li>
-                    <li>
-                        <a href="javascript:void(0);" class="load-content"
-                            data-url="{{ route('profile.orderHistorySec') }}">
+                    <li onclick = "window.location.href = '{{ route('profile.orderHistorySec') }}'">
+                        <a class="load-content">
                             <i class="fa-regular fa-teddy-bear"></i>
                             Order History
                         </a>
                     </li>
-                    <li>
-                        <a href="javascript:void(0);" class="load-content"
-                            data-url="{{ route('profile.shippingSec') }}">
+                    <li onclick = "window.location.href = '{{ route('profile.shippingSec') }}'">
+                        <a class="load-content">
                             <i class="fa-regular fa-box"></i>
                             Shipping
                         </a>
                     </li>
-                    <li>
-                        <a href="javascript:void(0);" class="load-content"
-                            data-url="{{ route('profile.supportChatSec') }}">
+                    <li onclick = "window.location.href = '{{ route('profile.supportChatSec') }}'">
+                        <a class="load-content">
                             <i class="fa-brands fa-rocketchat"></i>
                             Support Chat
                         </a>
                     </li>
-                    <li>
-                        <a href="javascript:void(0);" class="load-content" data-url="{{ route('profile.settingSec') }}">
+                    <li onclick = "window.location.href = '{{ route('profile.settingSec') }}'">
+                        <a class="load-content">
                             <i class="fa-regular fa-user"></i>
                             Settings
                         </a>
@@ -147,23 +144,5 @@
             </div>
         </div>
 </body>
-<script>
-    $(document).on('click', '.load-content', function(e) {
-        e.preventDefault();
-
-        var url = $(this).data('url');
-
-        $.ajax({
-            url: url,
-            method: 'GET',
-            success: function(response) {
-                $('.right_content').html(response);
-            },
-            error: function(xhr, status, error) {
-                console.error('Error loading content:', error);
-            }
-        });
-    });
-</script>
 
 </html>

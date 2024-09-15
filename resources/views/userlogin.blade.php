@@ -127,7 +127,8 @@
             e.preventDefault();
 
             let formData = new FormData(this);
-
+            console.log(formData);
+            console.log(this.action);
             fetch(this.action, {
                     method: 'POST',
                     body: formData,
