@@ -197,9 +197,9 @@
         <div class="container mt-4 product-image">
             <!-- Main Image Display -->
             <div class="main-image mb-3">
-                <img id="mainImage" src="{{ asset('storage/images/products/' . $product->product_id . '/' . $images[0]) }}"
+                <img id="mainImage" src="{{ asset('storage/images/products/' . $product->product_id . '/main.' . pathinfo($images[0], PATHINFO_EXTENSION)) }}"
                     class="img-fluid main-square" alt="Main Product Image" draggable="false">
-            </div>
+            </div>            
 
             <!-- Thumbnail Images -->
             <div class="thumbnails d-flex">
