@@ -16,27 +16,27 @@ class CustomerController extends Controller
     }
     public function profileSec()
     {
-        return view('profile.profileSec');
+        return view('userprofile/profile');
     }
 
     public function orderHistorySec()
     {
-        return view('profile.orderHistorySec');
+        return view('userprofile/orderHistorySec');
     }
 
     public function shippingSec()
     {
-        return view('profile.shippingSec');
+        return view('userprofile/shippingSec');
     }
 
     public function supportChatSec()
     {
-        return view('profile.supportChatSec');
+        return view('userprofile/supportChatSec');
     }
 
     public function settingSec()
     {
-        return view('profile.settingSec');
+        return view('userprofile/settingSec');
     }
     
 }

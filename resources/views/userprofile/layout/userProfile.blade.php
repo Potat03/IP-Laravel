@@ -10,6 +10,10 @@
     @include('partials.fontawesome')
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <style>
+        body {
+            overflow: hidden;
+        }
+
         .profile_content {
             display: flex;
             flex-direction: column;
@@ -138,31 +142,26 @@
 
             <div class="right_content">
                 <div class="lower_content overflow-auto">
-                    @yield('content')
+                    @yield('allcontent')
                 </div>
             </div>
         </div>
 </body>
 <script>
-    $(document).ready(function() {
-        $('.load-content').on('click', function(e) {
-            e.preventDefault();
+    $(document).on('click', '.load-content', function(e) {
+        e.preventDefault();
 
-            var url = $(this).data('url');
-            console.log('Requesting URL:', url);
+        var url = $(this).data('url');
 
-            $.ajax({
-                url: url,
-                method: 'GET',
-                success: function(response) {
-                    console.log('Response received:', response);
-                    $('.right_content').html(response);
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error loading content:', error, xhr
-                        .responseText);
-                }
-            });
+        $.ajax({
+            url: url,
+            method: 'GET',
+            success: function(response) {
+                $('.right_content').html(response);
+            },
+            error: function(xhr, status, error) {
+                console.error('Error loading content:', error);
+            }
         });
     });
 </script>

@@ -29,13 +29,6 @@
         Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout');
         Route::post('/register', [AuthController::class, 'userRegister'])->name('auth.userRegister');
         Route::post('/verify', [AuthController::class, 'verify'])->name('auth.verify');
-
-        //profile content
-        Route::get('/profileSec', [CustomerController::class, 'profileSec'])->name('profile.profileSec');
-        Route::get('/orderHistorySec', [CustomerController::class, 'orderHistorySec'])->name('profile.orderHistorySec');
-        Route::get('/shippingSec', [CustomerController::class, 'shippingSec'])->name('profile.shippingSec');
-        Route::get('/supportChatSec', [CustomerController::class, 'supportChatSec'])->name('profile.supportChatSec');
-        Route::get('/settingSec', [CustomerController::class, 'settingSec'])->name('profile.settingSec');
     });
     Route::post('/resendOtp', [AuthController::class, 'resendOtp'])->name('auth.resendOtp');
 
