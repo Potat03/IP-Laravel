@@ -17,6 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('product_id')->references('product_id')->on('product');
             $table->unsignedBigInteger('promotion_id')->references('promotion_id')->on('promotion');
             $table->integer('quantity');
+            $table->string('details');
             $table->decimal('subtotal', 8, 2);
             $table->decimal('discount', 8, 2);
             $table->decimal('total', 8, 2);

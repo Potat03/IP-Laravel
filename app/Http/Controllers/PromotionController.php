@@ -15,7 +15,6 @@ use Exception;
 
 class PromotionController extends Controller
 {
-    //api method
     public function getPromotion(){
         try{
             $promotion = Promotion::all();
@@ -27,7 +26,7 @@ class PromotionController extends Controller
             return response()->json(['success' => true, 'data' => $promotion], 200);
         }
         catch(Exception $e){
-            return response()->json(['success' => false, 'message' => '$e->getMessage()'], 400);
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
         }
     }    
 
@@ -45,7 +44,6 @@ class PromotionController extends Controller
 
     public function createPromotion(Request $request){
         try{
-            //validate request
             $request->validate([
                 'title' => 'required|string',
                 'description' => 'required|string',
@@ -57,11 +55,9 @@ class PromotionController extends Controller
                 'status' => 'required|string'
             ]);
 
-            //json to array
             $productList = json_decode($request->products);
             $originalPrice = 0;
 
-            //get original price
             foreach($productList as $product){
                 $originalPrice += Product::find($product->product_id)->price * $product->quantity;
             }
@@ -100,13 +96,11 @@ class PromotionController extends Controller
         try{
             $promotion = Promotion::find($id);
 
-            //store old data in cache for 1 day
             Cache::put('promotion_'.$id, $promotion, 86400);
 
             $originalPrice = 0;
             $productList = json_decode($request->products);
             
-            //get original price
             foreach($productList as $product){
                 $originalPrice += Product::find($product->product_id)->price * $product->quantity;
             }
@@ -125,15 +119,10 @@ class PromotionController extends Controller
             $promotion->status = $request->status;
             $promotion->save();
 
-
-
-            //product list
             $productList = json_decode($request->products);
 
-            //delete old product list
             PromotionItem::where('promotion_id', $id)->delete();
 
-            //add new product list
             foreach($productList as $product){
                 PromotionItem::create([
                     'promotion_id' => $id,
@@ -150,7 +139,6 @@ class PromotionController extends Controller
 
     public function deletePromotion($id){
         try{
-            //status = deleted
             $promotion = Promotion::find($id);
             $promotion->status = 'deleted';
             $promotion->save();
@@ -213,27 +201,23 @@ class PromotionController extends Controller
     }
 
     //views
-
     public function customerList(){
         try{
             $promotions = Promotion::where('status', 'active')->paginate(12);
             foreach($promotions as $promotion){
                 $promotion->product_list = Promotion::find($promotion->promotion_id)->product;
 
-                //see if promotion is new (less than 3 days)
                 if($promotion->created_at->diffInDays(now()) < 3){
                     $promotion->is_new = true;
                 }else{
                     $promotion->is_new = false;
                 }
 
-                //quantity of each product
                 foreach($promotion->product_list as $product){
                     $product->quantity = PromotionItem::where('product_id', $product->product_id)->where('promotion_id', $promotion->promotion_id)->first()->quantity;
                 }
             }
 
-            //get all category
             $categories = Category::all();
             
             return view('promotion', ['promotions' => $promotions, 'categories' => $categories]);
@@ -247,18 +231,15 @@ class PromotionController extends Controller
         try{
             $promotion = Promotion::find($id);
             $promotion->product_list = Promotion::find($id)->product;
-            //|| $promotion->end_at < now()
-            if($promotion->status == 'deleted' || $promotion->status == 'inactive' ){
+            if($promotion->status == 'deleted' || $promotion->status == 'inactive'){
                 return view('errors.404');
             }else if ($promotion->type == 'single'){
-                //redirect url to product page
                 return redirect()->route('product', ['id' => $promotion->product_list[0]->product_id]);
             }
 
 
             foreach($promotion->product_list as $product){
                 $product->quantity = PromotionItem::where('product_id', $product->product_id)->where('promotion_id', $id)->first()->quantity;
-                //check variable type and assign value
                 switch($product->getProductType()) {
                     case 'Wearable':
                         $product->type = 'wearable';
@@ -292,6 +273,7 @@ class PromotionController extends Controller
             return view('errors.404');
         }
     }
+
     public function adminList(){
         try{
             $promotions = Promotion::whereNot('status', 'deleted')->paginate(12);
@@ -316,7 +298,6 @@ class PromotionController extends Controller
             $promotion->product_list = Promotion::find($id)->product;
             $products = Product::all();
 
-            //quantity of each product
             foreach($promotion->product_list as $product){
                 $product->quantity = PromotionItem::where('product_id', $product->product_id)->where('promotion_id', $id)->first()->quantity;
             }
@@ -329,7 +310,6 @@ class PromotionController extends Controller
 
     public function restorePromotion(){
         try{
-            //get promotion where status = deleted
             $promotions = Promotion::where('status', 'deleted')->get();
             foreach($promotions as $promotion){
                 $promotion->product_list = Promotion::find($promotion->promotion_id)->product;
