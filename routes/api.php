@@ -48,7 +48,7 @@
     Route::post('/promotion/restore/{id}', [PromotionController::class, 'undoDeletePromotion']);
 
 
-    
+
     Route::post('/product/image/upload', [ProductController::class, 'productImageUpload']);
     Route::get('/product/generateTable', [ProductController::class, 'generateTable']);
 
@@ -59,5 +59,3 @@
 
     // Route::get('/cartItem/getCartItem/{id}', [CartItemController::class, 'getCartItem']);
     // Route::post('/cartItems/get', [CartItemController::class, 'getCartItems']);
-
-

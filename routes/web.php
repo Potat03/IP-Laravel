@@ -88,6 +88,9 @@ Route::middleware([customAuth::class])->group(function () {
     Route::get('/admin/product', action: [ProductController::class, 'getAll'])->name('admin.product');
     Route::get('/admin/product/add', action: [ProductController::class, 'addProduct'])->name('admin.product.add');
     Route::get('/admin/product/edit/{id}', [ProductController::class, 'editProduct'])->name('admin.product.edit');
+
+    Route::get('/product/get/images/{id}', [ProductController::class, 'showProductImagesAdmin']);
+
     
     Route::get('/admin/promotion', [PromotionController::class, 'adminList'])->name('admin.promotion');
 

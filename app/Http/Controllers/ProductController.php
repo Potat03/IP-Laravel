@@ -16,7 +16,7 @@ use App\Http\Controllers\Adapters\ProductAdapter;
 
 class ProductController extends Controller
 {
-    //product image upload
+    //product image upload(for create product)
     public function productImageUpload(Request $request, $id)
     {
         try {
@@ -54,9 +54,72 @@ class ProductController extends Controller
         }
     }
 
+    //for update product
+    public function productImageUploadUpdate(Request $request, $id)
+    {
+        try {
+            $request->validate([
+                'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            ]);
 
+            $folderPath = 'storage/images/products/' . $id;
+            $folderFullPath = public_path($folderPath);
 
-    //display success message
+            // Create the folder if it doesn't exist
+            if (!file_exists($folderFullPath)) {
+                mkdir($folderFullPath, 0777, true);
+            }
+
+            $existingImages = array_map('basename', glob($folderFullPath . '/*'));
+
+            $images = $request->file('images');
+            if ($images) {
+                $mainImageExists = false; // Initialize flag
+
+                foreach ($images as $index => $image) {
+                    $extension = $image->getClientOriginalExtension();
+
+                    // Check if 'main' image with this extension already exists
+                    if ($index === 0 && !$mainImageExists) {
+                        $mainImage = 'main.' . $extension;
+                        $mainImageExists = in_array($mainImage, $existingImages);
+                    }
+
+                    if ($index === 0 && !$mainImageExists) {
+                        // Assign 'main' name if it doesn't exist already
+                        $imageName = 'main.' . $extension;
+                        $mainImageExists = true; // Update flag to indicate 'main' image now exists
+                    } else {
+                        // Generate a unique name for the image
+                        $imageName = $this->generateUniqueName($existingImages, $extension);
+                    }
+
+                    // Move the image to the folder
+                    $image->move($folderFullPath, $imageName);
+                    Log::info('Uploaded image: ' . $imageName);
+
+                    // Add the new image to the existing images list
+                    $existingImages[] = $imageName;
+                }
+            }
+            return response()->json(['success' => true, 'data' => 'Images have been successfully uploaded.'], 200);
+        } catch (Exception $e) {
+            return response()->json(['success' => false, 'data' => $e->getMessage()], 400);
+        }
+    }
+
+    private function generateUniqueName(array $existingImages, string $extension): string
+    {
+        $counter = 1;
+        $uniqueName = $counter . '.' . $extension;
+
+        while (in_array($uniqueName, $existingImages)) {
+            $counter++;
+            $uniqueName = $counter . '.' . $extension;
+        }
+
+        return $uniqueName;
+    }
 
     //add product to database
     public function addProduct(Request $request)
@@ -288,6 +351,20 @@ class ProductController extends Controller
         return view('product', compact('product', 'images'));
     }
 
+    // Show product images for admin product
+    public function showProductImagesAdmin($id)
+    {
+        $product = Product::find($id);
+
+        // Get all images for this product from the storage directory
+        $imageFiles = Storage::files('public/images/products/' . $id);
+        $images = array_map(function ($file) {
+            return basename($file);
+        }, $imageFiles);
+
+        return response()->json(['success' => true, 'data' => $images], 200);
+    }
+
     // Update a product
     public function updateProduct(Request $request, $id)
     {
@@ -310,6 +387,8 @@ class ProductController extends Controller
                 'supplier' => 'nullable|string',
                 'selected_groups' => 'nullable|string',
             ]);
+
+            $this->productImageUploadUpdate($request, $id);
 
             $product = Product::findOrFail($id);
             $product->update($validatedData);
@@ -361,8 +440,14 @@ class ProductController extends Controller
 
     protected function updateConsumableAttributes($product, Request $request)
     {
-        $consumableAttributes = $request->only(['expiry_date', 'portion', 'halal']);
-        $product->consumable->update($consumableAttributes);
+        $consumable = $product->consumable;
+        $consumableObj = new ConsumablesController();
+
+        if ($consumable) {
+            $consumableObj->update($request, $product->product_id);
+        } else {
+            Log::warning('Consumable not found for product ID: ' . $product->product_id);
+        }
     }
 
     protected function updateCollectibleAttributes($product, Request $request)
