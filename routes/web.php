@@ -185,4 +185,5 @@ Route::get('/addMsg', function () {
 });
 Route::post('/sendMsg', [ChatMessageController::class, 'sendMessage'])->name('sendMsg');
 Route::get('/getMsg', [ChatMessageController::class, 'initCustomerChat'])->name('getMsg');
-Route::get('/getAdmMsg', [ChatMessageController::class, 'initAdminChatList'])->name('getAdmMsg');
+Route::get('/getAdmChatList', [ChatMessageController::class, 'initAdminChatList'])->name('getAdmChatList');
+Route::get('/getChatMessage', [ChatMessageController::class, 'adminGetMessage'])->name('getChatMessage');

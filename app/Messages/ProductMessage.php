@@ -31,8 +31,8 @@ class ProductMessage implements MessageInterface
         return [
             'type' => 'PRODUCT',
             'image' => $image_url,
+            'id' => $product->product_id,
             'name' => $product->name,
-            'price' => $product->price,
             'by_customer'=> $this->data->by_customer
         ];
     }

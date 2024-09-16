@@ -231,6 +231,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    display: none;
 }
 
 .main_action div:hover{
@@ -249,6 +250,7 @@
     border-radius: 5px;
     flex-grow: 1;
     overflow-y: scroll;
+    position: relative;
 }
 
 .chat_content::-webkit-scrollbar{
@@ -402,6 +404,11 @@
     overflow-wrap: anywhere;
     justify-content: center;
     align-items: center;
+}
+
+.product_msg img{
+    width: 50px;
+    height: 50px;
 }
 
 .product_msg_title{
@@ -592,9 +599,10 @@
     cursor: default;
     font-size: 14px;
     font-weight: 600;
-    position: fixed;
+    position: absolute;
+    top: 10px;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translateX(-50%) translateY(15px);
     width: fit-content;
     display: flex;
     align-items: center;
@@ -604,11 +612,10 @@
 
 .chat_error_msg.show{
     opacity: 1;
-    transform: translateY(0);
 }
 
 .chat_error_msg.hide{
-    transform: translateY(10px);
+    transform: translateX(-50%) translateY(5px);
     pointer-events: none;
 }
 
@@ -623,11 +630,11 @@
     scale: 0.8;
 }
 
-.chat_error_msg_icon:hover{
+.chat_error_msg:hover .chat_error_msg_icon{
     scale: 1;
 }
 
-.chat_error_msg_icon:active{
+.chat_error_msg:active .chat_error_msg_icon{
     scale: 0.6;
 }
 
@@ -642,6 +649,28 @@
     transition: opacity 0.4s ease, transform 0.4s ease; 
     user-select: none;
     letter-spacing: -0.5px;
+}
+
+.empty_message{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    user-select: none;
+    font-size: 2em;
+    color: var(--adminmain);
+    opacity: 0.4;
+}
+
+.chat_hide{
+    opacity: 0;
+    pointer-events: none;
+    user-select: none;
+}
+
+.action_show{
+    display: block !important;
 }
 
 

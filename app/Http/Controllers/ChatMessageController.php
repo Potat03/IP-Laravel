@@ -12,7 +12,7 @@ use App\Models\Customer;
 
 class ChatMessageController extends Controller
 {
-    public function initCustomerChat(Request $request)
+    public function initCustomerChat()
     {
         try {
             // Check if got logged in
@@ -38,11 +38,6 @@ class ChatMessageController extends Controller
     public function initAdminChatList()
     {
         try {
-            // Check if got logged in
-            if (!Auth::guard('admin')->check()) {
-                return response()->json(['success' => false, 'info' => 'Unauthorized'], 403);
-            }
-
             $user = Auth::guard('admin')->user();
 
             // Check if the user have an active chat
@@ -53,11 +48,14 @@ class ChatMessageController extends Controller
 
                 if(!$customer) return null;
 
+                $latest_message = ChatMessage::where('chat_id', $chat->chat_id)->latest('created_at')->first();
+
                 return [
                     'chat_id' => $chat->chat_id,
                     'customer_id' => $chat->customer_id,
                     'customer_name' => $customer->username,
                     'status' => $chat->status,
+                    'latest_message' => $latest_message ? $latest_message->message_content : "No message yet",
                 ];
             })->filter(); // to remove null rows
 
@@ -65,6 +63,32 @@ class ChatMessageController extends Controller
                 'success' => true,
                 'chat_list' => $chat_list
             ], 200);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'info' => $e->getMessage()], 500);
+        }
+    }
+
+    public function adminGetMessage(Request $request){
+        try {
+            $user = Auth::guard('admin')->user();
+
+            $chat_id = $request->chat_id;
+
+            if(!$chat_id){
+                return response()->json(['success' => false, 'info' => 'Chat ID is required'], 400);
+            }
+
+            $chat = Chat::find($chat_id);
+
+            if(!$chat){
+                return response()->json(['success' => false, 'info' => 'Chat not found'], 404);
+            }
+
+            if(Gate::forUser($user)->denies('viewChat', $chat)){
+                return response()->json(['success' => false, 'info' => 'Unauthorized'], 403);
+            }
+
+            return $this->getAllMessage($chat_id);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'info' => $e->getMessage()], 500);
         }
