@@ -280,6 +280,11 @@
                 form.append('existingImages', existingImagesJson);
                 form.append('filesArray', filesArrayJson);
 
+                if (existingImages.length + files.length === 0) {
+                    alert('You must upload at least one image for the product.');
+                    return;
+                }
+
                 filesArray.forEach(file => {
                     form.append('images[]', file);
                 });

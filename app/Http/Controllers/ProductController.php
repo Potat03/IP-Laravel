@@ -164,8 +164,12 @@ class ProductController extends Controller
         return $uniqueName;
     }
 
+    public function addProduct(){
+        return view('admin.product_add');
+    }
+
     //add product to database
-    public function addProduct(Request $request)
+    public function createProduct(Request $request)
     {
         try {
             $request->validate([
