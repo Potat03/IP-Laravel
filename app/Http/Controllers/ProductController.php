@@ -59,7 +59,7 @@ class ProductController extends Controller
     {
         try {
             $request->validate([
-                'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
                 'existingImages' => 'nullable|string',
                 'filesArray' => 'nullable|string',
             ]);
@@ -84,18 +84,20 @@ class ProductController extends Controller
 
             $images = $request->file('images');
             if ($images) {
+                // Check if 'main' image exists in the folder
                 $mainImageExists = false;
+                foreach (['jpg', 'png', 'jpeg'] as $extension) {
+                    if (in_array('main.' . $extension, $existingImages)) {
+                        $mainImageExists = true;
+                        break;
+                    }
+                }
 
                 foreach ($images as $index => $image) {
                     $extension = $image->getClientOriginalExtension();
+                    $imageName = '';
 
-                    // Check if 'main' image with this extension already exists
-                    if ($index === 0 && !$mainImageExists) {
-                        $mainImage = 'main.' . $extension;
-                        $mainImageExists = in_array($mainImage, $existingImages);
-                    }
-
-                    if ($index === 0 && !$mainImageExists) {
+                    if (!$mainImageExists) {
                         // Assign 'main' name if it doesn't exist already
                         $imageName = 'main.' . $extension;
                         $mainImageExists = true;
@@ -353,13 +355,15 @@ class ProductController extends Controller
     {
         $product = Product::find($id);
 
+        $mainImageExtension = $this->getMainImageExtension($id);
+
         // Get all images for this product from the storage directory
         $imageFiles = Storage::files('public/images/products/' . $id);
         $images = array_map(function ($file) {
             return basename($file);
         }, $imageFiles);
 
-        return view('product', compact('product', 'images'));
+        return view('product', compact('product', 'images', 'mainImageExtension'));
     }
 
     // Show product images for admin product
@@ -382,6 +386,21 @@ class ProductController extends Controller
         // }, $imageFiles);
 
         // return response()->json(['success' => true, 'data' => $images], 200);
+    }
+
+    public function getMainImageExtension($productId)
+    {
+        $folderPath = public_path('storage/images/products/' . $productId);
+        $extensions = ['jpg', 'jpeg', 'png'];
+
+        foreach ($extensions as $extension) {
+            $mainImage = 'main.' . $extension;
+            if (file_exists($folderPath . '/' . $mainImage)) {
+                return $extension;
+            }
+        }
+
+        return null; // No main image found
     }
 
     // Update a product
@@ -561,7 +580,4 @@ class ProductController extends Controller
     {
         return app('App\Http\Controllers\RatingController')->fetchRatingsForShop($productsId, $products);
     }
-
-
-
 }
