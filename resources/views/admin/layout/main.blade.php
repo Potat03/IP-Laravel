@@ -6,10 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title')</title>
 
-    @vite(['resources/css/app.css','resources/sass/app.scss', 'resources/js/app.js', 'resources/css/admin-nav.css','resources/js/bootstrap.js'])
     @include('partials.fontawesome')
-    <link href="{{ asset('css/admin_support.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/admin_nav.css') }}" rel="stylesheet">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    @yield('vite')
     @yield('css')
 </head>
 

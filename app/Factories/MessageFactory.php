@@ -19,6 +19,5 @@ class MessageFactory
             'PRODUCT' => new ProductMessage($messageData),
             default => throw new \InvalidArgumentException('Invalid Message'),
         };
-
     }
 }

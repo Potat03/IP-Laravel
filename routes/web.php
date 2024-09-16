@@ -160,18 +160,17 @@ Route::get('/template', function () {
     return view('admin.error');
 });
 
-
+Route::get('/adminLogin', [AuthController::class, 'showAdminLoginForm']);
 Route::post('/adminLogin', [AuthController::class, 'adminLogin'])->name('admin.login');
 Route::get('/adminLogout', [AuthController::class, 'adminLogout'])->name('admin.logout');
-
-Route::get('/adminLogin', function () {
-    return view('admin.login');
-});
 
 Route::middleware([AdminAuth::class])->group(function () {
     Route::get('/adminChat', function () {
         return view('adminChat');
-    })->name('adminChat');
+    });
+    Route::get('/adminChat2', function () {
+        return view('admin.chat_room');
+    });
 });
 
 Route::get('/chat', [ChatController::class, 'index']);
@@ -179,4 +178,11 @@ Route::post('/chat', [ChatController::class, 'store']);
 Route::get('/chat/{chatId}', [ChatController::class, 'show']);
 
 
-Route::get('/chatImage', [ChatController::class, 'test1']);
+Route::get('/chatImage', [ChatMessageController::class, 'initCustomerChat']);
+
+Route::get('/addMsg', function () {
+    return view('weiTestChat');
+});
+Route::post('/sendMsg', [ChatMessageController::class, 'sendMessage'])->name('sendMsg');
+Route::get('/getMsg', [ChatMessageController::class, 'initCustomerChat'])->name('getMsg');
+Route::get('/getAdmMsg', [ChatMessageController::class, 'initAdminChatList'])->name('getAdmMsg');

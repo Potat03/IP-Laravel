@@ -19,15 +19,21 @@ class ProductMessage implements MessageInterface
 
     public function getContent(): array
     {
+        
         $product_id = $this->data->message_content;
         $product = $this->chatMessageService->getProductDetails($product_id);
         $image_url = $this->chatMessageService->getMainProductImagePath($product_id);
 
+        if(!$product || !$image_url) {
+            return [];
+        }
+
         return [
-            'type' => 'product',
+            'type' => 'PRODUCT',
             'image' => $image_url,
             'name' => $product->name,
             'price' => $product->price,
+            'by_customer'=> $this->data->by_customer
         ];
     }
 }

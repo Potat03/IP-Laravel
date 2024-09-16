@@ -200,15 +200,15 @@ class AuthController extends Controller
 
     public function showAdminLoginForm()
     {
+        if (Auth::guard('admin')->check()) {
+            return response()->redirectTo('/adminChat');
+        }
         return view('admin.login');
     }
 
     public function adminLogin(Request $request)
     {
         try {
-            if (Auth::guard('admin')->check()) {
-                return response()->json(['success' => true, 'data' => 'Sorry, You already logged in'], 200); // 200 = process success
-            }
 
             $request->validate([
                 'email' => 'required|email',
