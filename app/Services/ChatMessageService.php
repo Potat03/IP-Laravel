@@ -25,22 +25,19 @@ class ChatMessageService
     public function getProductDetails($id)
     {
         $product = Product::find($id);
+        if(!$product) {
+            return null;
+        }
         return $product;
     }
 
-    public function getImageMessagePath($chat_id, $message_id)
+    public function getImageMessagePath($chat_id, $image_name)
     {
-        $extensions = ['png', 'jpg', 'jpeg'];
-        $imagePath = null;
-
-        foreach ($extensions as $ext) {
-            $filePath = "images/chat/{$chat_id}/{$message_id}.{$ext}";
-            if (Storage::disk('public')->exists($filePath)) {
-                $imagePath = asset("storage/{$filePath}");
-                break;
-            }
+        $filePath = "images/chats/{$chat_id}/{$image_name}";
+        if (Storage::disk('public')->exists($filePath)) {
+            return  asset("storage/{$filePath}");
         }
-        return $imagePath;
+        return null;
     }
 
     public function uploadImageMessage($chat_id, $message_id, $image)
@@ -49,7 +46,7 @@ class ChatMessageService
         $imagePath = null;
 
         foreach ($extensions as $ext) {
-            $filePath = "images/chat/{$chat_id}/{$message_id}.{$ext}";
+            $filePath = "images/chats/{$chat_id}/{$message_id}.{$ext}";
             if (Storage::disk('public')->put($filePath, $image)) {
                 $imagePath = asset("storage/{$filePath}");
                 break;

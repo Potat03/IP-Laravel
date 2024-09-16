@@ -7,7 +7,8 @@
     <title>Admin Customer Support</title>
 
     @include('partials.fontawesome')
-    <link href="{{ asset('css/admin_support.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/admin_nav.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/chat_room.css') }}" rel="stylesheet">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 

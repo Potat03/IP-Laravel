@@ -14,8 +14,9 @@ class NormalMessage implements MessageInterface
     public function getContent(): array
     {
         return [
-            'type' => 'text',
-            'image_url' => $this->data->text
+            'type' => 'TEXT',
+            'text' => $this->data->message_content,
+            'by_customer'=> $this->data->by_customer
         ];
     }
 }
