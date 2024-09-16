@@ -58,8 +58,11 @@ class ProductController extends Controller
     public function productImageUploadUpdate(Request $request, $id)
     {
         try {
+            // Validate the incoming request
             $request->validate([
                 'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'existingImages' => 'nullable|string',
+                'filesArray' => 'nullable|string',
             ]);
 
             $folderPath = 'storage/images/products/' . $id;
@@ -70,8 +73,23 @@ class ProductController extends Controller
                 mkdir($folderFullPath, 0777, true);
             }
 
+            // Retrieve existing images from the folder
             $existingImages = array_map('basename', glob($folderFullPath . '/*'));
 
+            // Decode existingImages and filesArray from request
+            $existingImagesFromRequest = json_decode($request->input('existingImages', '[]'), true);
+            $filesArrayFromRequest = json_decode($request->input('filesArray', '[]'), true);
+
+            // Remove images that are no longer in the `existingImagesFromRequest` array
+            foreach ($existingImages as $image) {
+                if (!in_array($image, $existingImagesFromRequest)) {
+                    // Delete the file if it is not in the current list
+                    unlink($folderFullPath . '/' . $image);
+                    Log::info('Deleted old image: ' . $image);
+                }
+            }
+
+            // Process new files
             $images = $request->file('images');
             if ($images) {
                 $mainImageExists = false;
@@ -102,7 +120,8 @@ class ProductController extends Controller
                     $existingImages[] = $imageName;
                 }
             }
-            return response()->json(['success' => true, 'data' => 'Images have been successfully uploaded.'], 200);
+
+            return response()->json(['success' => true, 'data' => 'Images have been successfully updated.'], 200);
         } catch (Exception $e) {
             return response()->json(['success' => false, 'data' => $e->getMessage()], 400);
         }
