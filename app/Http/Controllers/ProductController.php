@@ -569,4 +569,7 @@ class ProductController extends Controller
     {
         return app('App\Http\Controllers\RatingController')->fetchRatingsForShop($productsId, $products);
     }
+
+
+
 }

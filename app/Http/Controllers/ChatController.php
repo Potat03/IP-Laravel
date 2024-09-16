@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ChatMessage;
 use Illuminate\Http\Request;
+use App\Services\ChatMessageService;
 
 class ChatController extends Controller
 {
@@ -76,5 +77,14 @@ class ChatController extends Controller
             'success' => false,
             'message' => 'Message not found',
         ], 404);
+    }
+
+    public function test1()
+    {
+        $chatSerive = new ChatMessageService();
+        $imagePath = $chatSerive->getImageMessagePath(1, 2);
+        return response()->json([
+            'imagePath' => $imagePath,
+        ]);
     }
 }
