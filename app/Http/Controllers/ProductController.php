@@ -7,6 +7,8 @@ use App\Models\Product;
 use App\Models\Wearable;
 use App\Models\Collectible;
 use App\Models\Rating;
+use App\Directors\ProductDirector;
+use App\Builders\ProductBuilder;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Exception;
 use Illuminate\Support\Facades\Log;
@@ -21,34 +23,30 @@ class ProductController extends Controller
     {
         try {
             $request->validate([
-                'images' => 'required',
+                'images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+                'filesArray' => 'nullable|string',
             ]);
 
-
-            $imageName = "main.png";
-
-            if ($id) {
-                $folderPath = 'storage/images/products/' . $id;
-            } else {
-                $folderPath = 'storage/images/products/lol';
-                // return response()->json(['success' => false, 'message' => 'Product ID is required.'], 400);
-            }
+            $folderPath = $id ? 'storage/images/products/' . $id : 'storage/images/products/lol';
 
             if (!file_exists(public_path($folderPath))) {
                 mkdir(public_path($folderPath), 0777, true);
             }
 
             $images = $request->file('images');
-            foreach ($images as $index => $image) {
-                if ($index === 0) {
-                    $imageName = 'main.' . $image->getClientOriginalExtension(); // The first image is named "main"
-                } else {
-                    $imageName = $index . '.' . $image->getClientOriginalExtension(); // Subsequent images are numbered
+            if ($images) {
+                foreach ($images as $index => $image) {
+                    $imageName = $index === 0
+                        ? 'main.' . $image->getClientOriginalExtension()
+                        : $index . '.' . $image->getClientOriginalExtension();
+
+                    $image->move(public_path($folderPath), $imageName);
                 }
-                $image->move(public_path($folderPath), $imageName);
+
+                return response()->json(['success' => true, 'data' => 'Images have been successfully uploaded.'], 200);
             }
 
-            return response()->json(['success' => true, 'data' => 'You have successfully uploaded an image.'], 200);
+            return response()->json(['success' => false, 'data' => 'No images were uploaded.'], 400);
         } catch (Exception $e) {
             return response()->json(['success' => false, 'data' => $e->getMessage()], 400);
         }
@@ -59,36 +57,58 @@ class ProductController extends Controller
     {
         try {
             $request->validate([
-                'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+                'existingImages' => 'nullable|string',
+                'filesArray' => 'nullable|string',
             ]);
 
             $folderPath = 'storage/images/products/' . $id;
             $folderFullPath = public_path($folderPath);
 
-            // Create the folder if it doesn't exist
             if (!file_exists($folderFullPath)) {
                 mkdir($folderFullPath, 0777, true);
             }
 
+            // Get list of existing images in the folder
             $existingImages = array_map('basename', glob($folderFullPath . '/*'));
 
-            $images = $request->file('images');
-            if ($images) {
-                $mainImageExists = false; // Initialize flag
+            $existingImagesFromRequest = json_decode($request->input('existingImages', '[]'), true);
+            $filesArrayFromRequest = json_decode($request->input('filesArray', '[]'), true);
 
+            $mainImageExists = false;
+            foreach (['jpg', 'png', 'jpeg'] as $extension) {
+                if (in_array('main.' . $extension, $existingImages)) {
+                    $mainImageExists = true;
+                    break;
+                }
+            }
+
+            // Remove images that are not in the existing images list
+            foreach ($existingImages as $image) {
+                if (!in_array($image, $existingImagesFromRequest)) {
+                    if ($mainImageExists && in_array($image, ['main.jpg', 'main.png', 'main.jpeg'])) {
+                        // The main image is being deleted
+                        $mainImageExists = false; // Update flag
+                        Log::info('Deleted main image: ' . $image);
+                    }
+                    unlink($folderFullPath . '/' . $image);
+                    Log::info('Deleted image: ' . $image);
+                }
+            }
+
+            $images = $request->file('images');
+            $newMainImage = null;
+
+            if ($images) {
                 foreach ($images as $index => $image) {
                     $extension = $image->getClientOriginalExtension();
+                    $imageName = '';
 
-                    // Check if 'main' image with this extension already exists
-                    if ($index === 0 && !$mainImageExists) {
-                        $mainImage = 'main.' . $extension;
-                        $mainImageExists = in_array($mainImage, $existingImages);
-                    }
-
-                    if ($index === 0 && !$mainImageExists) {
-                        // Assign 'main' name if it doesn't exist already
+                    // If no main image exists, assign 'main' name to the first uploaded image
+                    if (!$mainImageExists) {
                         $imageName = 'main.' . $extension;
-                        $mainImageExists = true; // Update flag to indicate 'main' image now exists
+                        $newMainImage = $imageName;
+                        $mainImageExists = true; // Mark that we have assigned a main image
                     } else {
                         // Generate a unique name for the image
                         $imageName = $this->generateUniqueName($existingImages, $extension);
@@ -101,9 +121,30 @@ class ProductController extends Controller
                     // Add the new image to the existing images list
                     $existingImages[] = $imageName;
                 }
+
+                // If a new main image was assigned, log the action
+                if ($newMainImage) {
+                    Log::info('Assigned new main image: ' . $newMainImage);
+                }
             }
-            return response()->json(['success' => true, 'data' => 'Images have been successfully uploaded.'], 200);
+
+            // If no new images were uploaded and no main image exists, find a new main image
+            if (!$images && !$mainImageExists) {
+                $remainingImages = array_diff($existingImages, ['main.jpg', 'main.png', 'main.jpeg']);
+                if (!empty($remainingImages)) {
+                    $newMainImage = reset($remainingImages);
+                    $newMainImageExtension = pathinfo($newMainImage, PATHINFO_EXTENSION);
+                    $newMainImageName = 'main.' . $newMainImageExtension;
+                    rename($folderFullPath . '/' . $newMainImage, $folderFullPath . '/' . $newMainImageName);
+                    Log::info('Assigned new main image from existing images: ' . $newMainImageName);
+                } else {
+                    Log::info('No images available to assign as main image.');
+                }
+            }
+
+            return response()->json(['success' => true, 'data' => 'Images have been successfully updated.'], 200);
         } catch (Exception $e) {
+            Log::error('Error updating images: ' . $e->getMessage());
             return response()->json(['success' => false, 'data' => $e->getMessage()], 400);
         }
     }
@@ -121,8 +162,13 @@ class ProductController extends Controller
         return $uniqueName;
     }
 
-    //add product to database
-    public function addProduct(Request $request)
+    public function addProduct()
+    {
+        return view('admin.product_add');
+    }
+
+    // Add product to database
+    public function createProduct(Request $request)
     {
         try {
             $request->validate([
@@ -131,60 +177,84 @@ class ProductController extends Controller
                 'price' => 'required|numeric',
                 'stock' => 'required|integer',
                 'status' => 'required|string',
+                'isWearable' => 'nullable|numeric',
+                'isConsumable' => 'nullable|numeric',
+                'isCollectible' => 'nullable|numeric',
+                'sizes' => 'nullable|string',
+                'colors' => 'nullable|string',
+                'expiry_date' => 'nullable|date',
+                'portion' => 'nullable|string',
+                'halal' => 'nullable|boolean',
+                'supplier' => 'nullable|string',
+                'selected_groups' => 'nullable|string',
             ]);
 
-            $id = Product::create([
-                'name' => $request->name,
-                'description' => $request->description,
-                'price' => $request->price,
-                'stock' => $request->stock,
-                'status' => $request->status,
-            ])->product_id;
+            // Build the product using ProductBuilder
+            $productBuilder = new ProductBuilder();
 
-            $product = new Product();
+            $productDirector = new ProductDirector($productBuilder);
 
-            $product->name = $request->name;
-            $product->description = $request->description;
-            $product->price = $request->price;
-            $product->stock = $request->stock;
-            $product->status = $request->status;
-            $product->save();
+            $created_at = now()->addHours(8);
+
+            $product = $productDirector->buildBasicProduct(
+                $request->name,
+                $request->description,
+                $request->price,
+                $request->stock,
+                $request->status,
+                $created_at
+            );
+
             $id = $product->product_id;
 
-            //forward request
-            //get the product id
-            ProductController::productImageUpload($request, $id);
+            // Check for specific attributes
+            if ($request->has('isWearable')) {
+                $this->createWearable($product, $request);
+            }
 
+            if ($request->has('isConsumable')) {
+                $this->createConsumable($product, $request);
+            }
 
-            return response()->json(['success' => true, 'message' => 'You have successfully added a product.'], 200);
+            if ($request->has('isCollectible')) {
+                $this->createCollectible($product, $request);
+            }
+
+            // Forward request for image upload
+            // ProductController::productImageUpload($request, $id);
+
+            return response()->json(['success' => true, 'message' => 'Product created successfully.'], 200);
         } catch (Exception $e) {
             return response()->json(['failure' => false, 'message' => $e->getMessage()], 400);
         }
     }
 
-    public function store(Request $request)
+    protected function createWearable($product, Request $request)
     {
-        try {
-            // Validate the request data
-            $validatedData = $request->validate([
-                'product_id' => 'required|unique:product',
-                'name' => 'required|string|max:255',
-                'description' => 'nullable|string',
-                'price' => 'required|numeric',
-                'stock' => 'required|integer',
-                'created_at' => 'required|date'
-            ]);
+        $sizes = $request->input('sizes', []);
+        $colors = $request->input('colors', []);
+        $userGroups = $request->input('selected_groups', '');
 
-            // Create the product
-            $product = Product::create($validatedData);
+        $sizesString = is_array($sizes) ? implode(',', $sizes) : $sizes;
+        $colorsString = is_array($colors) ? implode(',', $colors) : $colors;
 
-            // Return a response
-            return response()->json($product, 201);
-        } catch (Exception $e) {
-            // Log the error
-            Log::error('Product creation failed: ' . $e->getMessage());
-            return response()->json(['error' => 'Product creation failed.'], 500);
-        }
+        $wearableObj = new WearableController();
+
+        $wearableObj->store($request, $product->product_id);
+    }
+
+    protected function createConsumable($product, Request $request)
+    {
+        $consumableObj = new ConsumablesController();
+
+        $consumableObj->store($request, $product->product_id);
+    }
+
+    protected function createCollectible($product, Request $request)
+    {
+        $collectibleObj = new CollectiblesController();
+
+        $collectibleObj->store($request, $product->product_id);
     }
 
     public function editProduct($id)
@@ -342,13 +412,15 @@ class ProductController extends Controller
     {
         $product = Product::find($id);
 
+        $mainImageExtension = $this->getMainImageExtension($id);
+
         // Get all images for this product from the storage directory
         $imageFiles = Storage::files('public/images/products/' . $id);
         $images = array_map(function ($file) {
             return basename($file);
         }, $imageFiles);
 
-        return view('product', compact('product', 'images'));
+        return view('product', compact('product', 'images', 'mainImageExtension'));
     }
 
     // Show product images for admin product
@@ -356,13 +428,36 @@ class ProductController extends Controller
     {
         $product = Product::find($id);
 
-        // Get all images for this product from the storage directory
-        $imageFiles = Storage::files('public/images/products/' . $id);
-        $images = array_map(function ($file) {
-            return basename($file);
-        }, $imageFiles);
+        if ($product) {
+            $imagePath = storage_path('app/public/images/products/' . $product->product_id);
+            $images = array_map('basename', glob($imagePath . '/*'));
+            return response()->json($images);
+        } else {
+            return response()->json(['error' => 'Product not found'], 404);
+        }
 
-        return response()->json(['success' => true, 'data' => $images], 200);
+        // // Get all images for this product from the storage directory
+        // $imageFiles = Storage::files('public/images/products/' . $id);
+        // $images = array_map(function ($file) {
+        //     return basename($file);
+        // }, $imageFiles);
+
+        // return response()->json(['success' => true, 'data' => $images], 200);
+    }
+
+    public function getMainImageExtension($productId)
+    {
+        $folderPath = public_path('storage/images/products/' . $productId);
+        $extensions = ['jpg', 'jpeg', 'png'];
+
+        foreach ($extensions as $extension) {
+            $mainImage = 'main.' . $extension;
+            if (file_exists($folderPath . '/' . $mainImage)) {
+                return $extension;
+            }
+        }
+
+        return null; // No main image found
     }
 
     // Update a product

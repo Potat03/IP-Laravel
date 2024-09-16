@@ -13,20 +13,58 @@ class ProductDirector
         $this->builder = $builder;
     }
 
-    public function construct(array $productData, array $specificAttributes)
+    public function buildBasicProduct($name, $description, $price, $stock, $status, $created_at)
     {
-        $this->builder->setName($productData['name']);
-        $this->builder->setDescription($productData['description']);
-        $this->builder->setPrice($productData['price']);
-        $this->builder->setStock($productData['stock']);
-        $this->builder->setStatus($productData['status']);
+        return $this->builder
+            ->setName($name)
+            ->setDescription($description)
+            ->setPrice($price)
+            ->setStock($stock)
+            ->setStatus($status)
+            ->setCreatedAt($created_at)
+            ->build();
+    }
 
-        foreach($productData as $attribute => $value){
-            if (method_exists($this->builder, "set" . ucfirst($attribute))) {
-                $this->builder->{"set" . ucfirst($attribute)}($value);
-            }
-        }
+    public function buildWearable(array $attributes, $productId)
+    {
+        return $this->builder
+            ->setName("")
+            ->setDescription("")
+            ->setPrice(0)
+            ->setStock(0)
+            ->setStatus("")
+            ->setSize($attributes['size'])
+            ->setColor($attributes['color'])
+            ->setUserGroup($attributes['user_group'])
+            ->setProductId($productId)
+            ->build();
+    }
 
-        return $this->builder->build();
+    public function buildCollectible(array $attributes, $productId)
+    {
+        return $this->builder
+            ->setName("")
+            ->setDescription("")
+            ->setPrice(0)
+            ->setStock(0)
+            ->setStatus("")
+            ->setSupplier($attributes['supplier'])
+            ->setProductId($productId)
+            ->build();
+    }
+
+    public function buildConsumable(array $attributes, $productId)
+    {
+        return $this->builder
+            ->setName("")
+            ->setDescription("")
+            ->setPrice(0)
+            ->setStock(0)
+            ->setStatus("")
+            ->setExpireDate($attributes['expire_date'] ?? null)
+            ->setPortion($attributes['portion'] ?? "")
+            ->setIsHalal($attributes['is_halal'] ?? false)
+            ->setProductId($productId)
+            ->build();
     }
 }

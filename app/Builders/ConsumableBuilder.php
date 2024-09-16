@@ -10,7 +10,7 @@ class ConsumableBuilder implements ProductBuilderInterface
 
     public function __construct()
     {
-        $this->consumable = new Consumable(); 
+        $this->consumable = new Consumable();
     }
 
     public function setName($name)
@@ -61,9 +61,21 @@ class ConsumableBuilder implements ProductBuilderInterface
         return $this;
     }
 
-    // Return the built product
-    public function build():Consumable
+    public function setProductId($id)
     {
-        return $this->consumable;
+        $this->consumable->product_id = $id;
+        return $this;
+    }
+
+    // Return the built product
+    public function build(): Consumable
+    {
+        $consumable = new Consumable();
+        $consumable->product_id = $this->consumable->product_id;
+        $consumable->expire_date = $this->consumable->expire_date;
+        $consumable->portion = $this->consumable->portion;
+        $consumable->is_halal = $this->consumable->is_halal;
+
+        return $consumable;
     }
 }

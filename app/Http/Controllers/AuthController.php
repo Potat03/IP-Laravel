@@ -26,11 +26,6 @@ class AuthController extends Controller
         return view('customer.profile');
     }
 
-    public function showAdminLoginForm()
-    {
-        return view('login2');
-    }
-
     public function userLogin(Request $request)
     {
         if (AuthFacade::isLoggedIn()) {
@@ -203,12 +198,67 @@ class AuthController extends Controller
         return response()->json(['success' => true, 'message' => 'OTP resent successfully.']);
     }
 
+    public function showAdminLoginForm()
+    {
+        if (Auth::guard('admin')->check()) {
+            return response()->redirectTo('/adminChat');
+        }
+        return view('admin.login');
+    }
+
+    public function adminLogin(Request $request)
+    {
+        try {
+
+            $request->validate([
+                'email' => 'required|email',
+                'password' => 'required',
+            ]);
+
+            $credentials = request(['email', 'password']);
+
+            if (Auth::guard('admin')->attempt($credentials)) {
+                $admin = Auth::guard('admin')->user();
+
+                if ($admin->status == 'active') {
+                    Log::info($request->session()->token());
+                    $request->session()->regenerate();
+                    return response()->json(['success' => true, 'redirect' => route('adminChat')]);
+                } else {
+                    return response()->json(['success' => false, 'message' => 'Sorry, your account is inactive'], 403); // 403 = forbidden (not permited)
+                }
+            } else {
+                return response()->json(['success' => false, 'message' => 'Sorry, we can\'t find your account'], 403);
+            }
+        } catch (\Exception $e) {
+            Log::error('Admin login failed: ' . $e->getMessage()); // Kepp a log let developer know the problem
+            return response()->json(['success' => false, 'message' => 'Something went wrong. Please try again later.'], 500); // 500 = internal server error
+        }
+    }
+
     public function logout(Request $request)
     {
-        Auth::guard('customer')->logout();
+        Auth::guard('admin')->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
         return redirect()->intended('/userlogin');
+    }
+
+    public function adminLogout(Request $request)
+    {
+        Auth::guard('admin')->logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->intended('adminLogin');
+    }
+
+    public function simpleLogout(Request $request)
+    {
+        Auth::guard('customer')->logout();
+        Auth::guard('admin')->logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
     }
 }

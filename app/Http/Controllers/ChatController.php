@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ChatMessage;
 use Illuminate\Http\Request;
+use App\Services\ChatMessageService;
 
 class ChatController extends Controller
 {
@@ -77,4 +78,5 @@ class ChatController extends Controller
             'message' => 'Message not found',
         ], 404);
     }
+
 }

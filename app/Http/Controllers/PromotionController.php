@@ -200,7 +200,6 @@ class PromotionController extends Controller
         }
     }
 
-    //views
     public function customerList(){
         try{
             $promotions = Promotion::where('status', 'active')->paginate(12);
@@ -258,7 +257,7 @@ class PromotionController extends Controller
             }
 
             $promotion->bought_count = 0;
-            //check if user has bought this promotion
+
             // if(auth()->check()){
             //     $promotion->bought_count = Promotion::find($id)->order->where('customer_id', auth()->user()->customer_id)->count();
             // }else{

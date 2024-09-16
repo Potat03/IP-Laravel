@@ -68,11 +68,6 @@ Route::get('/testDB', function () {
 Route::get('/promotion', [PromotionController::class, 'customerList'])->name('promotion');
 Route::get('/promotion/{id}', [PromotionController::class, 'viewDetails'])->name('promotion.details');
 
-//admin side
-Route::get('/admin/login', function () {
-    return view('admin.login');
-});
-
 
 //middleware
 Route::middleware([customAuth::class])->group(function () {
@@ -83,6 +78,8 @@ Route::middleware([customAuth::class])->group(function () {
     Route::get('/admin/product', function () {
         return view('admin.product');
     });
+
+    Route::get('/product/get/images/{id}', [ProductController::class, 'showProductImagesAdmin']);
 
     Route::get('/admin/product', action: [ProductController::class, 'getAll'])->name('admin.product');
     Route::get('/admin/product/add', action: [ProductController::class, 'addProduct'])->name('admin.product.add');
@@ -97,27 +94,26 @@ Route::middleware([customAuth::class])->group(function () {
     Route::get('/admin/promotion/restore', [PromotionController::class, 'restorePromotion'])->name('admin.promotion.restore');
 });
 
-
-//TW blade
-Route::get('/wei', function () {
-    return view('wei');
-});
-
-Route::get('/cc', function () {
-    return view('customerChat');
-});
-
-Route::get('/cc2', function () {
-    return view('adminChat');
-});
-
-Route::get('/template', function () {
-    return view('admin.error');
-});
-
 use App\Http\Controllers\CustomerController;
 use App\Http\Middleware\CustomerAuth;
 use App\Http\Controllers\AuthController;
+
+//WK route
+Route::get('/userlogin', ['middleware' => 'guest:customer', function () {
+    return view('userlogin');
+}])->name('user.login');
+
+Route::middleware([CustomerAuth::class])->group(function () {
+
+    Route::get('/profile', function () {
+        return view('userprofile/layout/userProfile');
+    })->name('user.profile');
+});
+
+Route::get('/userverify', function () {
+    return view('userVerification');
+})->name('user.verify');
+
 
 //WK route
 Route::get('/userlogin', ['middleware' => 'guest:customer', function () {
@@ -138,10 +134,55 @@ Route::middleware([CustomerAuth::class])->group(function () {
     Route::get('/settingSec', [CustomerController::class, 'settingSec'])->name('profile.settingSec');
 });
 
-Route::get('/userverify', function () {
-    return view('userVerification');
-})->name('user.verify');
+
+
+
+
+
+
+
+
+
+//TW blade
+Route::get('/wei', function () {
+    return view('wei');
+});
+
+Route::get('/cc', function () {
+    return view('customerChat');
+});
+
+Route::get('/cc2', function () {
+    return view('adminChat');
+});
+
+Route::get('/template', function () {
+    return view('admin.error');
+});
+
+Route::get('/adminLogin', [AuthController::class, 'showAdminLoginForm']);
+Route::post('/adminLogin', [AuthController::class, 'adminLogin'])->name('admin.login');
+Route::get('/adminLogout', [AuthController::class, 'adminLogout'])->name('admin.logout');
+
+Route::middleware([AdminAuth::class])->group(function () {
+    Route::get('/adminChat', function () {
+        return view('adminChat');
+    });
+    Route::get('/adminChat2', function () {
+        return view('admin.chat_room');
+    });
+});
 
 Route::get('/chat', [ChatController::class, 'index']);
 Route::post('/chat', [ChatController::class, 'store']);
 Route::get('/chat/{chatId}', [ChatController::class, 'show']);
+
+
+Route::get('/chatImage', [ChatMessageController::class, 'initCustomerChat']);
+
+Route::get('/addMsg', function () {
+    return view('weiTestChat');
+});
+Route::post('/sendMsg', [ChatMessageController::class, 'sendMessage'])->name('sendMsg');
+Route::get('/getMsg', [ChatMessageController::class, 'initCustomerChat'])->name('getMsg');
+Route::get('/getAdmMsg', [ChatMessageController::class, 'initAdminChatList'])->name('getAdmMsg');

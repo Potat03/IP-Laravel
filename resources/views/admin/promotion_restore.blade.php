@@ -1,5 +1,9 @@
 @extends('admin.layout.main')
 
+@section('vite')
+@vite(['resources/css/app.css','resources/sass/app.scss', 'resources/js/app.js', 'resources/css/admin-nav.css','resources/js/bootstrap.js'])
+@endsection
+
 @section('css')
 <style>
     .btn {
@@ -145,7 +149,7 @@
 
     document.querySelector('#confirm-delete').addEventListener('click', function() {
         let promotion_id = document.querySelector('#promotion_id').value;
-        fetch(`http://127.0.0.1:8000/api/promotion/restore/${promotion_id}`, {
+        fetch('/api/promotion/restore/' + promotion_id, {
                 method: 'POST',
             })
             .then(response => response.json())

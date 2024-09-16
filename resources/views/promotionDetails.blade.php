@@ -480,7 +480,6 @@
             });
 
             if (allSelected) {
-                //ajax request to add to cart
                 fetch("{{ route('cart.add') }}", {
                     method: 'POST',
                     headers: {
@@ -493,7 +492,6 @@
                         quantity: document.getElementById('quantity').value
                     })
                 }).then(response => {
-                    //display bootstrap alert
                     if (response.ok) {
                         alert('Product added to cart');
                         window.location.reload();

@@ -1,10 +1,18 @@
 :root {
     --red: #F76C6C;
     --yellow: #F8E9A1;
+    --green: #80e658;
     --lightblue: #A8D0E6;
+    --contrastblue: #55bbff;
     --blue: #374785;
     --darkblue: #24305E;
     --grey: #f0f0f0;
     --black: #3f3f3f;
     --white: #fff;
+    --adminblue: #0f7eec;
+    --adminblack: #313131;
+    --adminblackopacity: #31313150;
+    --adminmain: #232f47;
+    --adminmainlight: #2e3952;
+    --adminmainlighter: #334261;
 }

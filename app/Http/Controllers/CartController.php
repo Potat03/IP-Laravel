@@ -15,7 +15,6 @@ class CartController extends Controller
 {
     public function addToCart(Request $request)
     {
-        //check if customer is logged in
         $customer = null;
         try{
             $customer = Auth::guard('customer')->user();
@@ -30,7 +29,7 @@ class CartController extends Controller
             $cartItem->customer_id = $customer->id;
         }
         catch(\Exception $e){
-           $cartItem->customer_id = 0;
+            return response()->redirectToRoute('auth.showForm');
         }
 
         if($request->type == 'product'){
@@ -66,10 +65,8 @@ class CartController extends Controller
                     'message' => 'Invalid promotion'
                 ], 400);
             }else{
-                //get all content of the promotion
                 $details = [];
                 foreach($request->products as $product){
-                    //get size and color
                     $details[] = [
                         'product_id' => $product['product_id'],
                         'size' => $product['size'],
