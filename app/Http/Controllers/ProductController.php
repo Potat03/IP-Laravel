@@ -58,7 +58,6 @@ class ProductController extends Controller
     public function productImageUploadUpdate(Request $request, $id)
     {
         try {
-            // Validate the incoming request
             $request->validate([
                 'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
                 'existingImages' => 'nullable|string',
@@ -68,28 +67,21 @@ class ProductController extends Controller
             $folderPath = 'storage/images/products/' . $id;
             $folderFullPath = public_path($folderPath);
 
-            // Create the folder if it doesn't exist
             if (!file_exists($folderFullPath)) {
                 mkdir($folderFullPath, 0777, true);
             }
 
-            // Retrieve existing images from the folder
             $existingImages = array_map('basename', glob($folderFullPath . '/*'));
 
-            // Decode existingImages and filesArray from request
             $existingImagesFromRequest = json_decode($request->input('existingImages', '[]'), true);
             $filesArrayFromRequest = json_decode($request->input('filesArray', '[]'), true);
 
-            // Remove images that are no longer in the `existingImagesFromRequest` array
             foreach ($existingImages as $image) {
                 if (!in_array($image, $existingImagesFromRequest)) {
-                    // Delete the file if it is not in the current list
                     unlink($folderFullPath . '/' . $image);
-                    Log::info('Deleted old image: ' . $image);
                 }
             }
 
-            // Process new files
             $images = $request->file('images');
             if ($images) {
                 $mainImageExists = false;
@@ -106,7 +98,7 @@ class ProductController extends Controller
                     if ($index === 0 && !$mainImageExists) {
                         // Assign 'main' name if it doesn't exist already
                         $imageName = 'main.' . $extension;
-                        $mainImageExists = true; // Update flag to indicate 'main' image now exists
+                        $mainImageExists = true;
                     } else {
                         // Generate a unique name for the image
                         $imageName = $this->generateUniqueName($existingImages, $extension);

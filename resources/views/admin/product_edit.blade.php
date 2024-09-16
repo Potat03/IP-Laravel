@@ -529,8 +529,6 @@
                     thumbnailsContainer.appendChild(thumbnailWrapper);
                 });
 
-                console.log('Initial existingImages array:', existingImages);
-
                 document.querySelectorAll('.remove-image').forEach(button => {
                     button.addEventListener('click', function() {
                         const image = this.dataset.image;
@@ -544,8 +542,6 @@
 
                         const removedImagesInput = document.getElementById('removedImages');
                         removedImagesInput.value += image + ',';
-
-                        console.log('Updated existingImages array:', existingImages);
 
                         if (thumbnailsContainer.children.length < 5) {
                             addButton.style.display = 'block';
@@ -565,21 +561,18 @@
             });
 
             imageInput.addEventListener('change', function() {
-                console.log('File input changed');
                 const newFiles = Array.from(imageInput.files);
 
                 newFiles.forEach(file => {
                     if (!filesArray.some(existingFile => existingFile.name === file.name)) {
                         if (filesArray.length + existingImages.length < 5) {
                             filesArray.push(file);
-                            console.log('Added file:', file.name);
                         } else {
                             alert('You can only upload a maximum of 5 images.');
                         }
                     }
                 });
 
-                console.log('filesArray after adding new files:', filesArray);
                 updateThumbnails();
 
                 imageInput.value = '';
@@ -591,7 +584,6 @@
 
                 // Display new files
                 filesArray.forEach((file, index) => {
-                    console.log('Processing file:', file.name);
                     const reader = new FileReader();
                     reader.onload = function(e) {
                         const newImageSrc = e.target.result;
@@ -620,16 +612,12 @@
                                 filesArray.splice(index, 1); // Remove from filesArray
                                 const thumbnailWrapper = this.closest('.thumbnail-wrapper');
                                 thumbnailWrapper.remove();
-                                console.log('Removed file at index:', index);
-                                console.log('filesArray after removal:', filesArray);
                                 updateThumbnails(); // Update thumbnails
                             }
                         });
                     };
                     reader.readAsDataURL(file);
                 });
-
-                console.log('filesArray after updateThumbnails:', filesArray);
 
                 if (filesArray.length + existingImages.length < 5) {
                     addButton.style.display = 'block';
