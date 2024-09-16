@@ -69,11 +69,6 @@ Route::get('/testDB', function () {
 Route::get('/promotion', [PromotionController::class, 'customerList'])->name('promotion');
 Route::get('/promotion/{id}', [PromotionController::class, 'promotionDetails'])->name('promotion.details');
 
-//admin side
-Route::get('/admin/login', function () {
-    return view('admin.login');
-});
-
 
 //middleware
 Route::middleware([customAuth::class])->group(function () {
@@ -88,7 +83,7 @@ Route::middleware([customAuth::class])->group(function () {
     Route::get('/admin/product', action: [ProductController::class, 'getAll'])->name('admin.product');
     Route::get('/admin/product/add', action: [ProductController::class, 'addProduct'])->name('admin.product.add');
     Route::get('/admin/product/edit/{id}', [ProductController::class, 'editProduct'])->name('admin.product.edit');
-    
+
     Route::get('/admin/promotion', [PromotionController::class, 'adminList'])->name('admin.promotion');
 
     Route::get('/admin/promotion/add', [PromotionController::class, 'addPromotion'])->name('admin.promotion.add');
@@ -97,6 +92,30 @@ Route::middleware([customAuth::class])->group(function () {
 
     Route::get('/admin/promotion/restore', [PromotionController::class, 'restorePromotion'])->name('admin.promotion.restore');
 });
+
+
+use App\Http\Controllers\CustomerController;
+use App\Http\Middleware\CustomerAuth;
+use App\Http\Controllers\AuthController;
+
+//WK route
+Route::get('/userlogin', ['middleware' => 'guest:customer', function () {
+    return view('userlogin');
+}])->name('user.login');
+
+Route::middleware([CustomerAuth::class])->group(function () {
+
+    Route::get('/profile', function () {
+        return view('userprofile/layout/userProfile');
+    })->name('user.profile');
+});
+
+Route::get('/userverify', function () {
+    return view('userVerification');
+})->name('user.verify');
+
+
+
 
 
 //TW blade
@@ -116,27 +135,22 @@ Route::get('/template', function () {
     return view('admin.error');
 });
 
-use App\Http\Controllers\CustomerController;
-use App\Http\Middleware\CustomerAuth;
-use App\Http\Controllers\AuthController;
-
-//WK route
-Route::get('/userlogin', ['middleware' => 'guest:customer', function () {
-    return view('userlogin');
-}])->name('user.login');
-
-Route::middleware([CustomerAuth::class])->group(function () {
-
-    Route::get('/profile', function () {
-        return view('userprofile/layout/userProfile');
-    })->name('user.profile');
-    
+Route::get('/adminLogin', function () {
+    return view('admin.login');
 });
 
-Route::get('/userverify', function () {
-    return view('userVerification');
-})->name('user.verify');
+Route::post('/adminLogin', [AuthController::class, 'adminLogin'])->name('admin.login');
+Route::get('/adminLogout', [AuthController::class, 'adminLogout'])->name('admin.logout');
+
+Route::middleware([AdminAuth::class])->group(function () {
+    Route::get('/adminChat', function () {
+        return view('adminChat');
+    })->name('adminChat');
+});
 
 Route::get('/chat', [ChatController::class, 'index']);
 Route::post('/chat', [ChatController::class, 'store']);
 Route::get('/chat/{chatId}', [ChatController::class, 'show']);
+
+
+Route::get('/chatImage', [ChatController::class, 'test1']);

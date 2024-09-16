@@ -11,10 +11,9 @@ class AdminAuth
 {
     public function handle($request, Closure $next)
     {
-        // if (!Auth::guard('customer')->check()) {
-        //     return redirect()->route('/login2')->withErrors(['error' => 'You must be logged in to access this page.']);
-        // }
-        
+        if (!Auth::guard('admin')->check()) {
+            return redirect()->route('admin.login');
+        }
 
         return $next($request);
     }
