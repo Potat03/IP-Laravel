@@ -10,6 +10,38 @@
         .table td {
             vertical-align: middle;
         }
+
+        .thumbnail-square {
+            width: 300px;
+            height: 300px;
+            object-fit: contain;
+            object-position: center;
+            border: 3px solid transparent;
+            transition: border-color 0.3s;
+        }
+
+        .thumbnail-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .remove-image {
+            position: absolute;
+            top: 7px;
+            right: 5px;
+            width: 30px;
+            height: 30px;
+            font-size: 30px;
+            z-index: 1;
+            border: none;
+            color: white;
+            cursor: pointer;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0;
+        }
     </style>
 @endsection
 
@@ -21,13 +53,21 @@
     <div class="card shadow-sm p-3 mb-5 w-100">
         <div class="overflow-auto">
             <div class="card-body">
-                <form method="POST" id="productForm">
+                <form method="POST" id="productForm" enctype="multipart/form-data">
                     @csrf
 
                     <div class="mb-3">
+                        <div class="thumbnails d-flex" data-base-path="{{ asset('storage/images/products') }}"></div>
+                        <input type="hidden" id="removedImages" name="removed_images" value="">
+                        <button type="button" class="btn btn-primary" id="addImageButton">Add Image</button>
+                        <input type="file" id="imageInput" name="images[]" accept="image/*" style="display: none;"
+                            multiple />
+                    </div>
+
+                    <div class="mb-3">
                         <label for="name" class="form-label">Product Name</label>
-                        <input type="text" class="form-control" id="name" name="name" value="{{ $product->name }}"
-                            required>
+                        <input type="text" class="form-control" id="name" name="name"
+                            value="{{ $product->name }}" required>
                     </div>
                     <div class="mb-3">
                         <label for="price" class="form-label">Price</label>
@@ -72,8 +112,13 @@
                                 @endif
                             </div>
                             <div class="mb-3 mt-2">
-                                <input type="text" id="new-size" class="form-control" placeholder="Enter new size">
-                                <button type="button" class="btn btn-primary mt-2" id="add-size">Add Size</button>
+                                <div class="row mb-3 size-box align-items-center">
+                                    <div class="col-md-10">
+                                        <input type="text" id="new-size" class="form-control"
+                                            placeholder="Enter new size">
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-primary" id="add-size">Add Size</button>
                             </div>
                         </div>
 
@@ -101,8 +146,13 @@
                                 @endif
                             </div>
                             <div class="mb-3 mt-2">
-                                <input type="text" id="new-color" class="form-control" placeholder="Enter new color">
-                                <button type="button" class="btn btn-primary mt-2" id="add-color">Add Color</button>
+                                <div class="row mb-3 size-box align-items-center">
+                                    <div class="col-md-10">
+                                        <input type="text" id="new-color" class="form-control"
+                                            placeholder="Enter new color">
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-primary" id="add-color">Add Color</button>
                             </div>
                         </div>
 
@@ -132,7 +182,7 @@
                         <div class="mb-3">
                             <label for="expiry_date" class="form-label">Expiry Date:</label>
                             <input type="date" class="form-control" id="expiry_date" name="expiry_date"
-                                value="{{ $product->consumable->expiry_date }}" required>
+                                value="{{ $product->consumable->expire_date }}" required>
                         </div>
 
                         <div class="mb-3">
@@ -144,8 +194,8 @@
                         <div class="mb-3">
                             <label for="halal" class="form-label">Halal:</label>
                             <select class="form-control" id="halal" name="halal" required>
-                                <option value="1" {{ $product->consumable->halal ? 'selected' : '' }}>Yes</option>
-                                <option value="0" {{ !$product->consumable->halal ? 'selected' : '' }}>No</option>
+                                <option value="1" {{ $product->consumable->is_halal ? 'selected' : '' }}>Yes</option>
+                                <option value="0" {{ !$product->consumable->is_halal ? 'selected' : '' }}>No</option>
                             </select>
                         </div>
                     @endif
@@ -199,8 +249,12 @@
             const statusSwitch = document.getElementById('statusSwitch');
             const statusHidden = document.getElementById('statusHidden');
             const statusLabel = document.querySelector('label[for="statusSwitch"]');
+            const imageInput = document.getElementById('imageInput');
+            const addButton = document.getElementById('addImageButton');
+            const thumbnailsContainer = document.querySelector('.thumbnails');
 
-            // Update hidden input and label based on the switch status
+            let filesArray = [];
+
             statusLabel.textContent = statusSwitch.checked ? 'Active' : 'Inactive';
             statusHidden.value = statusSwitch.checked ? 'active' : 'inactive';
 
@@ -217,6 +271,22 @@
 
                 // Collect common attributes
                 const form = new FormData(productForm);
+                const files = imageInput.files;
+
+                if (files.length === 0) {
+                    alert('No files selected.');
+                } else {
+                    let fileNames = '';
+                    for (const file of files) {
+                        fileNames += file.name + '\n'; // Collect all file names
+                    }
+                    alert('Selected files:\n' + fileNames); // Display all file names in one alert
+                }
+
+                for (const file of files) {
+                    form.append('images[]', file);
+                }
+
                 const name = form.get('name');
                 const stock = form.get('stock');
                 const description = form.get('description');
@@ -249,21 +319,32 @@
                 }
 
                 if (isConsumableField && isConsumableField.value) {
-                    const expiryDate = form.get('expiry_date').trim();
+                    const expiryDateInput = form.get('expiry_date').trim();
                     const portion = form.get('portion').trim();
                     const halal = form.get('halal').trim();
 
-                    if (expiryDate === '' || portion === '' || halal === '') {
+                    if (expiryDateInput === '' || portion === '' || halal === '') {
                         alert(
                             'Please enter expiry date, portion, and halal status for consumable products.'
                         );
                         return;
                     }
 
-                    form.append('expiry_date', expiryDate);
+                    const expiryDate = new Date(expiryDateInput);
+                    const minimumDate = new Date();
+                    minimumDate.setMonth(minimumDate.getMonth() + 3);
+
+                    if (expiryDate < minimumDate) {
+                        alert('The expiry date must be at least 3 months in the future.');
+                        return;
+                    }
+
+                    form.append('isConsumable', isConsumable);
+                    form.append('expiry_date', expiryDateInput);
                     form.append('portion', portion);
                     form.append('halal', halal);
                 }
+
 
                 if (isCollectibleField && isCollectibleField.value) {
                     const supplier = form.get('supplier').trim();
@@ -404,6 +485,134 @@
 
             if (isWearableField && isWearableField.value) {
                 handleWearableFields();
+            }
+
+            const baseImagePath = thumbnailsContainer.getAttribute('data-base-path');
+
+            fetch(`/product/get/images/${productId}`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    if (data && !data.error) {
+                        const images = data;
+                        displayProductImages(images);
+                    }
+                })
+                .catch(error => console.error('Error fetching images:', error));
+
+            function displayProductImages(images) {
+
+                thumbnailsContainer.innerHTML = '';
+
+                images.forEach(image => {
+                    const thumbnailWrapper = document.createElement('div');
+                    thumbnailWrapper.classList.add('thumbnail-wrapper', 'position-relative');
+
+                    const imgElement = document.createElement('img');
+                    imgElement.src = `${baseImagePath}/${productId}/${image}`;
+                    // imgElement.src = `{{ asset('storage/images/products/${productId}/${image}') }}`;
+                    imgElement.classList.add('thumbnail', 'img-thumbnail', 'thumbnail-square');
+                    imgElement.alt = 'Thumbnail Image';
+                    imgElement.draggable = false;
+
+                    const removeButton = document.createElement('button');
+                    removeButton.type = 'button';
+                    removeButton.classList.add('btn', 'btn-danger', 'remove-image');
+                    removeButton.textContent = '\u00D7';
+                    removeButton.dataset.image = image;
+
+                    thumbnailWrapper.appendChild(imgElement);
+                    thumbnailWrapper.appendChild(removeButton);
+
+                    thumbnailsContainer.appendChild(thumbnailWrapper);
+                });
+
+                document.querySelectorAll('.remove-image').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const image = this.dataset.image;
+                        const thumbnailWrapper = this.closest('.thumbnail-wrapper');
+                        thumbnailWrapper.remove();
+
+                        const removedImagesInput = document.getElementById('removedImages');
+                        removedImagesInput.value += image + ',';
+
+                        if (thumbnailsContainer.children.length < 5) {
+                            addButton.style.display = 'block';
+                        }
+                    });
+                });
+
+                if (images.length < 5) {
+                    addButton.style.display = 'block';
+                } else {
+                    addButton.style.display = 'none';
+                }
+            }
+
+            addButton.addEventListener('click', function() {
+                imageInput.click();
+            });
+
+            imageInput.addEventListener('change', function() {
+                console.log('File input changed');
+                const newFiles = Array.from(imageInput.files);
+
+                // Filter out files that are already in the array to avoid duplicates
+                newFiles.forEach(file => {
+                    if (!filesArray.some(existingFile => existingFile.name === file.name)) {
+                        filesArray.push(file);
+                    }
+                });
+
+                updateThumbnails();
+
+                // Clear file input after processing
+                imageInput.value = '';
+            });
+
+            function updateThumbnails() {
+                console.log('Updating thumbnails');
+                thumbnailsContainer.innerHTML = ''; // Clear existing thumbnails
+
+                filesArray.forEach((file, index) => {
+                    console.log('Processing file:', file.name);
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const newImageSrc = e.target.result;
+                        const thumbnailWrapper = document.createElement('div');
+                        thumbnailWrapper.classList.add('thumbnail-wrapper', 'position-relative');
+
+                        const imgElement = document.createElement('img');
+                        imgElement.src = newImageSrc;
+                        imgElement.classList.add('thumbnail', 'img-thumbnail', 'thumbnail-square');
+                        imgElement.alt = 'Thumbnail Image';
+                        imgElement.draggable = false;
+
+                        const removeButton = document.createElement('button');
+                        removeButton.type = 'button';
+                        removeButton.classList.add('btn', 'btn-danger', 'remove-image');
+                        removeButton.textContent = '\u00D7';
+                        removeButton.dataset.index = index;
+
+                        thumbnailWrapper.appendChild(imgElement);
+                        thumbnailWrapper.appendChild(removeButton);
+                        thumbnailsContainer.appendChild(thumbnailWrapper);
+
+                        removeButton.addEventListener('click', function() {
+                            // Remove file from array and update thumbnails
+                            filesArray.splice(removeButton.dataset.index, 1);
+                            updateThumbnails();
+                        });
+                    };
+                    reader.readAsDataURL(file);
+                });
+
+                // Show or hide the add button based on the number of images
+                if (filesArray.length < 5) {
+                    addButton.style.display = 'block';
+                } else {
+                    addButton.style.display = 'none';
+                }
             }
         });
     </script>

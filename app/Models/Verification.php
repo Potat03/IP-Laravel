@@ -11,6 +11,8 @@ class Verification extends Model
 
     protected $table = 'verification';
 
+    protected $primaryKey = 'id';
+
     protected $fillable = [
         'customer_id',
         'code',

@@ -10,6 +10,10 @@
     @include('partials.fontawesome')
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <style>
+        body {
+            overflow: hidden;
+        }
+
         .profile_content {
             display: flex;
             flex-direction: column;
@@ -100,35 +104,32 @@
         <div class="content">
             <div class="left_bar">
                 <ul>
-                    <li>
-                        <a href="javascript:void(0);" class="load-content" data-url="{{ route('profile.profileSec') }}">
+                    <li onclick = "window.location.href = '{{ route('profile.profileSec') }}'">
+                        <a class="load-content">
                             <i class="fa-solid fa-square-poll-vertical"></i>
                             Profile
                         </a>
                     </li>
-                    <li>
-                        <a href="javascript:void(0);" class="load-content"
-                            data-url="{{ route('profile.orderHistorySec') }}">
+                    <li onclick = "window.location.href = '{{ route('profile.orderHistorySec') }}'">
+                        <a class="load-content">
                             <i class="fa-regular fa-teddy-bear"></i>
                             Order History
                         </a>
                     </li>
-                    <li>
-                        <a href="javascript:void(0);" class="load-content"
-                            data-url="{{ route('profile.shippingSec') }}">
+                    <li onclick = "window.location.href = '{{ route('profile.shippingSec') }}'">
+                        <a class="load-content">
                             <i class="fa-regular fa-box"></i>
                             Shipping
                         </a>
                     </li>
-                    <li>
-                        <a href="javascript:void(0);" class="load-content"
-                            data-url="{{ route('profile.supportChatSec') }}">
+                    <li onclick = "window.location.href = '{{ route('profile.supportChatSec') }}'">
+                        <a class="load-content">
                             <i class="fa-brands fa-rocketchat"></i>
                             Support Chat
                         </a>
                     </li>
-                    <li>
-                        <a href="javascript:void(0);" class="load-content" data-url="{{ route('profile.settingSec') }}">
+                    <li onclick = "window.location.href = '{{ route('profile.settingSec') }}'">
+                        <a class="load-content">
                             <i class="fa-regular fa-user"></i>
                             Settings
                         </a>
@@ -138,33 +139,10 @@
 
             <div class="right_content">
                 <div class="lower_content overflow-auto">
-                    @yield('content')
+                    @yield('allcontent')
                 </div>
             </div>
         </div>
 </body>
-<script>
-    $(document).ready(function() {
-        $('.load-content').on('click', function(e) {
-            e.preventDefault();
-
-            var url = $(this).data('url');
-            console.log('Requesting URL:', url);
-
-            $.ajax({
-                url: url,
-                method: 'GET',
-                success: function(response) {
-                    console.log('Response received:', response);
-                    $('.right_content').html(response);
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error loading content:', error, xhr
-                        .responseText);
-                }
-            });
-        });
-    });
-</script>
 
 </html>

@@ -44,7 +44,6 @@ Route::get('/shop/new-arrivals', [ProductController::class, 'newArrivals'])->nam
 Route::get('/product/{id}', [ProductController::class, 'show'])->name('product');
 Route::get('/product/{id}', [ProductController::class, 'showProductImages']);
 
-
 // Route::get('/cart', function () {
 //     return view('cart');
 // });
@@ -67,7 +66,7 @@ Route::get('/testDB', function () {
 //promotion
 
 Route::get('/promotion', [PromotionController::class, 'customerList'])->name('promotion');
-Route::get('/promotion/{id}', [PromotionController::class, 'promotionDetails'])->name('promotion.details');
+Route::get('/promotion/{id}', [PromotionController::class, 'viewDetails'])->name('promotion.details');
 
 
 //middleware
@@ -79,6 +78,8 @@ Route::middleware([customAuth::class])->group(function () {
     Route::get('/admin/product', function () {
         return view('admin.product');
     });
+
+    Route::get('/product/get/images/{id}', [ProductController::class, 'showProductImagesAdmin']);
 
     Route::get('/admin/product', action: [ProductController::class, 'getAll'])->name('admin.product');
     Route::get('/admin/product/add', action: [ProductController::class, 'addProduct'])->name('admin.product.add');
@@ -92,7 +93,6 @@ Route::middleware([customAuth::class])->group(function () {
 
     Route::get('/admin/promotion/restore', [PromotionController::class, 'restorePromotion'])->name('admin.promotion.restore');
 });
-
 
 use App\Http\Controllers\CustomerController;
 use App\Http\Middleware\CustomerAuth;
@@ -115,6 +115,31 @@ Route::get('/userverify', function () {
 })->name('user.verify');
 
 
+//WK route
+Route::get('/userlogin', ['middleware' => 'guest:customer', function () {
+    return view('userlogin');
+}])->name('user.login');
+
+Route::middleware([CustomerAuth::class])->group(function () {
+
+    Route::get('/profile', function () {
+        return view('userprofile/layout/userProfile');
+    })->name('user.profile');
+
+    //profile content
+    Route::get('/profileSec', [CustomerController::class, 'profileSec'])->name('profile.profileSec');
+    Route::get('/orderHistorySec', [CustomerController::class, 'orderHistorySec'])->name('profile.orderHistorySec');
+    Route::get('/shippingSec', [CustomerController::class, 'shippingSec'])->name('profile.shippingSec');
+    Route::get('/supportChatSec', [CustomerController::class, 'supportChatSec'])->name('profile.supportChatSec');
+    Route::get('/settingSec', [CustomerController::class, 'settingSec'])->name('profile.settingSec');
+});
+
+
+
+
+
+
+
 
 
 
@@ -135,12 +160,13 @@ Route::get('/template', function () {
     return view('admin.error');
 });
 
-Route::get('/adminLogin', function () {
-    return view('admin.login');
-});
 
 Route::post('/adminLogin', [AuthController::class, 'adminLogin'])->name('admin.login');
 Route::get('/adminLogout', [AuthController::class, 'adminLogout'])->name('admin.logout');
+
+Route::get('/adminLogin', function () {
+    return view('admin.login');
+});
 
 Route::middleware([AdminAuth::class])->group(function () {
     Route::get('/adminChat', function () {
