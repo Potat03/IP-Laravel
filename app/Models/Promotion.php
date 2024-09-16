@@ -18,6 +18,8 @@ class Promotion extends Model
         'title',
         'description',
         'discount',
+        'discount_amount',
+        'original_price',
         'type',
         'limit',
         'status',

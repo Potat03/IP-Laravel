@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('consumable', function (Blueprint $table) {
-            $table->id()->references('product_id')->on('product');
+            $table->id('product_id')->references('product_id')->on('product');
             $table->date('expire_date');
             $table->integer('portion');
             $table->boolean('is_halal');

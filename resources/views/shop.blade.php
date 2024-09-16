@@ -1,308 +1,151 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('layout.shop')
 
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Shop</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-    {{-- <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css" /> --}}
-    @vite(['resources/sass/app.scss', 'resources/js/app.js', 'resources/css/app.css'])
-    <style>
-        /* .bg-image {
-            background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.6)), URL('storage/images/banner3.jpg');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-        } */
+@section('title', 'Shop')
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-        .mainthree {
-            background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.6));
-        }
-
-        main {
-            display: flex;
-            min-height: 100vh;
-        }
-
-        /* Slideshow text styling */
-        .slideshow-text {
-            display: inline-block;
-            opacity: 0;
-            transition: opacity 1s ease-in-out;
-            /* Adjust transition to 1 second */
-        }
-
-        .overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            /* Adjust opacity as needed */
-            z-index: 1;
-        }
-
-        .show {
-            opacity: 1;
-        }
-
-        @keyframes fadeInOut {
-            0% {
-                opacity: 0;
-            }
-
-            10% {
-                opacity: 1;
-            }
-
-            30% {
-                opacity: 1;
-            }
-
-            40% {
-                opacity: 0;
-            }
-
-            100% {
-                opacity: 0;
-            }
-        }
-
-        .custom-btn {
-            border-radius: 50px;
-            border: 3px solid whitesmoke;
-            padding-left: 3rem;
-            padding-right: 3rem;
-            padding-top: 1rem;
-            padding-bottom: 1rem;
-            transition: background-color 0.2s ease, color 0.2s ease;
-            background-color: rgba(221, 216, 216, 0.2);
-        }
-
-        .custom-btn:hover {
-            background-color: whitesmoke;
-            border-color: whitesmoke;
-            color: black;
-        }
-
-        .card-showcase {
-            overflow: hidden;
-        }
-
-        .card-img {
-            object-fit: cover;
-            transition: transform .2s;
-        }
-
-        .card-showcase:hover .card-img {
-            transform: scale(1.5);
-        }
-
-        .carousel-inner {
-            padding: 1em;
-        }
-
-        .card {
-            margin: 0 0.5em;
-            box-shadow: 2px 6px 8px 0 rgba(22, 22, 26, 0.18);
-            border: none;
-            user-select: none;
-        }
-
-        .carousel-control-prev,
-        .carousel-control-next {
-            width: 6vh;
-            height: 6vh;
-            border-radius: 50%;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-
-        .card-img-top .img {
-            user-select: none;
-        }
-
-        /* .card img {
-            max-width: 100%;
-            height: 13em;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        } */
-
-        .card img {
-            max-height: 100%;
-            -webkit-user-drag: none;
-            /* For WebKit browsers (e.g., Chrome, Safari) */
-            user-select: none;
-        }
-
-        .card-text {
-            user-select: none;
-        }
-
-        .card .btn {
-            -webkit-user-drag: none;
-            user-select: none;
-        }
-
-        .col-md-2-4 {
-            flex: 0 0 calc(100% / 5);
-            max-width: calc(100% / 5);
-        }
-
-        @media (min-width: 1025px) {
-            .carousel-item {
-                margin-right: 0;
-                flex: 0 0 calc(100%/5);
-                display: block;
-            }
-
-            .carousel-inner {
-                display: flex;
-            }
-        }
-
-        @media (max-width: 1024px) {
-            .carousel-item {
-                margin-right: 0;
-                flex: 0 0 calc(100%/3);
-                display: block;
-            }
-
-            .carousel-inner {
-                display: flex;
-            }
-
-            .card img {
-                height: 17em;
-            }
-        }
-    </style>
-</head>
-
-<body>
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container px-4 px-lg-5">
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
-                    <li class="nav-item"><a class="nav-link active" aria-current="page" href="#!">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#!">About</a></li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button"
-                            data-bs-toggle="dropdown" aria-expanded="false">Shop</a>
-                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <li><a class="dropdown-item" href="#!">All Products</a></li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li><a class="dropdown-item" href="#!">Popular Items</a></li>
-                            <li><a class="dropdown-item" href="#!">New Arrivals</a></li>
-                        </ul>
-                    </li>
-                </ul>
-                <form class="d-flex">
-                    <button class="btn btn-outline-dark" type="submit">
-                        <i class="bi-cart-fill me-1"></i>
-                        Cart
-                        <span class="badge bg-dark text-white ms-1 rounded-pill">0</span>
-                    </button>
-                </form>
-            </div>
-        </div>
-    </nav>
-
-    <main class="pt-5">
-        <div class="flex-shrink-0 p-3 bg-white d-flex flex-column">
-            <div class="container">
-                <div class="card">
-                    <div class="card-header">
-                        <div class="input-group mb-3">
-                            <input type="text" class="form-control" id="search" name="search"
-                                placeholder="Search" aria-label="Search" aria-describedby="search-btn">
-                            <button class="btn btn-outline-secondary" type="button" id="search-btn"><i
-                                    class="fa-solid fa-magnifying-glass"></i></button>
-                        </div>
+@section('content')
+    <div class="flex-shrink-0 p-3 bg-white d-flex flex-column">
+        <div class="container">
+            <div class="card">
+                <div class="card-header">
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" id="search" name="search" placeholder="Search"
+                            aria-label="Search" aria-describedby="search-btn">
+                        <button class="btn btn-outline-secondary" type="button" id="search-btn"><i
+                                class="fa-solid fa-magnifying-glass"></i></button>
                     </div>
-                    <div class="card-body">
-                        <div class="input-group mb-3">
-                            <div class="input-group-text">
-                                <input class="form-check-input mt-0" type="checkbox" value=""
-                                    aria-label="Checkbox for following text input">
-                            </div>
-                            <input type="text" class="form-control" aria-label="Text input with checkbox"
-                                value="category" disabled>
-                        </div>
-                        <div class="input-group mb-3">
-                            <div class="input-group-text">
-                                <input class="form-check-input mt-0" type="checkbox" value=""
-                                    aria-label="Checkbox for following text input">
-                            </div>
-                            <input type="text" class="form-control" aria-label="Text input with checkbox"
-                                value="category" disabled>
-                        </div>
-                        <div class="input-group mb-3">
-                            <div class="input-group-text">
-                                <input class="form-check-input mt-0" type="checkbox" value=""
-                                    aria-label="Checkbox for following text input">
-                            </div>
-                            <input type="text" class="form-control" aria-label="Text input with checkbox"
-                                value="category" disabled>
-                        </div>
+                </div>
+
+                <div class="card-body">
+                    <!-- Price and Rating Range -->
+                    <div class="mb-3">
+                        <label for="sort-by" class="form-label">Sort By</label>
+                        <select class="form-select" id="sort-by" name="sort-by">
+                            <option value="">Select</option>
+                            <option value="price-low-high">Price: Low to High</option>
+                            <option value="price-high-low">Price: High to Low</option>
+                            <option value="rating-high-low">Rating: Highest to Lowest</option>
+                            <option value="rating-low-high">Rating: Lowest to Highest</option>
+                        </select>
                     </div>
+
+                    <!-- Availability -->
+                    <div class="input-group mb-3">
+                        <div class="input-group-text">
+                            <input class="form-check-input mt-0" type="checkbox" value="available" id="available"
+                                aria-label="Checkbox for available products">
+                        </div>
+                        <label class="form-control" for="available">Available Only</label>
+                    </div>
+
+                    <!-- New Arrivals -->
+                    <div class="input-group mb-3">
+                        <div class="input-group-text">
+                            <input class="form-check-input mt-0" type="checkbox" value="new" id="new-arrival"
+                                aria-label="Checkbox for new arrivals">
+                        </div>
+                        <label class="form-control" for="new-arrival">New Arrivals</label>
+                    </div>
+
                 </div>
             </div>
         </div>
-        <div class="col-md-9">
-            <div class="row">
-                @for ($i = 0; $i < 10; $i++)
+    </div>
+    <div class="col-md-9">
+        <div class="row" id="product-list">
+            @forelse ($products as $product)
+                @if ($product->status == 'active')
                     <div class="col-md-2-4 mb-4">
-                        <a href="{{ url('product') }}" class="text-decoration-none text-dark">
+                        <a href="{{ url('product/' . $product->product_id) }}" class="text-decoration-none text-dark">
                             <div class="card h-100">
-                                <div class="badge bg-dark text-white position-absolute w-50 d-flex align-items-center justify-content-center fs-5"
-                                    style="top: 0.5rem; left: 0rem; border-radius: 0 5px 5px 0;">
-                                    <span class="fs-5">Best Seller</span>
-                                </div>
+                                @if ($product->is_new)
+                                    <div class="badge bg-dark text-white position-absolute w-50 d-flex align-items-center justify-content-center fs-5"
+                                        style="top: 0.5rem; left: 0rem; border-radius: 0 5px 5px 0;">
+                                        {{-- <span class="fs-5">Best Seller</span> --}}
+                                        <span class="fs-5">New</span>
+                                    </div>
+                                @endif
+
                                 <div class="card-img-top">
                                     <img src="{{ URL('storage/images/pokemon.png') }}" class="d-block w-100"
                                         alt="product image" width="280" height="300">
                                 </div>
                                 <div class="card-body">
-                                    <p class="card-text mb-1 fs-5 fs-lg-5 fs-xl-3">Product {{ $i + 1 }}</p>
-                                    <h4 class="card-text fw-bold mb-2 fs-5 fs-xl-3">RM40.00 - RM80.00</h4>
+                                    <p class="card-text mb-1 fs-5 fs-lg-5 fs-xl-3">{{ $product->name }}</p>
+                                    <h4 class="card-text fw-bold mb-2 fs-5 fs-xl-3">RM {{ $product->price }}</h4>
                                     <div class="d-flex justify-content align-items-center small text-warning">
-                                        <i class="bi bi-star-fill me-1"></i>
-                                        <i class="bi bi-star-fill me-1"></i>
-                                        <i class="bi bi-star-fill me-1"></i>
-                                        <i class="bi bi-star-fill me-1"></i>
-                                        <i class="bi bi-star-fill me-1"></i>
-                                        <span class="text-dark ms-lg-2">(20)</span>
+                                        @php
+                                            $averageRating = $product->averageRating ?? 0;
+                                            $reviewsCount = $product->reviewsCount ?? 0;
+
+                                            $fullStars = floor($averageRating);
+                                            $halfStar = $averageRating - $fullStars >= 0.5;
+                                        @endphp
+                                        @for ($i = 0; $i < $fullStars; $i++)
+                                            <i class="bi bi-star-fill me-1"></i>
+                                        @endfor
+                                        @if ($halfStar)
+                                            <i class="bi bi-star-half me-1"></i>
+                                        @endif
+                                        @for ($i = $fullStars + ($halfStar ? 1 : 0); $i < 5; $i++)
+                                            <i class="bi bi-star me-1"></i>
+                                        @endfor
+                                        <span class="text-dark ms-lg-2">({{ $reviewsCount }})</span>
                                     </div>
                                 </div>
                                 <div class="card-footer p-3 pt-0 border-top-0 bg-transparent">
                                     <div class="text-center text-uppercase">
-                                        <a class="btn btn-outline-dark mt-auto w-100 fw-bold" href="#">Add to
+                                        <a class="btn btn-outline-dark mt-auto w-100 fw-bold" href="#">Add
+                                            to
                                             Cart</a>
                                     </div>
                                 </div>
                             </div>
                         </a>
                     </div>
-                @endfor
+                @endif
+            @empty
+                <p>No products found.</p>
+            @endforelse
+
+            <div class="justify-content-center mt-4">
+                {{ $products->links() }}
             </div>
         </div>
-    </main>
+    </div>
+@endsection
 
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <!-- jQuery migrate (for compatibility with older jQuery versions) -->
-    <script src="https://code.jquery.com/jquery-migrate-3.3.2.min.js"></script>
-    <!-- Bootstrap JS -->
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // Listen for filter changes
+        $('#price-sort, #available, #rating-filter, #new-arrival, #search').on('change keyup', function() {
+            filterProducts();
+        });
 
-    <script></script>
-</body>
+        // AJAX function to get filtered products
+        function filterProducts() {
+            let priceSort = $('#price-sort').val();
+            let available = $('#available').is(':checked') ? 1 : 0;
+            let rating = $('#rating-filter').val();
+            let newArrival = $('#new-arrival').is(':checked') ? 1 : 0;
+            let search = $('#search').val();
 
-</html>
+            console.log('Search:', search); // Debugging line
+
+            $.ajax({
+                url: '/shop',
+                method: 'GET',
+                data: {
+                    price_sort: priceSort,
+                    available: available,
+                    rating: rating,
+                    new_arrival: newArrival,
+                    search: search
+                },
+                success: function(response) {
+                    $('#product-list').html(response);
+                }
+            });
+        }
+    });
+</script>
