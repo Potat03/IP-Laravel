@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Log;
 
 class ConsumablesController extends Controller
 {
-    public function store(Request $request)
+    public function store(Request $request, $productId)
     {
         $request->validate([
             'expiry_date' => 'required|date',
@@ -25,13 +25,13 @@ class ConsumablesController extends Controller
 
         $director = new ProductDirector($builder);
 
-        $consumable = $director->construct(
+        $consumable = $director->buildConsumable(
             [
                 'expiry_date' => $request->expiry_date,
                 'portion' => $request->portion,
                 'is_halal' => $request->is_halal,
             ],
-            $request->specificAttributes
+            $productId
         );
 
         $consumable->save();

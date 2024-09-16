@@ -10,7 +10,7 @@ class CollectibleBuilder implements ProductBuilderInterface
 
     public function __construct()
     {
-        $this->collectible = new Collectible(); 
+        $this->collectible = new Collectible();
     }
 
     public function setName($name)
@@ -49,9 +49,19 @@ class CollectibleBuilder implements ProductBuilderInterface
         return $this;
     }
 
-    // Return the built product
-    public function build():Collectible
+    public function setProductId($id)
     {
-        return $this->collectible;
+        $this->collectible->product_id = $id;
+        return $this;
+    }
+
+    // Return the built product
+    public function build()
+    {
+        $collectible = new Collectible();
+        $collectible->product_id = $this->collectible->product_id;
+        $collectible->supplier = $this->collectible->supplier;
+
+        return $collectible;
     }
 }

@@ -12,24 +12,23 @@ use Illuminate\Support\Facades\Log;
 
 class CollectiblesController extends Controller
 {
-    public function store(Request $request)
+    public function store(Request $request, $productId)
     {
         $request->validate([
             'supplier' => 'required|string'
         ]);
 
         $builder = new CollectibleBuilder();
-        
+
         $director = new ProductDirector($builder);
 
-        $collectible = $director->construct(
+        $collectible = $director->buildCollectible(
             [
                 'supplier' => $request->supplier,
             ],
-            $request->specificAttributes
+            $productId
         );
 
-        // Save the product
         $collectible->save();
 
         return response()->json(['success' => true, 'message' => 'Collectible product added successfully.'], 200);
@@ -39,7 +38,7 @@ class CollectiblesController extends Controller
     {
         try {
             $query = $request->input('search');
-            
+
             if ($query) {
                 $collectibleIds = Collectible::where('name', 'LIKE', "%$query%")->pluck('product_id');
             } else {

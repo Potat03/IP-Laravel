@@ -43,8 +43,15 @@ class ProductBuilder implements ProductBuilderInterface
         return $this;
     }
 
-    public function build():Product
+    public function setCreatedAt($created_at)
     {
+        $this->product->created_at = $created_at;
+        return $this;
+    }
+
+    public function build()
+    {
+        $this->product->save();
         return $this->product;
     }
 }

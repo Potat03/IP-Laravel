@@ -62,9 +62,16 @@ class WearableBuilder implements ProductBuilderInterface
         return $this;
     }
 
+    public function setProductId($id)
+    {
+        $this->wearable->product_id = $id;
+        return $this;
+    }
+
     // Return the built product
     public function build():Wearable
     {
+        $this->wearable->save();
         return $this->wearable;
     }
 }
