@@ -6,17 +6,12 @@
     use App\Http\Controllers\PromotionController;
     use App\Http\Middleware\customAuth;
     use App\Http\Controllers\CustomerController;
+    use App\Http\Controllers\CartController;
 
     use App\Http\Controllers\CartItemController;
     // Route::get('/user', function (Request $request) {
     //     return $request->user();
     // })->middleware('auth:sanctum');
-
-
-    //upload product image
-    Route::post('/product/image/upload', [ProductController::class, 'productImageUpload']);
-    Route::get('/product/generateTable', [ProductController::class, 'generateTable']);
-    Route::post('product/image/upload', [ProductController::class, 'productImageUpload'])->name('product.image.upload');
 
     //pass login/register details
     use App\Http\Controllers\AuthController;
@@ -55,7 +50,7 @@
     Route::post('/product/image/upload', [ProductController::class, 'productImageUpload']);
     Route::get('/product/generateTable', [ProductController::class, 'generateTable']);
 
-    Route::post('/cartItem/upload', [CartItemController::class, 'addToCart']);
+    Route::post('/cartItem/upload', [CartController::class, 'addToCart'])->name('cart.add');
 
     //cart
     Route::get('/cartItem/getCartItemByCustomerID/{customerID}', [CartItemController::class, 'getCartItemByCustomerID']);

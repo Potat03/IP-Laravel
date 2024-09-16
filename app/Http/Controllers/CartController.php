@@ -4,42 +4,90 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\CartItem;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Product;
+use App\Models\Promotion;
+
+use function Laravel\Prompts\error;
+use function Pest\Laravel\json;
 
 class CartController extends Controller
 {
     public function addToCart(Request $request)
     {
-        $customer_id = $request->input('customer_id');
-        $product_id = $request->input('product_id');
-        $promotion_id = $request->input('promotion_id');
-        $quantity = $request->input('quantity');
-        $details = $request->input('details');
-        $subtotal = $request->input('subtotal');
-        $discount = $request->input('discount');
-        $total = $request->input('total');
+        //check if customer is logged in
+        $customer = null;
+        try{
+            $customer = Auth::guard('customer')->user();
+        }
+        catch(\Exception $e){
+            return response()->redirectToRoute('auth.showForm');
+        }
 
-        $cart_item = CartItem::create([
-            'customer_id' => $customer_id,
-            'product_id' => $product_id,
-            'promotion_id' => $promotion_id,
-            'quantity' => $quantity,
-            'details' => $details,
-            'subtotal' => $subtotal,
-            'discount' => $discount,
-            'total' => $total,
-        ]);
+        $cartItem = new CartItem();
 
-        if ($cart_item) {
+        try{
+            $cartItem->customer_id = $customer->id;
+        }
+        catch(\Exception $e){
+           $cartItem->customer_id = 0;
+        }
+
+        if($request->type == 'product'){
+            $cartItem->product_id = $request->product_id;
+            $validProduct = Product::find($request->product_id);
+            if($validProduct == null){
+                return response()->json([
+                    'error' => 'Invalid product',
+                    'message' => 'Invalid product'
+                ], 400);
+            }else if($validProduct->stock < $request->quantity){
+                    return response()->json([
+                        'error' => 'Invalid quantity',
+                        'message' => 'Invalid quantity'
+                    ], 400);
+                
+            }else{
+                $cartItem->quantity = $request->quantity;
+                $cartItem->subtotal = $validProduct->price;
+                $cartItem->discount = 0;
+                $cartItem->details = $request->size . ',' . $request->color;
+                $cartItem->total = $validProduct->price;
+                $cartItem->save();
+            }
+        }
+        else if($request->type == 'promotion'){
+            $cartItem->promotion_id = $request->promotion_id;
+            $cartItem->quantity = $request->quantity;
+            $validPromotion = Promotion::find($request->promotion_id);
+            if($validPromotion == null){
+                return response()->json([
+                    'error' => 'Invalid promotion',
+                    'message' => 'Invalid promotion'
+                ], 400);
+            }else{
+                //get all content of the promotion
+                $details = [];
+                foreach($request->products as $product){
+                    //get size and color
+                    $details[] = [
+                        'product_id' => $product['product_id'],
+                        'size' => $product['size'],
+                        'color' => $product['color']
+                    ];
+                }
+                $cartItem->details = json_encode($details);
+                $cartItem->subtotal = $validPromotion->original_price;
+                $cartItem->discount = $validPromotion->discount;
+                $cartItem->total = $validPromotion->original_price - $validPromotion->discount_amount;
+                $cartItem->save();
+            }
+        }
+        else{
             return response()->json([
-                'success' => true,
-                'message' => 'Item added to cart successfully',
-                'cart_item' => $cart_item
-            ]);
-        } else {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to add item to cart'
-            ]);
+                'error' => 'Invalid type',
+                'message' => 'Invalid type'
+            ], 400);
         }
     }
 }

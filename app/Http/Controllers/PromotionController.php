@@ -180,7 +180,7 @@ class PromotionController extends Controller
     public function undoDeletePromotion($id){
         try{
             $promotion = Promotion::find($id);
-            $promotion->status = 'deactive';
+            $promotion->status = 'inactive';
             $promotion->save();
             return response()->json(['success' => true, 'data' => $promotion], 200);
         }
@@ -233,8 +233,6 @@ class PromotionController extends Controller
             $promotion->product_list = Promotion::find($id)->product;
             if($promotion->status == 'deleted' || $promotion->status == 'inactive'){
                 return view('errors.404');
-            }else if ($promotion->type == 'single'){
-                return redirect()->route('product', ['id' => $promotion->product_list[0]->product_id]);
             }
 
 

@@ -487,7 +487,7 @@
                 handleWearableFields();
             }
 
-            fetch(`/product/get/images/${productId}`)
+            fetch(`/api/product/get/images/${productId}`)
                 .then(response => response.json())
                 .then(data => {
                     console.log(data);
@@ -499,7 +499,6 @@
                 .catch(error => console.error('Error fetching images:', error));
 
             function displayProductImages(images) {
-
                 thumbnailsContainer.innerHTML = '';
 
                 images.forEach(image => {
@@ -568,6 +567,7 @@
             });
 
             function updateThumbnails() {
+                thumbnailsContainer.innerHTML = '';
                 console.log('Updating thumbnails');
 
                 filesArray.forEach((file, index) => {

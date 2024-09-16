@@ -179,15 +179,13 @@
 <div class="container product-detail-container">
     <div class="container mt-4 product-image">
         <!-- Main Image Display -->
-        <div class="main-image border p-3 rounded mb-3" style="
-    width: 500px;
-    height: 500px;">
+        <div class="main-image p-3 rounded mb-3" style="width: 500px; height: 500px;">
             <div class="row">
                 @foreach ($promotion->product_list as $product)
                 @if ($loop->index >= 4)
                 @break
                 @endif
-                <div class="col-6 p-0">
+                <div class="{{count($promotion->product_list) == 1 ? 'col-12' : 'col-6'}}  p-0">
                     <img src="{{ asset('storage/images/products/' . $product->product_id . '/main.png') }}"
                         class="d-block img-thumbnail border-0" alt="product image">
                 </div>
@@ -247,7 +245,10 @@
 </div>
 <div class="modal fade modal-xl" id="selectModal" tabindex="-1" aria-labelledby="selectModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
+    <form id="cart-form">
+        @csrf
         <div class="modal-content">
+            
             <div class="modal-header">
                 <h5 class="modal-title" id="selectModalLabel">Select Variation</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -274,7 +275,7 @@
                                             <div class="d-flex flex-wrap pt-3 align-items-center">
                                                 <h5 class="col-1 text-secondary m-0">Color :</h5>
                                                 @foreach ($colors as $color)
-                                                <button class="btn btn-color"
+                                                <button class="btn btn-color" type="button"
                                                     onclick="selectColor(this, {{$product->product_id}}, {{($product->quantity > 1) ? $i : '-1'}})">{{ $color }}</button>
                                                 @endforeach
                                             </div>
@@ -282,7 +283,7 @@
                                                 <h5 class="col-1 text-secondary m-0">Size :</h5>
 
                                                 @foreach ($sizes as $size)
-                                                <button class="btn btn-size"
+                                                <button class="btn btn-size" type="button"
                                                     onclick="selectSize(this, {{$product->product_id}}, {{($product->quantity > 1) ? $i : '-1'}})">{{ $size }}</button>
                                                 @endforeach
                                             </div>
@@ -301,6 +302,7 @@
                 <button type="button" class="btn btn-primary" id="btn-submit-cart">Save changes</button>
             </div>
         </div>
+        </form>
     </div>
 </div>
 
@@ -442,23 +444,6 @@
         quantityInput.value = newQuantity;
     }
 
-    function addToCart() {
-        var quantityInput = document.getElementById('quantity');
-        var quantity = parseInt(quantityInput.value);
-
-        if (quantity < 1) {
-            alert('Please select a quantity greater than 0');
-            return;
-        }
-
-        if (limit > 0 && quantity > limit - bought_count) {
-            alert('You have exceeded the limit for this promotion');
-            return;
-        }
-
-        alert('Added to cart');
-    }
-
 
     document.addEventListener("DOMContentLoaded", function() {
 
@@ -494,8 +479,30 @@
                 }
             });
 
-            if (allSelected) {9
-                addToCart();
+            if (allSelected) {
+                //ajax request to add to cart
+                fetch("{{ route('cart.add') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        type: 'promotion',
+                        promotion_id: `{{$promotion->promotion_id}}`,
+                        products: promo_content,
+                        quantity: document.getElementById('quantity').value
+                    })
+                }).then(response => {
+                    //display bootstrap alert
+                    if (response.ok) {
+                        alert('Product added to cart');
+                        window.location.reload();
+                    } else {
+                        alert('Failed to add product to cart');
+                    }
+                });
+                console.log(promo_content);
+
             } else {
                 alert('Please select a size and color for each product');
             }
