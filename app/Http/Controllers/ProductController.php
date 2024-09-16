@@ -71,36 +71,46 @@ class ProductController extends Controller
                 mkdir($folderFullPath, 0777, true);
             }
 
+            // Get list of existing images in the folder
             $existingImages = array_map('basename', glob($folderFullPath . '/*'));
 
             $existingImagesFromRequest = json_decode($request->input('existingImages', '[]'), true);
             $filesArrayFromRequest = json_decode($request->input('filesArray', '[]'), true);
 
+            $mainImageExists = false;
+            foreach (['jpg', 'png', 'jpeg'] as $extension) {
+                if (in_array('main.' . $extension, $existingImages)) {
+                    $mainImageExists = true;
+                    break;
+                }
+            }
+
+            // Remove images that are not in the existing images list
             foreach ($existingImages as $image) {
                 if (!in_array($image, $existingImagesFromRequest)) {
+                    if ($mainImageExists && in_array($image, ['main.jpg', 'main.png', 'main.jpeg'])) {
+                        // The main image is being deleted
+                        $mainImageExists = false; // Update flag
+                        Log::info('Deleted main image: ' . $image);
+                    }
                     unlink($folderFullPath . '/' . $image);
+                    Log::info('Deleted image: ' . $image);
                 }
             }
 
             $images = $request->file('images');
-            if ($images) {
-                // Check if 'main' image exists in the folder
-                $mainImageExists = false;
-                foreach (['jpg', 'png', 'jpeg'] as $extension) {
-                    if (in_array('main.' . $extension, $existingImages)) {
-                        $mainImageExists = true;
-                        break;
-                    }
-                }
+            $newMainImage = null;
 
+            if ($images) {
                 foreach ($images as $index => $image) {
                     $extension = $image->getClientOriginalExtension();
                     $imageName = '';
 
+                    // If no main image exists, assign 'main' name to the first uploaded image
                     if (!$mainImageExists) {
-                        // Assign 'main' name if it doesn't exist already
                         $imageName = 'main.' . $extension;
-                        $mainImageExists = true;
+                        $newMainImage = $imageName;
+                        $mainImageExists = true; // Mark that we have assigned a main image
                     } else {
                         // Generate a unique name for the image
                         $imageName = $this->generateUniqueName($existingImages, $extension);
@@ -113,10 +123,30 @@ class ProductController extends Controller
                     // Add the new image to the existing images list
                     $existingImages[] = $imageName;
                 }
+
+                // If a new main image was assigned, log the action
+                if ($newMainImage) {
+                    Log::info('Assigned new main image: ' . $newMainImage);
+                }
+            }
+
+            // If no new images were uploaded and no main image exists, find a new main image
+            if (!$images && !$mainImageExists) {
+                $remainingImages = array_diff($existingImages, ['main.jpg', 'main.png', 'main.jpeg']);
+                if (!empty($remainingImages)) {
+                    $newMainImage = reset($remainingImages);
+                    $newMainImageExtension = pathinfo($newMainImage, PATHINFO_EXTENSION);
+                    $newMainImageName = 'main.' . $newMainImageExtension;
+                    rename($folderFullPath . '/' . $newMainImage, $folderFullPath . '/' . $newMainImageName);
+                    Log::info('Assigned new main image from existing images: ' . $newMainImageName);
+                } else {
+                    Log::info('No images available to assign as main image.');
+                }
             }
 
             return response()->json(['success' => true, 'data' => 'Images have been successfully updated.'], 200);
         } catch (Exception $e) {
+            Log::error('Error updating images: ' . $e->getMessage());
             return response()->json(['success' => false, 'data' => $e->getMessage()], 400);
         }
     }
