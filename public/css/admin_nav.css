@@ -1,7 +1,7 @@
 @import url('color.css');
 
 body{
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Poppins', sans-serif !important;
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -9,7 +9,9 @@ body{
 }
 
 p,h1,h2,h3,h4,h5,h6{
-    margin: 0;
+    margin: 0 !important;
+    font-weight: bold !important;
+    line-height: 1 !important;
 }
 
 .admin_content{
@@ -35,6 +37,10 @@ p,h1,h2,h3,h4,h5,h6{
     width: 200px;
     user-select: none;
     color: var(--adminmain);
+}
+
+.top_left > h1{
+    font-size: 2em !important;
 }
 
 .top_middle{
@@ -179,6 +185,7 @@ p,h1,h2,h3,h4,h5,h6{
     transition: all 0.1s;
     font-weight: 600;
     border-radius: 5px;
+    height:21px;
 }
 
 .left_bar a {
@@ -273,4 +280,64 @@ p,h1,h2,h3,h4,h5,h6{
     padding: 20px 0px;
     flex-grow: 1;
     max-width: 80vw;
+}
+
+.image_big_preview{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1001;
+    overflow: hidden;
+    visibility: hidden;
+} 
+
+.image_big_preview.show{
+    visibility: visible;
+}
+
+.image_big_preview .image_big_preview_wrap{
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left:100%;
+    transition: all 0.4s;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.image_big_preview.show .image_big_preview_wrap{
+    opacity: 1;
+    left: 0;
+    pointer-events: all;
+}
+
+.big_preview_bg{
+    width: 100%;
+    height: 100%;
+    background-color: var(--black);
+    opacity: 0.8;
+    filter: blur(2px) brightness(0.7);
+}
+
+.big_preview_wrap{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.big_preview_container img {
+    max-width: 95%;
+    max-height: 98vh;
+    border-radius: 5px;
+}
+
+*, *::before, *::after{
+    box-sizing: unset !important;
 }

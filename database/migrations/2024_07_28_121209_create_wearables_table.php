@@ -12,7 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('wearable', function (Blueprint $table) {
-            $table->id('product_id')->references('product_id')->on('product');
+            $table->id();
+            $table->unsignedBigInteger('product_id')->references('product_id')->on('product');
             $table->string('size');
             $table->string('color');
             $table->string('user_group');

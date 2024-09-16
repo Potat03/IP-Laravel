@@ -1,5 +1,9 @@
 @extends('admin.layout.main')
 
+@section('vite')
+@vite(['resources/css/app.css','resources/sass/app.scss', 'resources/js/app.js', 'resources/css/admin-nav.css','resources/js/bootstrap.js'])
+@endsection
+
 @section('css')
     <style>
         .btn {
@@ -90,6 +94,7 @@
 
                     <!-- Wearable Section -->
                     <div id="wearable-section" style="display: none;">
+                        <input type="hidden" id="isWearable" value="0">
                         <div class="mb-3">
                             <label for="size" class="form-label">Sizes:</label>
                             <div id="sizes-container">
@@ -141,20 +146,20 @@
 
                     <!-- Consumable Section -->
                     <div id="consumable-section" style="display: none;">
+                        <input type="hidden" id="isConsumable" value="0">
                         <div class="mb-3">
                             <label for="expiry_date" class="form-label">Expiry Date:</label>
-                            <input type="date" class="form-control" id="expiry_date" name="expiry_date" required>
+                            <input type="date" class="form-control" id="expiry_date" name="expiry_date">
                         </div>
 
                         <div class="mb-3">
                             <label for="portion" class="form-label">Portion:</label>
-                            <input type="number" class="form-control" id="portion" name="portion" required
-                                min="1">
+                            <input type="number" class="form-control" id="portion" name="portion" min="1">
                         </div>
 
                         <div class="mb-3">
                             <label for="halal" class="form-label">Halal:</label>
-                            <select class="form-control" id="halal" name="halal" required>
+                            <select class="form-control" id="halal" name="halal">
                                 <option value="1">Yes</option>
                                 <option value="0">No</option>
                             </select>
@@ -163,6 +168,7 @@
 
                     <!-- Collectible Section -->
                     <div id="collectible-section" style="display: none;">
+                        <input type="hidden" id="isCollectible" value="0">
                         <div class="mb-3">
                             <label for="supplier" class="form-label">Supplier:</label>
                             <input type="text" class="form-control" id="supplier" name="supplier"
@@ -209,21 +215,8 @@
             const addButton = document.getElementById('addImageButton');
             const thumbnailsContainer = document.querySelector('.thumbnails');
 
-            // Initialize files array
             let filesArray = [];
 
-            // Update status label and hidden input
-            statusLabel.textContent = statusSwitch.checked ? 'Active' : 'Inactive';
-            statusHidden.value = statusSwitch.checked ? 'active' : 'inactive';
-
-            // Toggle status
-            statusSwitch.addEventListener('change', function() {
-                const status = statusSwitch.checked ? 'active' : 'inactive';
-                statusHidden.value = status;
-                statusLabel.textContent = statusSwitch.checked ? 'Active' : 'Inactive';
-            });
-
-            // Manage product type sections
             const typeSelect = document.getElementById('type');
             const wearableSection = document.getElementById('wearable-section');
             const consumableSection = document.getElementById('consumable-section');
@@ -232,13 +225,151 @@
             typeSelect.addEventListener('change', function() {
                 const selectedType = typeSelect.value;
 
-                wearableSection.style.display = selectedType === 'wearable' ? 'block' : 'none';
-                consumableSection.style.display = selectedType === 'consumable' ? 'block' : 'none';
-                collectibleSection.style.display = selectedType === 'collectible' ? 'block' : 'none';
+                // Hide all sections
+                wearableSection.style.display = 'none';
+                consumableSection.style.display = 'none';
+                collectibleSection.style.display = 'none';
 
+                // Show the selected section and update hidden fields
                 if (selectedType === 'wearable') {
-                    handleWearableFields();
+                    wearableSection.style.display = 'block';
+                    document.getElementById('isWearable').value = '1';
+                    document.getElementById('isConsumable').value = '0';
+                    document.getElementById('isCollectible').value = '0';
+                } else if (selectedType === 'consumable') {
+                    consumableSection.style.display = 'block';
+                    document.getElementById('isWearable').value = '0';
+                    document.getElementById('isConsumable').value = '1';
+                    document.getElementById('isCollectible').value = '0';
+                } else if (selectedType === 'collectible') {
+                    collectibleSection.style.display = 'block';
+                    document.getElementById('isWearable').value = '0';
+                    document.getElementById('isConsumable').value = '0';
+                    document.getElementById('isCollectible').value = '1';
                 }
+            });
+
+            productForm.addEventListener('submit', function(event) {
+                event.preventDefault();
+
+                // Collect common attributes
+                const form = new FormData(productForm);
+                const files = imageInput.files;
+
+                const filesArrayJson = JSON.stringify(filesArray.map(file => file
+                    .name));
+
+                form.append('filesArray', filesArrayJson);
+
+                if (filesArrayJson.length === 0) {
+                    alert('You must upload at least one image for the product.');
+                    return;
+                }
+
+                filesArray.forEach(file => {
+                    form.append('images[]', file);
+                });
+
+                const name = form.get('name');
+                const stock = form.get('stock');
+                const description = form.get('description');
+                const status = form.get('status');
+
+                // form.append('status', status);
+
+                const isWearable = document.getElementById('isWearable').value;
+                const isConsumable = document.getElementById('isConsumable').value;
+                const isCollectible = document.getElementById('isCollectible').value;
+
+                // Handle attributes based on product type
+                if (isWearable === '1') {
+                    const sizes = Array.from(document.querySelectorAll('#sizes-container input')).map(
+                        input => input.value.trim());
+                    const colors = Array.from(document.querySelectorAll('#colors-container input')).map(
+                        input => input.value.trim());
+                    const userGroups = selectedGroupsInput.value.trim();
+
+                    if (sizes.length === 0 && colors.length === 0) {
+                        alert('Please enter at least one size or color for wearable products.');
+                        return;
+                    }
+
+                    if (userGroups === '') {
+                        alert('Please select at least one user group.');
+                        return;
+                    }
+
+                    form.append('isWearable', isWearable);
+                    form.append('sizes', sizes.join(','));
+                    form.append('colors', colors.join(','));
+                    form.append('user_groups', userGroups);
+                }
+
+                if (isConsumable === '1') {
+                    const expiryDateInput = form.get('expiry_date').trim();
+                    const portion = form.get('portion').trim();
+                    const halal = form.get('halal').trim();
+
+                    if (expiryDateInput === '' || portion === '' || halal === '') {
+                        alert(
+                            'Please enter expiry date, portion, and halal status for consumable products.'
+                        );
+                        return;
+                    }
+
+                    const expiryDate = new Date(expiryDateInput);
+                    const minimumDate = new Date();
+                    minimumDate.setMonth(minimumDate.getMonth() + 3);
+
+                    if (expiryDate < minimumDate) {
+                        alert('The expiry date must be at least 3 months in the future.');
+                        return;
+                    }
+
+                    form.append('isConsumable', isConsumable);
+                    form.append('expiry_date', expiryDateInput);
+                    form.append('portion', portion);
+                    form.append('halal', halal);
+                }
+
+
+                if (isCollectible === '1') {
+                    const supplier = form.get('supplier').trim();
+
+                    if (supplier === '') {
+                        alert('Please enter supplier for collectible products.');
+                        return;
+                    }
+
+                    form.append('isCollectible', isCollectible);
+                    form.append('supplier', supplier);
+                }
+
+                fetch("{{ route('product.create') }}", {
+                        method: 'POST',
+                        body: form
+                    }).then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            window.location.href = "{{ route('admin.product') }}";
+                        } else {
+                            alert('Failed to update product');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred: ' + error.message);
+                    });
+
+            });
+
+            statusLabel.textContent = statusSwitch.checked ? 'Active' : 'Inactive';
+            statusHidden.value = statusSwitch.checked ? 'active' : 'inactive';
+
+            statusSwitch.addEventListener('change', function() {
+                const status = statusSwitch.checked ? 'active' : 'inactive';
+                statusHidden.value = status;
+                statusLabel.textContent = statusSwitch.checked ? 'Active' : 'Inactive';
             });
 
             // Function to handle wearable fields

@@ -7,6 +7,8 @@ use App\Models\Product;
 use App\Models\Wearable;
 use App\Models\Collectible;
 use App\Models\Rating;
+use App\Directors\ProductDirector;
+use App\Builders\ProductBuilder;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Exception;
 use Illuminate\Support\Facades\Log;
@@ -21,34 +23,30 @@ class ProductController extends Controller
     {
         try {
             $request->validate([
-                'images' => 'required',
+                'images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+                'filesArray' => 'nullable|string',
             ]);
 
-
-            $imageName = "main.png";
-
-            if ($id) {
-                $folderPath = 'storage/images/products/' . $id;
-            } else {
-                $folderPath = 'storage/images/products/lol';
-                // return response()->json(['success' => false, 'message' => 'Product ID is required.'], 400);
-            }
+            $folderPath = $id ? 'storage/images/products/' . $id : 'storage/images/products/lol';
 
             if (!file_exists(public_path($folderPath))) {
                 mkdir(public_path($folderPath), 0777, true);
             }
 
             $images = $request->file('images');
-            foreach ($images as $index => $image) {
-                if ($index === 0) {
-                    $imageName = 'main.' . $image->getClientOriginalExtension(); // The first image is named "main"
-                } else {
-                    $imageName = $index . '.' . $image->getClientOriginalExtension(); // Subsequent images are numbered
+            if ($images) {
+                foreach ($images as $index => $image) {
+                    $imageName = $index === 0
+                        ? 'main.' . $image->getClientOriginalExtension()
+                        : $index . '.' . $image->getClientOriginalExtension();
+
+                    $image->move(public_path($folderPath), $imageName);
                 }
-                $image->move(public_path($folderPath), $imageName);
+
+                return response()->json(['success' => true, 'data' => 'Images have been successfully uploaded.'], 200);
             }
 
-            return response()->json(['success' => true, 'data' => 'You have successfully uploaded an image.'], 200);
+            return response()->json(['success' => false, 'data' => 'No images were uploaded.'], 400);
         } catch (Exception $e) {
             return response()->json(['success' => false, 'data' => $e->getMessage()], 400);
         }
@@ -164,11 +162,12 @@ class ProductController extends Controller
         return $uniqueName;
     }
 
-    public function addProduct(){
+    public function addProduct()
+    {
         return view('admin.product_add');
     }
 
-    //add product to database
+    // Add product to database
     public function createProduct(Request $request)
     {
         try {
@@ -178,60 +177,84 @@ class ProductController extends Controller
                 'price' => 'required|numeric',
                 'stock' => 'required|integer',
                 'status' => 'required|string',
+                'isWearable' => 'nullable|numeric',
+                'isConsumable' => 'nullable|numeric',
+                'isCollectible' => 'nullable|numeric',
+                'sizes' => 'nullable|string',
+                'colors' => 'nullable|string',
+                'expiry_date' => 'nullable|date',
+                'portion' => 'nullable|string',
+                'halal' => 'nullable|boolean',
+                'supplier' => 'nullable|string',
+                'selected_groups' => 'nullable|string',
             ]);
 
-            $id = Product::create([
-                'name' => $request->name,
-                'description' => $request->description,
-                'price' => $request->price,
-                'stock' => $request->stock,
-                'status' => $request->status,
-            ])->product_id;
+            // Build the product using ProductBuilder
+            $productBuilder = new ProductBuilder();
 
-            $product = new Product();
+            $productDirector = new ProductDirector($productBuilder);
 
-            $product->name = $request->name;
-            $product->description = $request->description;
-            $product->price = $request->price;
-            $product->stock = $request->stock;
-            $product->status = $request->status;
-            $product->save();
+            $created_at = now()->addHours(8);
+
+            $product = $productDirector->buildBasicProduct(
+                $request->name,
+                $request->description,
+                $request->price,
+                $request->stock,
+                $request->status,
+                $created_at
+            );
+
             $id = $product->product_id;
 
-            //forward request
-            //get the product id
-            ProductController::productImageUpload($request, $id);
+            // Check for specific attributes
+            if ($request->has('isWearable')) {
+                $this->createWearable($product, $request);
+            }
 
+            if ($request->has('isConsumable')) {
+                $this->createConsumable($product, $request);
+            }
 
-            return response()->json(['success' => true, 'message' => 'You have successfully added a product.'], 200);
+            if ($request->has('isCollectible')) {
+                $this->createCollectible($product, $request);
+            }
+
+            // Forward request for image upload
+            // ProductController::productImageUpload($request, $id);
+
+            return response()->json(['success' => true, 'message' => 'Product created successfully.'], 200);
         } catch (Exception $e) {
             return response()->json(['failure' => false, 'message' => $e->getMessage()], 400);
         }
     }
 
-    public function store(Request $request)
+    protected function createWearable($product, Request $request)
     {
-        try {
-            // Validate the request data
-            $validatedData = $request->validate([
-                'product_id' => 'required|unique:product',
-                'name' => 'required|string|max:255',
-                'description' => 'nullable|string',
-                'price' => 'required|numeric',
-                'stock' => 'required|integer',
-                'created_at' => 'required|date'
-            ]);
+        $sizes = $request->input('sizes', []);
+        $colors = $request->input('colors', []);
+        $userGroups = $request->input('selected_groups', '');
 
-            // Create the product
-            $product = Product::create($validatedData);
+        $sizesString = is_array($sizes) ? implode(',', $sizes) : $sizes;
+        $colorsString = is_array($colors) ? implode(',', $colors) : $colors;
 
-            // Return a response
-            return response()->json($product, 201);
-        } catch (Exception $e) {
-            // Log the error
-            Log::error('Product creation failed: ' . $e->getMessage());
-            return response()->json(['error' => 'Product creation failed.'], 500);
-        }
+        $wearableObj = new WearableController();
+
+        $wearableObj->store($request, $product->product_id);
+    }
+
+    protected function createConsumable($product, Request $request)
+    {
+        $consumableObj = new ConsumablesController();
+
+        $consumableObj->store($request, $product->product_id);
+    }
+
+    protected function createCollectible($product, Request $request)
+    {
+        $collectibleObj = new CollectiblesController();
+
+        $collectibleObj->store($request, $product->product_id);
     }
 
     public function editProduct($id)
