@@ -82,7 +82,7 @@ class ChatController extends Controller
     public function test1()
     {
         $chatSerive = new ChatMessageService();
-        $imagePath = $chatSerive->getImageMessagePath(1, 1);
+        $imagePath = $chatSerive->getImageMessagePath(1, 2);
         return response()->json([
             'imagePath' => $imagePath,
         ]);
