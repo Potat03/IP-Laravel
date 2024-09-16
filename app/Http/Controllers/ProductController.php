@@ -74,7 +74,7 @@ class ProductController extends Controller
 
             $images = $request->file('images');
             if ($images) {
-                $mainImageExists = false; // Initialize flag
+                $mainImageExists = false;
 
                 foreach ($images as $index => $image) {
                     $extension = $image->getClientOriginalExtension();
@@ -356,13 +356,21 @@ class ProductController extends Controller
     {
         $product = Product::find($id);
 
-        // Get all images for this product from the storage directory
-        $imageFiles = Storage::files('public/images/products/' . $id);
-        $images = array_map(function ($file) {
-            return basename($file);
-        }, $imageFiles);
+        if ($product) {
+            $imagePath = storage_path('app/public/images/products/' . $product->product_id);
+            $images = array_map('basename', glob($imagePath . '/*'));
+            return response()->json($images);
+        } else {
+            return response()->json(['error' => 'Product not found'], 404);
+        }
 
-        return response()->json(['success' => true, 'data' => $images], 200);
+        // // Get all images for this product from the storage directory
+        // $imageFiles = Storage::files('public/images/products/' . $id);
+        // $images = array_map(function ($file) {
+        //     return basename($file);
+        // }, $imageFiles);
+
+        // return response()->json(['success' => true, 'data' => $images], 200);
     }
 
     // Update a product

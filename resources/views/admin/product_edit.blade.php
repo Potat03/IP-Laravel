@@ -57,7 +57,7 @@
                     @csrf
 
                     <div class="mb-3">
-                        <div class="thumbnails d-flex"></div>
+                        <div class="thumbnails d-flex" data-base-path="{{ asset('storage/images/products') }}"></div>
                         <input type="hidden" id="removedImages" name="removed_images" value="">
                         <button type="button" class="btn btn-primary" id="addImageButton">Add Image</button>
                         <input type="file" id="imageInput" name="images[]" accept="image/*" style="display: none;"
@@ -487,12 +487,14 @@
                 handleWearableFields();
             }
 
+            const baseImagePath = thumbnailsContainer.getAttribute('data-base-path');
+
             fetch(`/product/get/images/${productId}`)
                 .then(response => response.json())
                 .then(data => {
                     console.log(data);
-                    if (data.success) {
-                        const images = data.data;
+                    if (data && !data.error) {
+                        const images = data;
                         displayProductImages(images);
                     }
                 })
@@ -507,7 +509,8 @@
                     thumbnailWrapper.classList.add('thumbnail-wrapper', 'position-relative');
 
                     const imgElement = document.createElement('img');
-                    imgElement.src = `http://127.0.0.1:8000/storage/images/products/${productId}/${image}`;
+                    imgElement.src = `${baseImagePath}/${productId}/${image}`;
+                    // imgElement.src = `{{ asset('storage/images/products/${productId}/${image}') }}`;
                     imgElement.classList.add('thumbnail', 'img-thumbnail', 'thumbnail-square');
                     imgElement.alt = 'Thumbnail Image';
                     imgElement.draggable = false;
@@ -569,6 +572,7 @@
 
             function updateThumbnails() {
                 console.log('Updating thumbnails');
+                thumbnailsContainer.innerHTML = ''; // Clear existing thumbnails
 
                 filesArray.forEach((file, index) => {
                     console.log('Processing file:', file.name);
