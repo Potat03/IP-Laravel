@@ -197,9 +197,15 @@
         <div class="container mt-4 product-image">
             <!-- Main Image Display -->
             <div class="main-image mb-3">
-                <img id="mainImage" src="{{ asset('storage/images/products/' . $product->product_id . '/main.' . pathinfo($images[0], PATHINFO_EXTENSION)) }}"
-                    class="img-fluid main-square" alt="Main Product Image" draggable="false">
-            </div>            
+                @php
+                    $mainImageUrl = $mainImageExtension
+                        ? asset('storage/images/products/' . $product->product_id . '/main.' . $mainImageExtension)
+                        : asset('storage/images/products/default.jpg'); // Default image
+                @endphp
+                <img id="mainImage" src="{{ $mainImageUrl }}" class="img-fluid main-square" alt="Main Product Image"
+                    draggable="false">
+
+            </div>
 
             <!-- Thumbnail Images -->
             <div class="thumbnails d-flex">
@@ -207,7 +213,8 @@
                     <div class="thumbnail-wrapper">
                         <img src="{{ asset('storage/images/products/' . $product->product_id . '/' . $image) }}"
                             class="thumbnail img-thumbnail thumbnail-square" alt="Thumbnail Image"
-                            data-image="{{ asset('storage/images/products/' . $product->product_id . '/' . $image) }}" draggable="false">
+                            data-image="{{ asset('storage/images/products/' . $product->product_id . '/' . $image) }}"
+                            draggable="false">
                     </div>
                 @endforeach
             </div>

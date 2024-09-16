@@ -273,19 +273,21 @@
                 const form = new FormData(productForm);
                 const files = imageInput.files;
 
-                if (files.length === 0) {
-                    alert('No files selected.');
-                } else {
-                    let fileNames = '';
-                    for (const file of files) {
-                        fileNames += file.name + '\n'; // Collect all file names
-                    }
-                    alert('Selected files:\n' + fileNames); // Display all file names in one alert
+                const existingImagesJson = JSON.stringify(existingImages);
+                const filesArrayJson = JSON.stringify(filesArray.map(file => file
+                    .name));
+
+                form.append('existingImages', existingImagesJson);
+                form.append('filesArray', filesArrayJson);
+
+                if (existingImages.length + files.length === 0) {
+                    alert('You must upload at least one image for the product.');
+                    return;
                 }
 
-                for (const file of files) {
+                filesArray.forEach(file => {
                     form.append('images[]', file);
-                }
+                });
 
                 const name = form.get('name');
                 const stock = form.get('stock');
@@ -500,9 +502,12 @@
                 })
                 .catch(error => console.error('Error fetching images:', error));
 
+            let existingImages = []; //array for existing images
+
             function displayProductImages(images) {
 
                 thumbnailsContainer.innerHTML = '';
+                existingImages = [];
 
                 images.forEach(image => {
                     const thumbnailWrapper = document.createElement('div');
@@ -521,6 +526,8 @@
                     removeButton.textContent = '\u00D7';
                     removeButton.dataset.image = image;
 
+                    existingImages.push(image);
+
                     thumbnailWrapper.appendChild(imgElement);
                     thumbnailWrapper.appendChild(removeButton);
 
@@ -532,6 +539,11 @@
                         const image = this.dataset.image;
                         const thumbnailWrapper = this.closest('.thumbnail-wrapper');
                         thumbnailWrapper.remove();
+
+                        const imageIndex = existingImages.indexOf(image);
+                        if (imageIndex > -1) {
+                            existingImages.splice(imageIndex, 1);
+                        }
 
                         const removedImagesInput = document.getElementById('removedImages');
                         removedImagesInput.value += image + ',';
@@ -554,33 +566,34 @@
             });
 
             imageInput.addEventListener('change', function() {
-                console.log('File input changed');
                 const newFiles = Array.from(imageInput.files);
 
-                // Filter out files that are already in the array to avoid duplicates
                 newFiles.forEach(file => {
                     if (!filesArray.some(existingFile => existingFile.name === file.name)) {
-                        filesArray.push(file);
+                        if (filesArray.length + existingImages.length < 5) {
+                            filesArray.push(file);
+                        } else {
+                            alert('You can only upload a maximum of 5 images.');
+                        }
                     }
                 });
 
                 updateThumbnails();
 
-                // Clear file input after processing
                 imageInput.value = '';
             });
 
             function updateThumbnails() {
-                console.log('Updating thumbnails');
-                thumbnailsContainer.innerHTML = ''; // Clear existing thumbnails
+                const newImageWrappers = document.querySelectorAll('.thumbnail-wrapper.new');
+                newImageWrappers.forEach(wrapper => wrapper.remove());
 
+                // Display new files
                 filesArray.forEach((file, index) => {
-                    console.log('Processing file:', file.name);
                     const reader = new FileReader();
                     reader.onload = function(e) {
                         const newImageSrc = e.target.result;
                         const thumbnailWrapper = document.createElement('div');
-                        thumbnailWrapper.classList.add('thumbnail-wrapper', 'position-relative');
+                        thumbnailWrapper.classList.add('thumbnail-wrapper', 'position-relative', 'new');
 
                         const imgElement = document.createElement('img');
                         imgElement.src = newImageSrc;
@@ -599,16 +612,19 @@
                         thumbnailsContainer.appendChild(thumbnailWrapper);
 
                         removeButton.addEventListener('click', function() {
-                            // Remove file from array and update thumbnails
-                            filesArray.splice(removeButton.dataset.index, 1);
-                            updateThumbnails();
+                            const index = parseInt(this.dataset.index, 10); // Parse index
+                            if (!isNaN(index)) {
+                                filesArray.splice(index, 1); // Remove from filesArray
+                                const thumbnailWrapper = this.closest('.thumbnail-wrapper');
+                                thumbnailWrapper.remove();
+                                updateThumbnails(); // Update thumbnails
+                            }
                         });
                     };
                     reader.readAsDataURL(file);
                 });
 
-                // Show or hide the add button based on the number of images
-                if (filesArray.length < 5) {
+                if (filesArray.length + existingImages.length < 5) {
                     addButton.style.display = 'block';
                 } else {
                     addButton.style.display = 'none';

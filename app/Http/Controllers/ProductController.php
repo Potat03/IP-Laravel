@@ -59,36 +59,58 @@ class ProductController extends Controller
     {
         try {
             $request->validate([
-                'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+                'existingImages' => 'nullable|string',
+                'filesArray' => 'nullable|string',
             ]);
 
             $folderPath = 'storage/images/products/' . $id;
             $folderFullPath = public_path($folderPath);
 
-            // Create the folder if it doesn't exist
             if (!file_exists($folderFullPath)) {
                 mkdir($folderFullPath, 0777, true);
             }
 
+            // Get list of existing images in the folder
             $existingImages = array_map('basename', glob($folderFullPath . '/*'));
 
-            $images = $request->file('images');
-            if ($images) {
-                $mainImageExists = false;
+            $existingImagesFromRequest = json_decode($request->input('existingImages', '[]'), true);
+            $filesArrayFromRequest = json_decode($request->input('filesArray', '[]'), true);
 
+            $mainImageExists = false;
+            foreach (['jpg', 'png', 'jpeg'] as $extension) {
+                if (in_array('main.' . $extension, $existingImages)) {
+                    $mainImageExists = true;
+                    break;
+                }
+            }
+
+            // Remove images that are not in the existing images list
+            foreach ($existingImages as $image) {
+                if (!in_array($image, $existingImagesFromRequest)) {
+                    if ($mainImageExists && in_array($image, ['main.jpg', 'main.png', 'main.jpeg'])) {
+                        // The main image is being deleted
+                        $mainImageExists = false; // Update flag
+                        Log::info('Deleted main image: ' . $image);
+                    }
+                    unlink($folderFullPath . '/' . $image);
+                    Log::info('Deleted image: ' . $image);
+                }
+            }
+
+            $images = $request->file('images');
+            $newMainImage = null;
+
+            if ($images) {
                 foreach ($images as $index => $image) {
                     $extension = $image->getClientOriginalExtension();
+                    $imageName = '';
 
-                    // Check if 'main' image with this extension already exists
-                    if ($index === 0 && !$mainImageExists) {
-                        $mainImage = 'main.' . $extension;
-                        $mainImageExists = in_array($mainImage, $existingImages);
-                    }
-
-                    if ($index === 0 && !$mainImageExists) {
-                        // Assign 'main' name if it doesn't exist already
+                    // If no main image exists, assign 'main' name to the first uploaded image
+                    if (!$mainImageExists) {
                         $imageName = 'main.' . $extension;
-                        $mainImageExists = true; // Update flag to indicate 'main' image now exists
+                        $newMainImage = $imageName;
+                        $mainImageExists = true; // Mark that we have assigned a main image
                     } else {
                         // Generate a unique name for the image
                         $imageName = $this->generateUniqueName($existingImages, $extension);
@@ -101,9 +123,30 @@ class ProductController extends Controller
                     // Add the new image to the existing images list
                     $existingImages[] = $imageName;
                 }
+
+                // If a new main image was assigned, log the action
+                if ($newMainImage) {
+                    Log::info('Assigned new main image: ' . $newMainImage);
+                }
             }
-            return response()->json(['success' => true, 'data' => 'Images have been successfully uploaded.'], 200);
+
+            // If no new images were uploaded and no main image exists, find a new main image
+            if (!$images && !$mainImageExists) {
+                $remainingImages = array_diff($existingImages, ['main.jpg', 'main.png', 'main.jpeg']);
+                if (!empty($remainingImages)) {
+                    $newMainImage = reset($remainingImages);
+                    $newMainImageExtension = pathinfo($newMainImage, PATHINFO_EXTENSION);
+                    $newMainImageName = 'main.' . $newMainImageExtension;
+                    rename($folderFullPath . '/' . $newMainImage, $folderFullPath . '/' . $newMainImageName);
+                    Log::info('Assigned new main image from existing images: ' . $newMainImageName);
+                } else {
+                    Log::info('No images available to assign as main image.');
+                }
+            }
+
+            return response()->json(['success' => true, 'data' => 'Images have been successfully updated.'], 200);
         } catch (Exception $e) {
+            Log::error('Error updating images: ' . $e->getMessage());
             return response()->json(['success' => false, 'data' => $e->getMessage()], 400);
         }
     }
@@ -121,8 +164,12 @@ class ProductController extends Controller
         return $uniqueName;
     }
 
+    public function addProduct(){
+        return view('admin.product_add');
+    }
+
     //add product to database
-    public function addProduct(Request $request)
+    public function createProduct(Request $request)
     {
         try {
             $request->validate([
@@ -342,13 +389,15 @@ class ProductController extends Controller
     {
         $product = Product::find($id);
 
+        $mainImageExtension = $this->getMainImageExtension($id);
+
         // Get all images for this product from the storage directory
         $imageFiles = Storage::files('public/images/products/' . $id);
         $images = array_map(function ($file) {
             return basename($file);
         }, $imageFiles);
 
-        return view('product', compact('product', 'images'));
+        return view('product', compact('product', 'images', 'mainImageExtension'));
     }
 
     // Show product images for admin product
@@ -371,6 +420,21 @@ class ProductController extends Controller
         // }, $imageFiles);
 
         // return response()->json(['success' => true, 'data' => $images], 200);
+    }
+
+    public function getMainImageExtension($productId)
+    {
+        $folderPath = public_path('storage/images/products/' . $productId);
+        $extensions = ['jpg', 'jpeg', 'png'];
+
+        foreach ($extensions as $extension) {
+            $mainImage = 'main.' . $extension;
+            if (file_exists($folderPath . '/' . $mainImage)) {
+                return $extension;
+            }
+        }
+
+        return null; // No main image found
     }
 
     // Update a product
@@ -550,7 +614,4 @@ class ProductController extends Controller
     {
         return app('App\Http\Controllers\RatingController')->fetchRatingsForShop($productsId, $products);
     }
-
-
-
 }
