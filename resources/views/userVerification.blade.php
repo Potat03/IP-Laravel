@@ -141,7 +141,7 @@
         let inputField = e.target;
         if ((e.key === "Backspace" || e.key === "Delete") && inputField.value.length === 0 && index > 0) {
             let previousField = inputFields[index - 1];
-            previousField.value = ''; // clear the previous field
+            previousField.value = '';
             previousField.focus();
         }
     }

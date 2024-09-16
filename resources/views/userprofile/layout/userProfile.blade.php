@@ -104,31 +104,31 @@
         <div class="content">
             <div class="left_bar">
                 <ul>
-                    <li onclick = "window.location.href = '{{ route('profile.profileSec') }}'">
+                    <li onclick = "window.location.href = '{{ route('user.profileSec') }}'">
                         <a class="load-content">
                             <i class="fa-solid fa-square-poll-vertical"></i>
                             Profile
                         </a>
                     </li>
-                    <li onclick = "window.location.href = '{{ route('profile.orderHistorySec') }}'">
+                    <li onclick = "window.location.href = '{{ route('user.orderHistorySec') }}'">
                         <a class="load-content">
                             <i class="fa-regular fa-teddy-bear"></i>
                             Order History
                         </a>
                     </li>
-                    <li onclick = "window.location.href = '{{ route('profile.shippingSec') }}'">
+                    <li onclick = "window.location.href = '{{ route('user.shippingSec') }}'">
                         <a class="load-content">
                             <i class="fa-regular fa-box"></i>
                             Shipping
                         </a>
                     </li>
-                    <li onclick = "window.location.href = '{{ route('profile.supportChatSec') }}'">
+                    <li onclick = "window.location.href = '{{ route('user.supportChatSec') }}'">
                         <a class="load-content">
                             <i class="fa-brands fa-rocketchat"></i>
                             Support Chat
                         </a>
                     </li>
-                    <li onclick = "window.location.href = '{{ route('profile.settingSec') }}'">
+                    <li onclick = "window.location.href = '{{ route('user.settingSec') }}'">
                         <a class="load-content">
                             <i class="fa-regular fa-user"></i>
                             Settings
@@ -139,7 +139,7 @@
 
             <div class="right_content">
                 <div class="lower_content overflow-auto">
-                    @yield('allcontent')
+                    @yield('content')
                 </div>
             </div>
         </div>

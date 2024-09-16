@@ -120,26 +120,32 @@ use App\Http\Middleware\CustomerAuth;
 use App\Http\Controllers\AuthController;
 
 //WK route
-Route::get('/userlogin', ['middleware' => 'guest:customer', function () {
+Route::get('/userlogin', function () {
     return view('userlogin');
-}])->name('user.login');
+})->middleware('guest:customer')->name('user.login');
 
-Route::middleware([CustomerAuth::class])->group(function () {
-
-    Route::get('/profile', function () {
-        return view('userprofile/layout/userProfile');
-    })->name('user.profile');
-
-    Route::get('/profileSec', [CustomerController::class, 'profileSec'])->name('profile.profileSec');
-    Route::get('/orderHistorySec', [CustomerController::class, 'orderHistorySec'])->name('profile.orderHistorySec');
-    Route::get('/shippingSec', [CustomerController::class, 'shippingSec'])->name('profile.shippingSec');
-    Route::get('/supportChatSec', [CustomerController::class, 'supportChatSec'])->name('profile.supportChatSec');
-    Route::get('/settingSec', [CustomerController::class, 'settingSec'])->name('profile.settingSec');
-});
+Route::get('/forgetPass', function () {
+    return view('forgetPass');
+})->middleware('guest:customer')->name('user.forget');
 
 Route::get('/userverify', function () {
     return view('userVerification');
-})->name('user.verify');
+})->middleware('guest:customer')->name('user.verify');
+
+Route::get('/enterForgetPassword', function () {
+    return view('enterForgetPassword');
+})->middleware('guest:customer')->name('user.enterForget');
+
+
+Route::middleware([CustomerAuth::class])->group(function () {
+
+    Route::get('/profileSec', [CustomerController::class, 'profileSec'])->name('user.profileSec');
+    Route::get('/orderHistorySec', [CustomerController::class, 'orderHistorySec'])->name('user.orderHistorySec');
+    Route::get('/shippingSec', [CustomerController::class, 'shippingSec'])->name('user.shippingSec');
+    Route::get('/supportChatSec', [CustomerController::class, 'supportChatSec'])->name('user.supportChatSec');
+    Route::get('/settingSec', [CustomerController::class, 'settingSec'])->name('user.settingSec');
+    Route::put('/profile/update', [CustomerController::class, 'updateProfile'])->name('profile.update');
+});
 
 Route::get('/chat', [ChatController::class, 'index']);
 Route::post('/chat', [ChatController::class, 'store']);
