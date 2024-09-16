@@ -166,6 +166,7 @@
     border-radius: 10px 10px 0px 0px;
     box-shadow: 1px 1px 5px 0px rgba(0, 0, 0,0.30);
     padding: 5px 0;
+    position: relative;
 }
 
 .user_name{
@@ -250,7 +251,7 @@
     border-radius: 5px;
     flex-grow: 1;
     overflow-y: scroll;
-    position: relative;
+
 }
 
 .chat_content::-webkit-scrollbar{
@@ -324,6 +325,9 @@
     padding-right: 10px;
     font-weight: 600;
     user-select: none;
+    outline: none;
+    border: none;
+    font-size: 1.2em;
 }
 
 .chat_input_send:hover{
@@ -600,7 +604,7 @@
     font-size: 14px;
     font-weight: 600;
     position: absolute;
-    top: 10px;
+    bottom: -40px;
     left: 50%;
     transform: translateX(-50%) translateY(15px);
     width: fit-content;
