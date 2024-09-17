@@ -184,6 +184,9 @@ Route::get('/addMsg', function () {
     return view('weiTestChat');
 });
 Route::post('/sendMsg', [ChatMessageController::class, 'sendMessage'])->name('sendMsg');
+Route::post('/endChat', [ChatMessageController::class, 'endChat'])->name('endChat');
+Route::post('/createChat', [ChatMessageController::class, 'createChat'])->name('createChat');
+
 Route::get('/getCustomerChat', [ChatMessageController::class, 'initCustomerChat'])->name('getCustomerChat');
 Route::get('/getAdmChatList', [ChatMessageController::class, 'initAdminChatList'])->name('getAdmChatList');
 Route::get('/getChatMessage', [ChatMessageController::class, 'adminGetMessage'])->name('getChatMessage');

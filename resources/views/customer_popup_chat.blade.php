@@ -50,8 +50,7 @@
         </div>
         <div class="popup_box_body">
             <div class="popup_box_body_chat">
-
-
+                <div class="start_message">Enter message to start</div>
             </div>
             <div class="paste_area">
                 <p class="paste_area_txt">Upload Image</p>
@@ -101,6 +100,8 @@
                             }
                         });
 
+                        $('.start_message').hide();
+
                         last_msg_id = response['last_msg_id'];
                         $('.popup_box_body_chat').attr('chat-id', response['chat_id']);
 
@@ -111,7 +112,7 @@
                         waitImageLoad();
                         intervalId = setInterval(fetchNewMessages, 2000);
                     } else {
-                        showErrorMsg(response.info);
+                        $('.start_message').show();
                     }
                 },
                 error: function(xhr) {
@@ -237,7 +238,11 @@
                 var images = $('.paste_area img');
                 var imageSrc = images.length > 0 ? images.first().attr('src') : null;
 
-                const chat_id = $('.popup_box_body_chat').attr('chat-id');
+                var chat_id = $('.popup_box_body_chat').attr('chat-id');
+
+                if (!chat_id) chat_id = createChat();
+
+                if (!chat_id) return;
 
                 clearInterval(intervalId);
                 if (imageSrc) {
@@ -291,7 +296,7 @@
                                 $('.paste_area img').remove();
                                 $('.paste_area').removeClass('show');
                                 fixTextarea();
-                                
+
                             } else {
                                 showErrorMsg(response.info);
                             }
@@ -304,8 +309,36 @@
                 }
                 intervalId = setInterval(fetchNewMessages, 2000);
             });
-
         });
+
+        function createChat() {
+
+            const formData = new FormData();
+            formData.append('_token', "{{ csrf_token() }}");
+
+            $.ajax({
+                method: 'POST',
+                url: '{{ route("createChat") }}',
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function(response) {
+                    if (response['success']) {
+                        $('.popup_box_body_chat').attr('chat-id', response['chat_id']);
+                        $('.start_message').hide();
+                        return response['chat_id'];
+                    } else {
+                        showErrorMsg(response.info);
+                        return false;
+                    }
+                },
+                error: function(xhr) {
+                    const response = JSON.parse(xhr.responseText);
+                    showErrorMsg(response.info);
+                    return false;
+                }
+            });
+        }
 
 
         function fixTextarea() {
