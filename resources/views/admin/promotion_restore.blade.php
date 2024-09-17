@@ -21,7 +21,7 @@
 
 @section('title', 'Promotion')
 @section('page_title', 'Promotion')
-@section('page_gm', 'Prmotion bring smiles to faces')
+@section('page_gm', 'Restore promotion')
 
 @section('content')
 <div class="card shadow-sm p-3 position-static">

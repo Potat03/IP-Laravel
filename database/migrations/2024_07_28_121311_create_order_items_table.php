@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('order_items', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('order_id')->references('order_id')->on('orders');
-            $table->unsignedBigInteger('product_id')->references('product_id')->on('products');
+            $table->unsignedBigInteger('product_id')->references('product_id')->on('products')->nullable();
             $table->unsignedBigInteger('promotion_id')->references('promotion_id')->on('promotions')->nullable();
             $table->integer('quantity');
             $table->decimal('subtotal', 8, 2);
