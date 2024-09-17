@@ -253,6 +253,8 @@ class ProductController extends Controller
             // Return validation error response
             return response()->json(['errors' => $e->errors()], 422);
         } catch (Exception $e) {
+            Log::error('Adding product failed: ' . $e->getMessage());
+
             return response()->json(['failure' => false, 'message' => $e->getMessage()], 400);
         }
     }
