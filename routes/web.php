@@ -42,7 +42,6 @@ Route::get('/shop/collectible', [CollectiblesController::class, 'index'])->name(
 Route::get('/shop/new-arrivals', [ProductController::class, 'newArrivals'])->name('shop.newArrivals');
 
 Route::get('/product/{id}', [ProductController::class, 'show'])->name('product');
-Route::get('/product/{id}', [ProductController::class, 'showProductImages']);
 
 // Route::get('/cart', function () {
 //     return view('cart');
@@ -61,12 +60,6 @@ Route::get('/tracking', function () {
 Route::get('/testDB', function () {
     return view('testDB');
 });
-
-
-//promotion
-
-Route::get('/promotion', [PromotionController::class, 'customerList'])->name('promotion');
-Route::get('/promotion/{id}', [PromotionController::class, 'viewDetails'])->name('promotion.details');
 
 use App\Http\Controllers\CustomerController;
 use App\Http\Middleware\CustomerAuth;
@@ -106,6 +99,7 @@ Route::middleware([CustomerAuth::class])->group(function () {
     Route::get('/shippingSec', [CustomerController::class, 'shippingSec'])->name('profile.shippingSec');
     Route::get('/supportChatSec', [CustomerController::class, 'supportChatSec'])->name('profile.supportChatSec');
     Route::get('/settingSec', [CustomerController::class, 'settingSec'])->name('profile.settingSec');
+
 });
 
 
@@ -137,6 +131,9 @@ Route::get('/template', function () {
 Route::get('/adminLogin', [AuthController::class, 'showAdminLoginForm']);
 Route::post('/adminLogin', [AuthController::class, 'adminLogin'])->name('admin.login');
 Route::get('/adminLogout', [AuthController::class, 'adminLogout'])->name('admin.logout');
+
+Route::get('/promotion', [PromotionController::class, 'customerList'])->name('promotion');
+Route::get('/promotion/{id}', [PromotionController::class, 'viewDetails'])->name('promotion.details');
 
 Route::middleware([AdminAuth::class])->group(function () {
     Route::get('/adminChat', function () {
@@ -181,6 +178,9 @@ Route::get('/addMsg', function () {
     return view('weiTestChat');
 });
 Route::post('/sendMsg', [ChatMessageController::class, 'sendMessage'])->name('sendMsg');
+Route::post('/endChat', [ChatMessageController::class, 'endChat'])->name('endChat');
+Route::post('/createChat', [ChatMessageController::class, 'createChat'])->name('createChat');
+
 Route::get('/getCustomerChat', [ChatMessageController::class, 'initCustomerChat'])->name('getCustomerChat');
 Route::get('/getAdmChatList', [ChatMessageController::class, 'initAdminChatList'])->name('getAdmChatList');
 Route::get('/getChatMessage', [ChatMessageController::class, 'adminGetMessage'])->name('getChatMessage');

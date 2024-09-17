@@ -14,6 +14,7 @@ use App\Strategies\CollectibleStrategy;
 use App\Strategies\ConsumableStrategy;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Exception;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Log;
 use Intervention\Image\ImageManagerStatic as Image;
 use Illuminate\Support\Facades\Storage;
@@ -38,18 +39,34 @@ class ProductController extends Controller
 
             $images = $request->file('images');
             if ($images) {
+                $isFirstImage = true;
+                $imageCounter = 1;
                 foreach ($images as $index => $image) {
-                    $imageName = $index === 0
-                        ? 'main.' . $image->getClientOriginalExtension()
-                        : $index . '.' . $image->getClientOriginalExtension();
+                    // Check if this is the first image
+                    if ($isFirstImage) {
+                        $imageName = 'main.' . $image->getClientOriginalExtension();
+                        $isFirstImage = false;
+                    } else {
+                        $imageName = $imageCounter . '.' . $image->getClientOriginalExtension();
+                        $imageCounter++;
+                    }
 
+                    // Move the image to the folder
                     $image->move(public_path($folderPath), $imageName);
                 }
-
                 return response()->json(['success' => true, 'data' => 'Images have been successfully uploaded.'], 200);
             }
 
             return response()->json(['success' => false, 'data' => 'No images were uploaded.'], 400);
+        } catch (ValidationException $e) {
+            // Log validation errors
+            Log::error('Validation failed for request', [
+                'errors' => $e->errors(),
+                'input' => $request->all(),
+            ]);
+
+            // Return validation error response
+            return response()->json(['errors' => $e->errors()], 422);
         } catch (Exception $e) {
             return response()->json(['success' => false, 'data' => $e->getMessage()], 400);
         }
@@ -111,9 +128,8 @@ class ProductController extends Controller
                     if (!$mainImageExists) {
                         $imageName = 'main.' . $extension;
                         $newMainImage = $imageName;
-                        $mainImageExists = true; // Mark that we have assigned a main image
+                        $mainImageExists = true;
                     } else {
-                        // Generate a unique name for the image
                         $imageName = $this->generateUniqueName($existingImages, $extension);
                     }
 
@@ -146,6 +162,15 @@ class ProductController extends Controller
             }
 
             return response()->json(['success' => true, 'data' => 'Images have been successfully updated.'], 200);
+        } catch (ValidationException $e) {
+            // Log validation errors
+            Log::error('Validation failed for request', [
+                'errors' => $e->errors(),
+                'input' => $request->all(),
+            ]);
+
+            // Return validation error response
+            return response()->json(['errors' => $e->errors()], 422);
         } catch (Exception $e) {
             Log::error('Error updating images: ' . $e->getMessage());
             return response()->json(['success' => false, 'data' => $e->getMessage()], 400);
@@ -175,11 +200,11 @@ class ProductController extends Controller
     {
         try {
             $request->validate([
-                'name' => 'required|string',
+                'name' => 'required|string|max:255',
                 'description' => 'required|string',
-                'price' => 'required|numeric',
-                'stock' => 'required|integer',
-                'status' => 'required|string',
+                'price' => 'required|numeric|min:0.01',
+                'stock' => 'required|integer|min:1',
+                'status' => 'required|string|in:active,inactive',
                 'isWearable' => 'nullable|numeric',
                 'isConsumable' => 'nullable|numeric',
                 'isCollectible' => 'nullable|numeric',
@@ -189,15 +214,15 @@ class ProductController extends Controller
                 'portion' => 'nullable|string',
                 'halal' => 'nullable|boolean',
                 'supplier' => 'nullable|string',
-                'selected_groups' => 'nullable|string',
+                'user_groups' => 'nullable|string',
             ]);
 
             $product = new Product();
-            $product->name = $request->name;
-            $product->description = $request->description;
+            $product->name = trim($request->name);
+            $product->description = htmlspecialchars($request->description, ENT_QUOTES, 'UTF-8');
             $product->price = $request->price;
             $product->stock = $request->stock;
-            $product->status = $request->status;
+            $product->status = trim($request->status);
             $product->created_at = now()->addHours(8);
             $product->save();
 
@@ -215,23 +240,27 @@ class ProductController extends Controller
             }
 
             // Forward request for image upload
-            // ProductController::productImageUpload($request, $id);
+            ProductController::productImageUpload($request, $product->product_id);
 
             return response()->json(['success' => true, 'message' => 'Product created successfully.'], 200);
+        } catch (ValidationException $e) {
+            // Log validation errors
+            Log::error('Validation failed for request', [
+                'errors' => $e->errors(),
+                'input' => $request->all(),
+            ]);
+
+            // Return validation error response
+            return response()->json(['errors' => $e->errors()], 422);
         } catch (Exception $e) {
+            Log::error('Adding product failed: ' . $e->getMessage());
+
             return response()->json(['failure' => false, 'message' => $e->getMessage()], 400);
         }
     }
 
     protected function createWearable($product, Request $request)
     {
-        $sizes = $request->input('sizes', []);
-        $colors = $request->input('colors', []);
-        $userGroups = $request->input('selected_groups', '');
-
-        $sizesString = is_array($sizes) ? implode(',', $sizes) : $sizes;
-        $colorsString = is_array($colors) ? implode(',', $colors) : $colors;
-
         $wearableObj = new WearableController();
 
         $wearableObj->store($request, $product->product_id);
@@ -265,64 +294,32 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         try {
-            $query = trim($request->input('search'));
-            $priceSort = $request->input('price_sort');
-            $rating = $request->input('rating');
-            $available = $request->input('available');
-            $newArrival = $request->input('new_arrival');
+            $query = $request->input('search');
 
-            // Debugging lines
-            // Log::info('Search Query:', ['query' => $query]);
-            // Log::info('Price Sort:', ['price_sort' => $priceSort]);
-            // Log::info('Rating:', ['rating' => $rating]);
-            // Log::info('Available:', ['available' => $available]);
-            // Log::info('New Arrival:', ['new_arrival' => $newArrival]);
-
-            $queryBuilder = Product::query();
-
-            // Search query
+            // Get the product IDs based on search query
             if ($query) {
-                $queryBuilder->where('name', 'LIKE', "%$query%");
+                $productIds = Product::where('name', 'LIKE', "%$query%")->pluck('product_id');
+            } else {
+                $productIds = Product::pluck('product_id');
             }
 
-            // Availability filter
-            if ($available) {
-                $queryBuilder->where('availability', true); // Assuming there's an 'availability' field
-            }
+            // Fetch the products
+            $products = Product::whereIn('product_id', $productIds)->paginate(20);
 
-            // Rating filter
-            if ($rating) {
-                $queryBuilder->where('rating', '>=', $rating); // Assuming there's a 'rating' field
-            }
+            // Fetch main images using the ProductController's getMainImages method
+            $productController = new ProductController();
+            $mainImages = $productController->getMainImages($productIds);
 
-            // New arrivals filter
-            if ($newArrival) {
-                $queryBuilder->where('is_new', true);
-            }
+            $ratingController = new RatingController();
 
-            // Price sorting
-            if ($priceSort) {
-                if ($priceSort === 'low-high') {
-                    $queryBuilder->orderBy('price', 'asc');
-                } else if ($priceSort === 'high-low') {
-                    $queryBuilder->orderBy('price', 'desc');
-                }
-            }
+            // Fetch and append ratings to the product collection
+            $productsWithRatings = $ratingController->fetchRatingsForShop($productIds, $products);
 
-            $products = $queryBuilder->paginate(20);
-
-            // Get the IDs
-            $productsCollection = collect($products->items());
-            $productsId = $productsCollection->pluck('product_id');
-
-            // Return a view or JSON response based on request type
-            // if ($request->ajax()) {
-            //     return view('partials.products', ['products' => $products])->render();
-            // }
-
-            // return view('shop', ['products' => $products]);
-
-            return $this->fetchRatingsForShop($productsId, $products);
+            // Pass the products, ratings, and images to the view
+            return view('shop', [
+                'products' => $productsWithRatings,  // The products with ratings included
+                'mainImages' => $mainImages,         // Pass the images to the view
+            ]);
         } catch (Exception $e) {
             Log::error('Fetching products failed: ' . $e->getMessage());
             return response()->json(['error' => 'Fetching products failed.'], 500);
@@ -364,58 +361,78 @@ class ProductController extends Controller
         return response()->json(['success' => true, 'data' => $images], 200);
     }
 
+    public function getMainImages($ids)
+    {
+        $images = [];
+        foreach ($ids as $id) {
+            $imageFiles = Storage::files('public/images/products/' . $id);
+            $mainImage = null;
+
+            foreach ($imageFiles as $file) {
+                $filename = basename($file);
+
+                if (strpos($filename, 'main') !== false) {
+                    $mainImage = $filename;
+                    break;
+                }
+            }
+
+            $images[$id] = $mainImage;
+        }
+
+        return $images;
+    }
+
     // Read a single product
     public function show($id)
     {
         try {
-            // Fetch the product by ID
             $product = Product::findOrFail($id);
 
-            // Check if the product is active
-            if ($product->status != 'active') {
-                return response()->view('errors.404', [], 404);
-            }
-
-            // Fetch ratings for the product
             $ratings = Rating::where('product_id', $id)
                 ->where('status', 'approved')
                 ->get();
 
-            // Calculate average rating and number of reviews
             $averageRating = $ratings->avg('star_rating') ?? 0;
             $reviewsCount = $ratings->count();
 
-            // Return view with product and rating information
+            $imageFiles = Storage::files('public/images/products/' . $id);
+            $images = array_map(function ($file) {
+                return basename($file);
+            }, $imageFiles);
+
+            $mainImageExtension = $this->getMainImageExtension($id);
+
             return view('product', [
                 'product' => $product,
                 'averageRating' => $averageRating,
                 'reviewsCount' => $reviewsCount,
+                'images' => $images,
+                'mainImageExtension' => $mainImageExtension,
             ]);
         } catch (ModelNotFoundException $e) {
-            return response()->view('errors.404');
-            // return response()->json(['error' => 'Product not found.'], 404);
+            return response()->json(['error' => 'Product not found.'], 404);
         } catch (Exception $e) {
-            // Log the error
             Log::error('Fetching product failed: ' . $e->getMessage());
             return response()->json(['error' => 'Fetching product failed.'], 500);
         }
     }
 
     // Show product images
-    public function showProductImages($id)
-    {
-        $product = Product::find($id);
+    // public function showProductImages($id)
+    // {
+    //     $product = Product::find($id);
 
-        $mainImageExtension = $this->getMainImageExtension($id);
+    //     $mainImageExtension = $this->getMainImageExtension($id);
 
-        // Get all images for this product from the storage directory
-        $imageFiles = Storage::files('public/images/products/' . $id);
-        $images = array_map(function ($file) {
-            return basename($file);
-        }, $imageFiles);
+    //     // Get all images for this product from the storage directory
+    //     $imageFiles = Storage::files('public/images/products/' . $id);
+    //     $images = array_map(function ($file) {
+    //         return basename($file);
+    //     }, $imageFiles);
 
-        return view('product', compact('product', 'images', 'mainImageExtension'));
-    }
+    //     return view('product', compact('product', 'images', 'mainImageExtension'));
+    // }
 
     // Show product images for admin product
     public function showProductImagesAdmin($id)
@@ -461,9 +478,9 @@ class ProductController extends Controller
             // Validate the request data
             $validatedData = $request->validate([
                 'name' => 'required|string|max:255',
-                'description' => 'nullable|string',
-                'price' => 'required|numeric',
-                'stock' => 'required|integer',
+                'description' => 'required|string',
+                'price' => 'required|numeric|min:0.01',
+                'stock' => 'required|integer|min:1',
                 'status' => 'required|string|in:active,inactive',
                 'isWearable' => 'nullable|numeric',
                 'isConsumable' => 'nullable|numeric',
@@ -476,6 +493,10 @@ class ProductController extends Controller
                 'supplier' => 'nullable|string',
                 'selected_groups' => 'nullable|string',
             ]);
+
+            $validatedData['name'] = trim($validatedData['name']);
+            $validatedData['description'] = trim($validatedData['description']);
+            $validatedData['description'] = htmlspecialchars($validatedData['description'], ENT_QUOTES, 'UTF-8');
 
             $this->productImageUploadUpdate($request, $id);
 
@@ -501,6 +522,15 @@ class ProductController extends Controller
             return response()->json(['success' => true, 'message' => 'Product updated successfully.'], 200);
         } catch (ModelNotFoundException $e) {
             return response()->json(['error' => 'Product not found.'], 404);
+        } catch (ValidationException $e) {
+            // Log validation errors
+            Log::error('Validation failed for request', [
+                'errors' => $e->errors(),
+                'input' => $request->all(),
+            ]);
+
+            // Return validation error response
+            return response()->json(['errors' => $e->errors()], 422);
         } catch (Exception $e) {
             // Log the error
             Log::error('Updating product failed: ' . $e->getMessage());
@@ -551,49 +581,87 @@ class ProductController extends Controller
         }
     }
 
-    // Delete a product
-    public function destroy($id)
-    {
-        try {
-            $product = Product::findOrFail($id);
-            $product->delete();
-
-            return response()->json(null, 204);
-        } catch (ModelNotFoundException $e) {
-            return response()->json(['error' => 'Product not found.'], 404);
-        }
-    }
-
-    // public function showNewArrivals()
+    // // Delete a product
+    // public function deleteProduct($id)
     // {
     //     try {
-    //         // Fetch new arrivals
-    //         $newArrivals = Product::where('created_at', '>=', now()->subDays(30))
-    //             ->orderBy('created_at', 'desc')
-    //             ->take(10)
-    //             ->get();
+    //         $product = Product::findOrFail($id);
 
-    //         return view('home', [
-    //             'newArrivals' => $newArrivals,
-    //         ]);
-    //     } catch (Exception $e) {
-    //         Log::error('Fetching new arrivals failed: ' . $e->getMessage());
-    //         return response()->json(['error' => 'Fetching new arrivals failed.'], 500);
+    //         // Fetch the folder path for the product images
+    //         $folderFullPath = public_path('storage/images/products/' . $id);
+
+    //         // Check if the folder exists
+    //         if (file_exists($folderFullPath) && is_dir($folderFullPath)) {
+    //             $this->deleteDirectory($folderFullPath);
+    //         }
+
+    //         $product->delete();
+
+    //         return response()->json(null, 204);
+    //     } catch (ModelNotFoundException $e) {
+    //         return response()->json(['error' => 'Product not found.'], 404);
     //     }
+    // }
+
+    // private function deleteDirectory($dir)
+    // {
+    //     if (!file_exists($dir) || !is_dir($dir)) {
+    //         return;
+    //     }
+
+    //     $items = array_diff(scandir($dir), ['.', '..']);
+
+    //     foreach ($items as $item) {
+    //         $path = $dir . '/' . $item;
+    //         if (is_dir($path)) {
+    //             $this->deleteDirectory($path);
+    //         } else {
+    //             unlink($path);
+    //         }
+    //     }
+
+    //     rmdir($dir);
     // }
 
     //at home page new arrival section
     public function showNewArrivals()
     {
         try {
+            // Get new arrivals
             $newArrivals = Product::where('created_at', '>=', now()->subDays(30))
+                ->where('status', 'active')
                 ->orderBy('created_at', 'desc')
                 ->take(10)
                 ->get();
 
-            $newArrivalsId = $newArrivals->pluck('product_id');
+            // Get product IDs
+            $newArrivalsIds = $newArrivals->pluck('product_id')->toArray();
 
-            return $this->fetchRatingsForProducts($newArrivalsId, $newArrivals);
+            // Fetch main images
+            $mainImages = $this->getMainImages($newArrivalsIds);
+
+            $ratingcontroller = new RatingController();
+
+            // Fetch ratings
+            $groupedRatings = $ratingcontroller->fetchRatings($newArrivalsIds);
+
+            /// Prepare data for the view
+            $data = $newArrivals->map(function ($product) use ($mainImages, $groupedRatings) {
+                $productId = (int) $product->product_id;
+                $productRatings = $groupedRatings[$productId] ?? [];
+
+                $averageRating = collect($productRatings)->avg('star_rating') ?? 0;
+                $reviewsCount = count($productRatings);
+
+                return [
+                    'product' => $product,
+                    'mainImage' => $mainImages[$productId] ?? '',
+                    'averageRating' => $averageRating,
+                    'reviewsCount' => $reviewsCount,
+                ];
+            });
+
+            return view('home', ['newArrivals' => $data]); // Pass data to the view
         } catch (Exception $e) {
             Log::error('Fetching new arrivals failed: ' . $e->getMessage());
             return response()->json(['error' => 'Fetching new arrivals failed.'], 500);
@@ -604,31 +672,46 @@ class ProductController extends Controller
     public function newArrivals()
     {
         try {
+            // Get new arrivals
             $newArrivals = Product::where('created_at', '>=', now()->subDays(30))
+                ->where('status', 'active')
                 ->orderBy('created_at', 'desc')
                 ->paginate(20);
 
-            $newArrivalsId = $newArrivals->pluck('product_id');
+            // Get product IDs
+            $newArrivalsIds = $newArrivals->pluck('product_id')->toArray();
 
-            return $this->fetchRatingsForNewArrivals($newArrivalsId, $newArrivals);
+            // Fetch main images
+            $mainImages = $this->getMainImages($newArrivalsIds);
+
+            $ratingController = new RatingController();
+
+            // Fetch ratings
+            $groupedRatings = $ratingController->fetchRatings($newArrivalsIds);
+
+            // Prepare data for the view
+            $data = $newArrivals->getCollection()->map(function ($product) use ($mainImages, $groupedRatings) {
+                $productId = (int) $product->product_id;
+                $productRatings = $groupedRatings[$productId] ?? [];
+
+                $averageRating = collect($productRatings)->avg('star_rating') ?? 0;
+                $reviewsCount = count($productRatings);
+
+                return [
+                    'product' => $product,
+                    'mainImage' => $mainImages[$productId] ?? '', // Fallback image
+                    'averageRating' => $averageRating,
+                    'reviewsCount' => $reviewsCount,
+                ];
+            });
+
+            // Update the paginated collection with transformed data
+            $newArrivals->setCollection($data);
+
+            return view('shop.new-arrivals', ['newArrivals' => $newArrivals]);
         } catch (Exception $e) {
             Log::error('Fetching new arrivals failed: ' . $e->getMessage());
             return response()->json(['error' => 'Fetching new arrivals failed.'], 500);
         }
-    }
-
-    private function fetchRatingsForProducts($newArrivalsId, $newArrivals)
-    {
-        return app('App\Http\Controllers\RatingController')->fetchRatings($newArrivalsId, $newArrivals);
-    }
-
-    private function fetchRatingsForNewArrivals($newArrivalsId, $newArrivals)
-    {
-        return app('App\Http\Controllers\RatingController')->fetchRatingsForNewArrival($newArrivalsId, $newArrivals);
-    }
-
-    private function fetchRatingsForShop($productsId, $products)
-    {
-        return app('App\Http\Controllers\RatingController')->fetchRatingsForShop($productsId, $products);
     }
 }

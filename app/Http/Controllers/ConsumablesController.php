@@ -18,7 +18,7 @@ class ConsumablesController extends Controller
         $request->validate([
             'expiry_date' => 'required|date',
             'portion' => 'required|integer|min:1',
-            'is_halal' => 'required|in:0,1'
+            'halal' => 'required|in:0,1'
         ]);
 
         try {
@@ -34,15 +34,14 @@ class ConsumablesController extends Controller
             // Apply the strategies and save the product
             $context->applyStrategies(
                 [
-                    'expiry_date' => $request->expiry_date,
+                    'expire_date' => $request->expiry_date,
                     'portion' => $request->portion,
-                    'is_halal' => $request->is_halal,
+                    'is_halal' => $request->halal,
                     'product_id' => $productId,
                 ]
             );
 
             return response()->json(['success' => true, 'message' => 'Consumable product added successfully.'], 200);
-
         } catch (Exception $e) {
             return response()->json(['failure' => false, 'message' => $e->getMessage()], 400);
         }
@@ -60,9 +59,16 @@ class ConsumablesController extends Controller
             }
 
             $products = Product::whereIn('product_id', $consumableIds)->paginate(20);
-            // return view('shop.consumable', ['products' => $products]);
 
-            return $this->fetchRatingsForConsumable($consumableIds, $products);
+            $productController = new ProductController();
+            $mainImages = $productController->getMainImages($consumableIds);
+
+            $productsWithRatings = $this->fetchRatingsForConsumable($consumableIds, $products);
+
+            return view('shop.consumable', [
+                'products' => $productsWithRatings,
+                'mainImages' => $mainImages,
+            ]);
         } catch (Exception $e) {
             Log::error('Fetching consumables failed: ' . $e->getMessage());
             return response()->json(['error' => 'Fetching consumables failed.'], 500);

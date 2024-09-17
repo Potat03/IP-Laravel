@@ -48,7 +48,7 @@ class AuthController extends Controller
 
         if (AuthFacade::login($credentials)) {
             AuthFacade::regenerateSession($request);
-
+            $request->session()->put('customer_id', $user->id);
             Log::info($request->session()->token());
             Log::info(AuthFacade::getUser());
 
@@ -238,7 +238,7 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        Auth::guard('admin')->logout();
+        Auth::guard('customer')->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 

@@ -37,4 +37,8 @@ class Admin extends Authenticatable implements UserInterface
     public function getRole() {
         return $this->role;
     }
+
+    public function getStatus() {
+        return $this->status;
+    }
 }

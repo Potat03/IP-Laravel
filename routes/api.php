@@ -7,13 +7,7 @@
     use App\Http\Middleware\customAuth;
     use App\Http\Controllers\CustomerController;
     use App\Http\Controllers\CartController;
-
     use App\Http\Controllers\CartItemController;
-    // Route::get('/user', function (Request $request) {
-    //     return $request->user();
-    // })->middleware('auth:sanctum');
-
-    //pass login/register details
     use App\Http\Controllers\AuthController;
     use App\Http\Middleware\CustomerAuth;
 
@@ -24,10 +18,10 @@
         Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout');
         Route::post('/register', [AuthController::class, 'userRegister'])->name('auth.userRegister');
         Route::post('/verify', [AuthController::class, 'verify'])->name('auth.verify');
+        Route::post('/cartItem/upload', [CartController::class, 'addToCart'])->name('cart.add');
     });
     Route::post('/resendOtp', [AuthController::class, 'resendOtp'])->name('auth.resendOtp');
 
-    Route::post('/cartItem/upload', [CartItemController::class, 'addToCart']);
     Route::post('/product/image/upload/{id}', [ProductController::class, 'productImageUpload']);
     Route::get('/product/index', [ProductController::class, 'index'])->name('product.index');
     Route::get('/product/all', [ProductController::class, 'getAll'])->name('product.getAll');
@@ -49,8 +43,6 @@
 
     Route::post('/product/image/upload', [ProductController::class, 'productImageUpload']);
     Route::get('/product/generateTable', [ProductController::class, 'generateTable']);
-
-    Route::post('/cartItem/upload', [CartController::class, 'addToCart'])->name('cart.add');
 
     //cart
     Route::get('/cartItem/getCartItemByCustomerID/{customerID}', [CartItemController::class, 'getCartItemByCustomerID']);

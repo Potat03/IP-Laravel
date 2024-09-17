@@ -176,6 +176,7 @@
 @endpush
 
 @section('top')
+<meta name="csrf-token" content="{{ csrf_token() }}">
 <div class="container product-detail-container">
     <div class="container mt-4 product-image">
         <!-- Main Image Display -->
@@ -212,11 +213,11 @@
             <h1 class="fw-bold">{{ $promotion->title }}</h1>
             <h4 class="text-muted">RM {{ $promotion->discount_amount }}</h4>
             <div class="d-flex align-items-center text-warning">
-            <i class="fa-solid fa-star"></i>
-            <i class="fa-solid fa-star"></i>
-            <i class="fa-solid fa-star"></i>
-            <i class="fa-solid fa-star"></i>
-            <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
                 <span class="text-dark ms-2">(20)</span>
             </div>
         </div>
@@ -245,63 +246,63 @@
 </div>
 <div class="modal fade modal-xl" id="selectModal" tabindex="-1" aria-labelledby="selectModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-    <form id="cart-form">
-        @csrf
-        <div class="modal-content">
-            
-            <div class="modal-header">
-                <h5 class="modal-title" id="selectModalLabel">Select Variation</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="container">
-                    <div class="row">
-                        @foreach ($promotion->product_list as $product)
-                        @for ($i = 0; $i < $product->quantity; $i++)
-                            <div class="card mb-3 col-12">
-                                <div class="row g-0">
-                                    <div class="col-md-2 border-end">
-                                        <img src="{{ asset('storage/images/products/' . $product->product_id . '/main.png') }}"
-                                            class="img-fluid p-5" alt="product image">
-                                    </div>
-                                    <div class="col-md-10">
-                                        <div class="card-body">
-                                            <h5 class="card-title"><span class="h4">Name : </span>{{ $product->name }}</h5>
-                                            @if(strtoupper($product->type) == strtoupper('wearable'))
-                                            @php
-                                            $sizes = explode(',', $product->wearable->size);
-                                            $colors = explode(',', $product->wearable->color);
-                                            @endphp
-                                            <div class="d-flex flex-wrap pt-3 align-items-center">
-                                                <h5 class="col-1 text-secondary m-0">Color :</h5>
-                                                @foreach ($colors as $color)
-                                                <button class="btn btn-color" type="button"
-                                                    onclick="selectColor(this, {{$product->product_id}}, {{($product->quantity > 1) ? $i : '-1'}})">{{ $color }}</button>
-                                                @endforeach
-                                            </div>
-                                            <div class="d-flex flex-wrap pt-3 align-items-center">
-                                                <h5 class="col-1 text-secondary m-0">Size :</h5>
+        <form id="cart-form">
+            @csrf
+            <div class="modal-content">
 
-                                                @foreach ($sizes as $size)
-                                                <button class="btn btn-size" type="button"
-                                                    onclick="selectSize(this, {{$product->product_id}}, {{($product->quantity > 1) ? $i : '-1'}})">{{ $size }}</button>
-                                                @endforeach
+                <div class="modal-header">
+                    <h5 class="modal-title" id="selectModalLabel">Select Variation</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="container">
+                        <div class="row">
+                            @foreach ($promotion->product_list as $product)
+                            @for ($i = 0; $i < $product->quantity; $i++)
+                                <div class="card mb-3 col-12">
+                                    <div class="row g-0">
+                                        <div class="col-md-2 border-end">
+                                            <img src="{{ asset('storage/images/products/' . $product->product_id . '/main.png') }}"
+                                                class="img-fluid p-5" alt="product image">
+                                        </div>
+                                        <div class="col-md-10">
+                                            <div class="card-body">
+                                                <h5 class="card-title"><span class="h4">Name : </span>{{ $product->name }}</h5>
+                                                @if(strtoupper($product->type) == strtoupper('wearable'))
+                                                @php
+                                                $sizes = explode(',', $product->wearable->size);
+                                                $colors = explode(',', $product->wearable->color);
+                                                @endphp
+                                                <div class="d-flex flex-wrap pt-3 align-items-center">
+                                                    <h5 class="col-1 text-secondary m-0">Color :</h5>
+                                                    @foreach ($colors as $color)
+                                                    <button class="btn btn-color" type="button"
+                                                        onclick="selectColor(this, {{$product->product_id}}, {{($product->quantity > 1) ? $i : '-1'}})">{{ $color }}</button>
+                                                    @endforeach
+                                                </div>
+                                                <div class="d-flex flex-wrap pt-3 align-items-center">
+                                                    <h5 class="col-1 text-secondary m-0">Size :</h5>
+
+                                                    @foreach ($sizes as $size)
+                                                    <button class="btn btn-size" type="button"
+                                                        onclick="selectSize(this, {{$product->product_id}}, {{($product->quantity > 1) ? $i : '-1'}})">{{ $size }}</button>
+                                                    @endforeach
+                                                </div>
+                                                @endif
                                             </div>
-                                            @endif
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            @endfor
-                            @endforeach
+                                @endfor
+                                @endforeach
+                        </div>
                     </div>
                 </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="btn-submit-cart">Save changes</button>
+                </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" id="btn-submit-cart">Save changes</button>
-            </div>
-        </div>
         </form>
     </div>
 </div>
@@ -338,17 +339,17 @@
 <!-- Review Section -->
 <div class="container review-section mb-5">
     <h2>Reviews</h2>
-        <div class="review-item">
+    <div class="review-item">
         <h5>John Doe</h5>
         <div class="d-flex align-items-center text-warning">
-        <i class="fa-solid fa-star"></i>
-        <i class="fa-solid fa-star"></i>
-        <i class="fa-solid fa-star"></i>
-        <i class="fa-solid fa-star"></i>
-        <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
         </div>
         <p style="font-size: 1.2rem;">This is an amazing product! Highly recommended.</p>
-</div>
+    </div>
 </div>
 @endsection
 
@@ -479,30 +480,33 @@
 
             if (allSelected) {
                 fetch("{{ route('cart.add') }}", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        type: 'promotion',
-                        promotion_id: `{{$promotion->promotion_id}}`,
-                        products: promo_content,
-                        quantity: document.getElementById('quantity').value
-                    })
-                }).then(response => {
-                    if (response.success) {
-                        alert('Product added to cart');
-                        window.location.reload();
-                    } else {
-                        if (response.status == 401) {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector(
+                                'meta[name="csrf-token"]').getAttribute('content')
+                        },
+                        body: JSON.stringify({
+                            type: 'promotion',
+                            promotion_id: `{{$promotion->promotion_id}}`,
+                            products: promo_content,
+                            quantity: document.getElementById('quantity').value
+                        })
+                    }).then(response => {
+                        if (response.status == 200) {
+                            alert('Added to cart');
+                        } else if (response.status == 401) {
                             alert('Please login to add to cart');
-                            window.location.href = "{{ route('user.login') }}";
+
+                        } else if (response.status == 403) {
+                            alert('Product is out of stock');
                         } else {
                             alert('An error occurred while adding to cart');
                         }
-                    }
-                });
-                console.log(promo_content);
+                    })
+                    .catch(error => {
+                        alert('An unexpected error occurred.');
+                    });
 
             } else {
                 alert('Please select a size and color for each product');

@@ -15,9 +15,9 @@ class WearableController extends Controller
     public function store(Request $request, $productId)
     {
         $request->validate([
-            'size' => 'required|string',
-            'color' => 'required|string',
-            'user_group' => 'required|string'
+            'sizes' => 'nullable|string',
+            'colors' => 'nullable|string',
+            'user_groups' => 'required|string'
         ]);
 
         try {
@@ -29,9 +29,9 @@ class WearableController extends Controller
 
             $context->applyStrategies(
                 [
-                    'size' => $request->size,
-                    'color' => $request->color,
-                    'user_group' => $request->user_group,
+                    'size' => $request->sizes ?? '',
+                    'color' => $request->colors ?? '',
+                    'user_group' => $request->user_groups,
                     'product_id' => $productId,
                 ]
             );
@@ -48,22 +48,29 @@ class WearableController extends Controller
     {
         try {
             $query = $request->input('search');
-
+    
             if ($query) {
                 $wearableIds = Wearable::where('name', 'LIKE', "%$query%")->pluck('product_id');
             } else {
                 $wearableIds = Wearable::pluck('product_id');
             }
-
+    
             $products = Product::whereIn('product_id', $wearableIds)->paginate(20);
-
-            // return view('shop.wearable', ['products' => $products]);
-            return $this->fetchRatingsForWearable($wearableIds, $products);
+    
+            $productController = new ProductController();
+            $mainImages = $productController->getMainImages($wearableIds);
+    
+            $productsWithRatings = $this->fetchRatingsForWearable($wearableIds, $products);
+    
+            return view('shop.wearable', [
+                'products' => $productsWithRatings,
+                'mainImages' => $mainImages, 
+            ]);
         } catch (Exception $e) {
             Log::error('Fetching wearable failed: ' . $e->getMessage());
             return response()->json(['error' => 'Fetching wearable failed.'], 500);
         }
-    }
+    }    
 
     public function update(Request $request, $id)
     {

@@ -6,4 +6,5 @@ interface UserInterface
 {
     public function getId();
     public function getRole();
+    public function getStatus();
 }
