@@ -59,9 +59,18 @@
                                     </div>
                                 @endif
 
-                                <div class="card-img-top">
-                                    <img src="{{ URL('storage/images/pokemon.png') }}" class="d-block w-100"
-                                        alt="product image" width="280" height="300">
+                                <div class="card-img-top" style="height: 300px; width: 100%;">
+                                    @php
+                                        $mainImage = $mainImages[$product->product_id] ?? 'default.jpg';
+                                    @endphp
+                                    @if ($mainImage == 'default.jpg')
+                                        <img src="{{ URL('storage/images/products/default.jpg') }}" class="d-block w-100"
+                                            style="height: 100%; object-fit: cover;" alt="{{ $product->name }}">
+                                    @else
+                                        <img src="{{ URL('storage/images/products/' . $product->product_id . '/' . $mainImage) }}"
+                                            class="d-block w-100" style="height: 100%; object-fit: cover;"
+                                            alt="{{ $product->name }}">
+                                    @endif
                                 </div>
                                 <div class="card-body">
                                     <p class="card-text mb-1 fs-5 fs-lg-5 fs-xl-3">{{ $product->name }}</p>

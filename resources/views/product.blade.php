@@ -200,7 +200,7 @@
                 @php
                     $mainImageUrl = $mainImageExtension
                         ? asset('storage/images/products/' . $product->product_id . '/main.' . $mainImageExtension)
-                        : asset('storage/images/products/default.jpg'); // Default image
+                        : asset('storage/images/products/default.jpg');
                 @endphp
                 <img id="mainImage" src="{{ $mainImageUrl }}" class="img-fluid main-square" alt="Main Product Image"
                     draggable="false">
