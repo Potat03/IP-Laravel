@@ -11,6 +11,9 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\WearableController;
 use App\Http\Controllers\CartItemController;
 use App\Http\Controllers\PromotionController;
+use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\AdminCustomerController;
+use App\Http\Middleware\CustomerAuth;
 
 Route::get('/', function () {
     return view('welcome');
@@ -95,6 +98,11 @@ Route::middleware([customAuth::class])->group(function () {
     Route::get('/admin/promotion/edit/{id}', [PromotionController::class, 'editPromotion'])->name('admin.promotion.edit');
 
     Route::get('/admin/promotion/restore', [PromotionController::class, 'restorePromotion'])->name('admin.promotion.restore');
+
+    Route::get('/admin/customer', [AdminCustomerController::class, 'getAll'])->name('admin.customer');
+    Route::post('/admin/customer/{id}/update', [AdminCustomerController::class, 'update'])->name('admin.customer.update');
+    // Route::get('/admin/customer/xml', [AdminCustomerController::class, 'generateXML'])->name('admin.customer.xml');
+    // Route::get('/admin/customer/report', [AdminCustomerController::class, 'generateXSLTReport'])->name('admin.customer.report');
 });
 
 
@@ -114,10 +122,6 @@ Route::get('/cc2', function () {
 Route::get('/template', function () {
     return view('admin.error');
 });
-
-use App\Http\Controllers\CustomerController;
-use App\Http\Middleware\CustomerAuth;
-use App\Http\Controllers\AuthController;
 
 //WK route
 Route::get('/userlogin', function () {

@@ -95,6 +95,63 @@
             background: #f0f0f0;
             overflow-y: hidden;
         }
+
+        .upper_content {
+            display: flex;
+            gap: 20px;
+        }
+
+        .back_btn {
+            width: 40px;
+            height: 40px;
+
+            border-radius: 5px;
+
+            opacity: 0.8;
+            transition: all 0.2s;
+        }
+
+        .back_btn:hover {
+            border-color: black;
+            opacity: 1;
+        }
+
+        .back_btn:hover a {
+            color: black;
+            transition: all 0.2s;
+        }
+
+        .back_btn:active {
+            scale: 0.9;
+        }
+
+        .back_btn a {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+        }
+
+        .title h1 {
+            color: black;
+            font-size: 1.6em;
+            font-weight: 600;
+        }
+
+        .title p {
+            color: black;
+            opacity: 0.8;
+            font-size: 0.9em;
+            font-weight: 400;
+        }
+
+        .lower_content {
+            padding: 20px 0px;
+            flex-grow: 1;
+            max-width: 80vw;
+        }
     </style>
 </head>
 
@@ -122,12 +179,6 @@
                             Shipping
                         </a>
                     </li>
-                    <li onclick = "window.location.href = '{{ route('user.supportChatSec') }}'">
-                        <a class="load-content">
-                            <i class="fa-brands fa-rocketchat"></i>
-                            Support Chat
-                        </a>
-                    </li>
                     <li onclick = "window.location.href = '{{ route('user.settingSec') }}'">
                         <a class="load-content">
                             <i class="fa-regular fa-user"></i>
@@ -138,6 +189,12 @@
             </div>
 
             <div class="right_content">
+                <div class="upper_content">
+                    <div class="title">
+                        <h1>@yield('page_title')</h1>
+                        <p>@yield('page_gm')</p>
+                    </div>
+                </div>
                 <div class="lower_content overflow-auto">
                     @yield('content')
                 </div>

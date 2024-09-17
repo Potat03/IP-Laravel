@@ -8,11 +8,12 @@ use App\Builders\ConsumableBuilder;
 use App\Models\Consumable;
 use App\Models\Product;
 use Exception;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
 class ConsumablesController extends Controller
 {
-    public function store(Request $request)
+    public function store(Request $request, $productId)
     {
         $request->validate([
             'expiry_date' => 'required|date',
@@ -24,13 +25,13 @@ class ConsumablesController extends Controller
 
         $director = new ProductDirector($builder);
 
-        $consumable = $director->construct(
+        $consumable = $director->buildConsumable(
             [
                 'expiry_date' => $request->expiry_date,
                 'portion' => $request->portion,
                 'is_halal' => $request->is_halal,
             ],
-            $request->specificAttributes
+            $productId
         );
 
         $consumable->save();
@@ -62,14 +63,26 @@ class ConsumablesController extends Controller
     public function update(Request $request, $id)
     {
         try {
-            $request->validate([
-                'expiry_date' => 'nullable|date',
-                'portion' => 'nullable|string',
-                'halal' => 'nullable|boolean',
+            $validatedData = $request->validate([
+                'expiry_date' => 'required|date_format:Y-m-d',
+                'portion' => 'required|integer|min:1',
+                'halal' => 'required|integer|in:0,1'
             ]);
 
             $consumable = Consumable::where('product_id', $id)->firstOrFail();
-            $consumable->update($request->only(['expiry_date', 'portion', 'halal']));
+
+            $expiry_date = $validatedData['expiry_date'];
+            $portion = $validatedData['portion'];
+            $halal = $validatedData['halal'];
+
+            $consumable->update([
+                'expire_date' => $expiry_date,
+                'portion' => $portion,
+                'is_halal' => $halal,
+            ]);
+
+            $consumable->updated_at = now()->addHours(8);
+            $consumable->save();
 
             return response()->json(['success' => true, 'message' => 'Consumable product updated successfully.'], 200);
         } catch (Exception $e) {

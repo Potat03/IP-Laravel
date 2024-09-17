@@ -4,37 +4,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin</title>
-    @vite(['resources/css/app.css','resources/sass/app.scss', 'resources/js/app.js', 'resources/css/admin-nav.css','resources/js/bootstrap.js'])
-
+    <title>Futatabi Admin Site</title>
+    @include('partials.fontawesome')
+    <link href="{{ asset('css/admin_login.css') }}" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 
 <body>
-    <section class="vh-100">
-        <div class="container py-5 h-100">
-            <div class="row d-flex align-items-center justify-content-center h-100">
-                <div class="col-md-8 col-lg-7 col-xl-6">
-                    <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/draw2.svg"
-                        class="img-fluid" alt="Phone image">
+    <div class="bg"></div>
+    <div class="content_wrap">
+        <div class="login_wrap">
+            <div class="login_form">
+                <div class="login_title">
+                    <img src="{{ asset('images/logo.png') }}">
+                    <div class="login_title_text">
+                        <h1>Futatabi</h1>
+                        <p>Admin Login</p>
+                    </div>
                 </div>
-                <div class="col-md-7 col-lg-5 col-xl-5 offset-xl-1">
-                    <form>
-                        <h3 class="fw-bold mb-3 pb-3">Sign in</h3>
-                        <div class="form-floating mb-3">
-                            <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com">
-                            <label for="floatingInput">Email address</label>
-                        </div>
-                        <div class="form-floating mb-3">
-                            <input type="password" class="form-control" id="floatingPassword" placeholder="Password">
-                            <label for="floatingPassword">Password</label>
-                        </div>
+                <div class="login_welcome">
+                    <p>Welcome back!</p>
+                </div>
+                <form action="{{ route('admin.login') }}" method="POST" id="login_form">
+                    @csrf
+                    <div class="login_input">
+                        <label for="email"><i class="fa-regular fa-envelope"></i></label>
+                        <input type="email" name="email" placeholder="Email" value="{{ old('email') }}" id="email" autocomplete="off" required>
 
-                        <button type="submit" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-lg btn-block">Sign in</button>
-                    </form>
-                </div>
+                    </div>
+                    <div class="login_input">
+                        <label for="password"><i class="fa-regular fa-key"></i></label>
+                        <input type="password" name="password" placeholder="Password" id="password" required> 
+                    </div>
+
+                    <div class="error_msg_box">
+                        <div class="error_msg" id="error_msg">
+
+                        </div>
+                    </div>
+                    <div class="login_button">
+                        <button type="submit">Login</button>
+                    </div>
+                </form>
             </div>
         </div>
-    </section>
+    </div>
+    <script>
+        $(document).ready(function() {
+            $('#login_form').submit(function(e) {
+                e.preventDefault();
+                var email = $('#email').val();
+                var password = $('#password').val();
+                $.ajax({
+                    method: 'POST',
+                    url: $(this).attr('action'),
+                    data: {
+                        email: email,
+                        password: password,
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            window.location.href = response.redirect;
+                        } else {
+                            $('#error_msg').text(response.error);
+                        }
+                    },
+                    error: function(xhr) {
+                        var response = xhr.responseJSON;
+                        if (response && response.message) {
+                            $('#error_msg').text(response.message);
+                        } else {
+                            $('#error_msg').text('Something went wrong. Please try again later.');
+                        }
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 
 </html>

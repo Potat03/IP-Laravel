@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Log;
 
 class WearableController extends Controller
 {
-    public function store(Request $request)
+    public function store(Request $request, $productId)
     {
         $request->validate([
             'size' => 'required|string',
@@ -20,24 +20,21 @@ class WearableController extends Controller
             'user_group' => 'required|string'
         ]);
 
-        // Create a WearableBuilder instance
         $builder = new WearableBuilder();
 
-        // Create a director with the builder
         $director = new ProductDirector($builder);
-
-        // Construct the product
-        $wearable = $director->construct(
+    
+        $wearable = $director->buildWearable(
             [
                 'size' => $request->size,
                 'color' => $request->color,
                 'user_group' => $request->user_group,
             ],
-            $request->specificAttributes
+            $productId
         );
-
+    
         $wearable->save();
-
+        
         return response()->json(['success' => true, 'message' => 'Wearable product added successfully.'], 200);
     }
 

@@ -6,6 +6,8 @@ use App\Models\Customer;
 use App\Models\Product;
 use App\Models\Cart;
 use App\Models\Promotion;
+use App\Models\PromotionItem;
+use App\Models\Wearable;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -61,6 +63,20 @@ class DatabaseSeeder extends Seeder
             'status' => 'active',
         ]);
 
+        Wearable::create([
+            'product_id' => '1',
+            'size' => 'M,L,XL',
+            'color' => 'black,white',
+            'user_group' => 'men'
+        ]);
+
+        Wearable::create([
+            'product_id' => '2',
+            'size' => 'M,L,XL',
+            'color' => 'black,green',
+            'user_group' => 'men'
+        ]);
+
         Cart::create([
             'customer_id' => '1',
             'subtotal' => '10000',
@@ -71,7 +87,7 @@ class DatabaseSeeder extends Seeder
         Promotion::create([
             'title' => 'promotion1',
             'description' => 'promotion1 description',
-            'discount' => '10%',
+            'discount' => '10',
             'discount_amount' => '1000',
             'original_price' => '10000',
             'type' => 'single',
@@ -79,6 +95,12 @@ class DatabaseSeeder extends Seeder
             'start_at' => '2024-07-28',
             'end_at' => '2024-07-30',
             'status' => 'active',
+        ]);
+
+        PromotionItem::create([
+            'promotion_id' => '1',
+            'product_id' => '1',
+            'quantity' => '1',
         ]);
 
         Promotion::create([
@@ -92,6 +114,18 @@ class DatabaseSeeder extends Seeder
             'start_at' => '2024-07-28',
             'end_at' => '2024-07-30',
             'status' => 'active',
+        ]);
+
+        PromotionItem::create([
+            'promotion_id' => '2',
+            'product_id' => '1',
+            'quantity' => '2',
+        ]);
+
+        PromotionItem::create([
+            'promotion_id' => '2',
+            'product_id' => '2',
+            'quantity' => '1',
         ]);
 
     }

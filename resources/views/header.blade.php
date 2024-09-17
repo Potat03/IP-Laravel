@@ -17,7 +17,7 @@
 
 
 <body class="headerBody">
-    <nav class="navbar navbar-expand-lg navbar-light sticky-top">
+    <nav class="navbar navbar-expand-lg sticky-top">
         <div class="container px-4 bg-light">
             <a class="navbar-brand" href="#!">Futatabi</a>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
