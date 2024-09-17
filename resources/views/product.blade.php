@@ -193,6 +193,8 @@
 @endpush
 
 @section('top')
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
     <div class="container product-detail-container">
         <div class="container mt-4 product-image">
             <!-- Main Image Display -->
@@ -200,7 +202,7 @@
                 @php
                     $mainImageUrl = $mainImageExtension
                         ? asset('storage/images/products/' . $product->product_id . '/main.' . $mainImageExtension)
-                        : asset('storage/images/products/default.jpg'); // Default image
+                        : asset('storage/images/products/default.jpg');
                 @endphp
                 <img id="mainImage" src="{{ $mainImageUrl }}" class="img-fluid main-square" alt="Main Product Image"
                     draggable="false">
@@ -307,15 +309,35 @@
                 <h5>Quantity:</h5>
                 <div class="input-group">
                     <button class="btn btn-outline-dark fw-bold" type="button" onclick="changeQuantity(-1)">-</button>
-                    <input type="text" class="form-control" id="quantity" value="1">
+                    <input type="text" class="form-control" id="quantity" value="1" min="1">
                     <button class="btn btn-outline-dark fw-bold" type="button" onclick="changeQuantity(1)">+</button>
+
+                    <input type="hidden" class="form-control" id="prodQuantity" value={{ $product->stock }}>
                 </div>
             </div>
 
             <div class="pt-5 border-top-0 bg-transparent">
                 <div class="text-center text-uppercase">
+                    @if ($product->wearable)
+                        @php
+                            $type = 'wearable';
+                        @endphp
+                    @elseif ($product->consumable)
+                        @php
+                            $type = 'consumable';
+                        @endphp
+                    @elseif ($product->collectible)
+                        @php
+                            $type = 'collectible';
+                        @endphp
+                    @endif
+
                     <a class="btn btn-outline-dark btn-add-to-cart mt-auto w-100 fw-bold {{ $product->stock > 0 ? '' : 'disabled' }}"
-                        href="#">Add to Cart</a>
+                        href="#" id="btn-add-to-cart" data-product-id="{{ $product->product_id }}"
+                        data-product-type="product" data-ptype={{ $type }} data-quantity="1" data-size=""
+                        data-color="">
+                        Add to Cart
+                    </a>
                 </div>
             </div>
 
@@ -432,6 +454,8 @@
 
 @push('scripts')
     <script>
+        const maxStock = document.getElementById('prodQuantity').value;
+
         function selectVariation(element) {
             var buttons = document.querySelectorAll('.btn-variation');
 
@@ -440,6 +464,16 @@
             });
 
             element.classList.add('active');
+
+            const selectedSize = document.querySelector('.btn-variation.active').textContent.trim();
+            const addToCartBtn = document.getElementById('btn-add-to-cart');
+
+            if (addToCartBtn) {
+                addToCartBtn.setAttribute('data-size', selectedSize);
+                console.log('Selected Size:', selectedSize);
+            } else {
+                console.error('Add to Cart button not found.');
+            }
         }
 
         function selectVariation2(element) {
@@ -450,19 +484,41 @@
             });
 
             element.classList.add('active');
+
+            const selectedColor = document.querySelector('.btn-variation-2.active').textContent.trim();
+            const addToCartBtn = document.getElementById('btn-add-to-cart');
+
+            if (addToCartBtn) {
+                addToCartBtn.setAttribute('data-color', selectedColor);
+                console.log('Selected color:', selectedColor);
+            } else {
+                console.error('Add to Cart button not found.');
+            }
         }
 
-        function changeQuantity(amount) {
-            var quantityInput = document.getElementById('quantity');
-            var currentQuantity = parseInt(quantityInput.value);
-            var newQuantity = currentQuantity + amount;
+        function changeQuantity(change) {
+            const quantityInput = document.getElementById('quantity');
+            let quantity = parseInt(quantityInput.value, 10);
 
-            if (newQuantity < 1) {
-                newQuantity = 1;
+            quantity += change;
+
+            if (quantity < 1) {
+                quantity = 1;
+            } else if (quantity > maxStock) {
+                quantity = maxStock;
             }
 
-            quantityInput.value = newQuantity;
+            quantityInput.value = quantity;
+
+            const minusButton = document.querySelector('button[onclick="changeQuantity(-1)"]');
+            const plusButton = document.querySelector('button[onclick="changeQuantity(1)"]');
+
+            minusButton.disabled = quantity === 1;
+
+            plusButton.disabled = quantity === maxStock;
         }
+
+        changeQuantity(0);
 
         document.getElementById('quantity').addEventListener('change', function() {
             var quantityInput = document.getElementById('quantity');
@@ -471,24 +527,97 @@
             if (currentQuantity < 1 || isNaN(currentQuantity)) {
                 quantityInput.value = 1;
             }
+
+            if (currentQuantity > maxStock) {
+                quantityInput.value = maxStock;
+
+                const plusButton = document.querySelector('button[onclick="changeQuantity(1)"]');
+                plusButton.disabled = currentQuantity >= maxStock;
+            }
         });
 
         document.addEventListener("DOMContentLoaded", function() {
-            // Get all thumbnails and the main image element
             const thumbnails = document.querySelectorAll('.thumbnail');
             const mainImage = document.getElementById('mainImage');
 
-            // Add click event listener to each thumbnail
+            const stock = parseInt(document.querySelector('.btn-add-to-cart').getAttribute('data-stock'), 10);
+            const quantityInput = document.getElementById('quantity');
+            quantityInput.setAttribute('max', stock);
+
             thumbnails.forEach(thumbnail => {
                 thumbnail.addEventListener('click', function() {
-                    // Get the image URL from the data-image attribute
                     const imageUrl = this.getAttribute('data-image');
-                    // Update the src attribute of the main image
                     mainImage.src = imageUrl;
 
-                    // Optionally update thumbnail styling to indicate the active state
                     thumbnails.forEach(thumb => thumb.classList.remove('active'));
                     this.classList.add('active');
+                });
+            });
+
+            document.querySelectorAll('.btn-add-to-cart').forEach(button => {
+                button.addEventListener('click', async (e) => {
+                    e.preventDefault();
+
+                    if (button.classList.contains('disabled')) return;
+
+                    const quantity = parseInt(quantityInput.value, 10);
+
+                    // Extract data from the button
+                    const productId = button.getAttribute('data-product-id');
+                    const productType = button.getAttribute('data-product-type');
+                    const size = button.getAttribute(
+                        'data-size'); // Update to get from button or relevant element
+                    const color = button.getAttribute(
+                        'data-color'); // Update to get from button or relevant element
+
+                    console.log('Product Type:', productType);
+                    console.log('Size:', size);
+                    console.log('Color:', color);
+
+                    // Prepare the payload
+                    let payload = {
+                        type: productType,
+                        product_id: productId,
+                        quantity: quantity,
+                    };
+
+                    // Validate for wearable products
+                    if (productType === 'wearable') {
+                        if (size == '' || color == '') {
+                            console.log('No size or color selected.');
+                            alert('Please select both size and color for wearable products.');
+                            return;
+                        }
+                        payload.size = size;
+                        payload.color = color;
+                    }
+
+                    // Validate the quantity
+                    if (quantity <= 0 || quantity > stock) {
+                        alert('Please enter a valid quantity (1 to ' + stock + ').');
+                        return;
+                    }
+
+                    fetch("{{ route('cart.add') }}", {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector(
+                                    'meta[name="csrf-token"]').getAttribute('content')
+                            },
+                            body: JSON.stringify(payload),
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                alert('Item added to cart successfully!');
+                            } else {
+                                alert('Failed to add item to cart.');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                        });
                 });
             });
         });

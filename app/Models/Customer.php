@@ -50,4 +50,8 @@ class Customer extends Authenticatable implements UserInterface
     public function getRole() {
         return 'customer';
     }
+
+    public function getStatus() {
+        return $this->status;
+    }
 }

@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Directors\ProductDirector;
-use App\Builders\CollectibleBuilder;
+use App\Contexts\ProductContext;
+use App\Strategies\CollectibleStrategy;
 use App\Models\Collectible;
 use App\Models\Product;
 use Exception;
@@ -18,20 +18,24 @@ class CollectiblesController extends Controller
             'supplier' => 'required|string'
         ]);
 
-        $builder = new CollectibleBuilder();
+        try {
+            $collectible = new Collectible();
 
-        $director = new ProductDirector($builder);
+            $collectibleStrategy = new CollectibleStrategy($collectible);
 
-        $collectible = $director->buildCollectible(
-            [
-                'supplier' => $request->supplier,
-            ],
-            $productId
-        );
+            $context = new ProductContext(specificStrategy: $collectibleStrategy);
 
-        $collectible->save();
+            $context->applyStrategies(
+                [
+                    'supplier' => $request->supplier,
+                    'product_id' => $productId,
+                ]
+            );
 
-        return response()->json(['success' => true, 'message' => 'Collectible product added successfully.'], 200);
+            return response()->json(['success' => true, 'message' => 'Collectible product added successfully.'], 200);
+        } catch (Exception $e) {
+            return response()->json(['failure' => false, 'message' => $e->getMessage()], 400);
+        }
     }
 
     public function index(Request $request)
@@ -46,9 +50,16 @@ class CollectiblesController extends Controller
             }
 
             $products = Product::whereIn('product_id', $collectibleIds)->paginate(20);
-            // return view('shop.collectible', ['products' => $products]);
 
-            return $this->fetchRatingsForCollectible($collectibleIds, $products);
+            $productController = new ProductController();
+            $mainImages = $productController->getMainImages($collectibleIds);
+
+            $productsWithRatings = $this->fetchRatingsForCollectible($collectibleIds, $products);
+
+            return view('shop.collectible', [
+                'products' => $productsWithRatings, 
+                'mainImages' => $mainImages,
+            ]);
         } catch (Exception $e) {
             Log::error('Fetching collectibles failed: ' . $e->getMessage());
             return response()->json(['error' => 'Fetching collectibles failed.'], 500);

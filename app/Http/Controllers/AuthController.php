@@ -65,6 +65,7 @@ class AuthController extends Controller
             return response()->json(['success' => 'Message saved successfully!', 'data' => 'You have logged in']);
         }
 
+        // validate the form
         $request->validate([
             'email' => 'required|email',
             'password' => 'required',
@@ -236,7 +237,7 @@ class AuthController extends Controller
                 if ($admin->status == 'active') {
                     Log::info($request->session()->token());
                     $request->session()->regenerate();
-                    return response()->json(['success' => true, 'redirect' => route('adminChat')]);
+                    return response()->json(['success' => true, 'redirect' => route('admin.main')]);
                 } else {
                     return response()->json(['success' => false, 'message' => 'Sorry, your account is inactive'], 403); // 403 = forbidden (not permited)
                 }
