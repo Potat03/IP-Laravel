@@ -212,11 +212,11 @@
             <h1 class="fw-bold">{{ $promotion->title }}</h1>
             <h4 class="text-muted">RM {{ $promotion->discount_amount }}</h4>
             <div class="d-flex align-items-center text-warning">
-                <i class="bi bi-star-fill me-1"></i>
-                <i class="bi bi-star-fill me-1"></i>
-                <i class="bi bi-star-fill me-1"></i>
-                <i class="bi bi-star-fill me-1"></i>
-                <i class="bi bi-star-fill me-1"></i>
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
                 <span class="text-dark ms-2">(20)</span>
             </div>
         </div>
@@ -338,19 +338,17 @@
 <!-- Review Section -->
 <div class="container review-section mb-5">
     <h2>Reviews</h2>
-    @for ($i = 0; $i < 10; $i++)
         <div class="review-item">
         <h5>John Doe</h5>
         <div class="d-flex align-items-center text-warning">
-            <i class="bi bi-star-fill me-1"></i>
-            <i class="bi bi-star-fill me-1"></i>
-            <i class="bi bi-star-fill me-1"></i>
-            <i class="bi bi-star-fill me-1"></i>
-            <i class="bi bi-star-fill me-1"></i>
+        <i class="fa-solid fa-star"></i>
+        <i class="fa-solid fa-star"></i>
+        <i class="fa-solid fa-star"></i>
+        <i class="fa-solid fa-star"></i>
+        <i class="fa-solid fa-star"></i>
         </div>
         <p style="font-size: 1.2rem;">This is an amazing product! Highly recommended.</p>
 </div>
-@endfor
 </div>
 @endsection
 
@@ -492,11 +490,16 @@
                         quantity: document.getElementById('quantity').value
                     })
                 }).then(response => {
-                    if (response.ok) {
+                    if (response.success) {
                         alert('Product added to cart');
                         window.location.reload();
                     } else {
-                        alert('Failed to add product to cart');
+                        if (response.status == 401) {
+                            alert('Please login to add to cart');
+                            window.location.href = "{{ route('user.login') }}";
+                        } else {
+                            alert('An error occurred while adding to cart');
+                        }
                     }
                 });
                 console.log(promo_content);

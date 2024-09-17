@@ -68,32 +68,6 @@ Route::get('/testDB', function () {
 Route::get('/promotion', [PromotionController::class, 'customerList'])->name('promotion');
 Route::get('/promotion/{id}', [PromotionController::class, 'viewDetails'])->name('promotion.details');
 
-
-//middleware
-Route::middleware([customAuth::class])->group(function () {
-    Route::get('/admin/dashboard', function () {
-        return view('admin.dashboard');
-    });
-
-    Route::get('/admin/product', function () {
-        return view('admin.product');
-    });
-
-    Route::get('/product/get/images/{id}', [ProductController::class, 'showProductImagesAdmin']);
-
-    Route::get('/admin/product', action: [ProductController::class, 'getAll'])->name('admin.product');
-    Route::get('/admin/product/add', action: [ProductController::class, 'addProduct'])->name('admin.product.add');
-    Route::get('/admin/product/edit/{id}', [ProductController::class, 'editProduct'])->name('admin.product.edit');
-
-    Route::get('/admin/promotion', [PromotionController::class, 'adminList'])->name('admin.promotion');
-
-    Route::get('/admin/promotion/add', [PromotionController::class, 'addPromotion'])->name('admin.promotion.add');
-
-    Route::get('/admin/promotion/edit/{id}', [PromotionController::class, 'editPromotion'])->name('admin.promotion.edit');
-
-    Route::get('/admin/promotion/restore', [PromotionController::class, 'restorePromotion'])->name('admin.promotion.restore');
-});
-
 use App\Http\Controllers\CustomerController;
 use App\Http\Middleware\CustomerAuth;
 use App\Http\Controllers\AuthController;
@@ -171,6 +145,25 @@ Route::middleware([AdminAuth::class])->group(function () {
     Route::get('/adminChat2', function () {
         return view('admin.chat_room');
     });
+
+    Route::get('/admin/dashboard', function () {
+        return view('admin.dashboard');
+    });
+
+    Route::get('/admin/product', function () {
+        return view('admin.product');
+    });
+
+    Route::get('/product/get/images/{id}', [ProductController::class, 'showProductImagesAdmin']);
+
+    Route::get('/admin/product', action: [ProductController::class, 'getAll'])->name('admin.product');
+    Route::get('/admin/product/add', action: [ProductController::class, 'addProduct'])->name('admin.product.add');
+    Route::get('/admin/product/edit/{id}', [ProductController::class, 'editProduct'])->name('admin.product.edit');
+
+    Route::get('/admin/promotion', [PromotionController::class, 'adminList'])->name('admin.promotion');
+    Route::get('/admin/promotion/add', [PromotionController::class, 'addPromotion'])->name('admin.promotion.add');
+    Route::get('/admin/promotion/edit/{id}', [PromotionController::class, 'editPromotion'])->name('admin.promotion.edit');
+    Route::get('/admin/promotion/restore', [PromotionController::class, 'restorePromotion'])->name('admin.promotion.restore');
 });
 
 Route::get('/chat', [ChatController::class, 'index']);
