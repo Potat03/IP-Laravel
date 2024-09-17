@@ -39,19 +39,4 @@ class ChatMessageService
         }
         return null;
     }
-
-    public function uploadImageMessage($chat_id, $message_id, $image)
-    {
-        $extensions = ['png', 'jpg', 'jpeg'];
-        $imagePath = null;
-
-        foreach ($extensions as $ext) {
-            $filePath = "images/chats/{$chat_id}/{$message_id}.{$ext}";
-            if (Storage::disk('public')->put($filePath, $image)) {
-                $imagePath = asset("storage/{$filePath}");
-                break;
-            }
-        }
-        return $imagePath;
-    }
 }

@@ -1,5 +1,7 @@
 @extends('admin.layout.main')
 
+@push('promotion', 'class="active"')
+
 @section('vite')
 @vite(['resources/css/app.css','resources/sass/app.scss', 'resources/js/app.js', 'resources/css/admin-nav.css','resources/js/bootstrap.js'])
 @endsection
@@ -22,7 +24,7 @@
 @section('page_gm', 'Prmotion bring smiles to faces')
 
 @section('content')
-<div class="card shadow-sm p-3">
+<div class="card shadow-sm p-3 position-static">
     <div class="card-body">
         <div class="card-title d-flex px-3">
             <div class="me-auto">

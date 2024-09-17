@@ -48,7 +48,7 @@
                                 Profile
                             </a>
                         </li>
-                        <li><a href="#">
+                        <li><a href="{{ route('admin.logout') }}">
                                 <div class="li_icon_wrap">
                                     <i class="fa-regular fa-person-from-portal"></i>
                                 </div>
@@ -62,26 +62,55 @@
         <div class="bottom_content">
             <div class="left_bar">
                 <ul>
-                    <li><a href="#">
-                            <i class="fa-solid fa-square-poll-vertical"></i>
-                            DashBoard</a>
+                    <li @stack('main')>
+                        <a href="{{ route('admin.main') }}">
+                            <i class="fa-regular fa-square-poll-vertical"></i>
+                            DashBoard
+                        </a>
                     </li>
-                    <li><a href="#">
+                    <li @stack('product')>
+                        <a href="{{ route('admin.product') }}">
                             <i class="fa-regular fa-teddy-bear"></i>
-                            Product</a>
-                    </li><a href="#">
-                        <li class="active">
+                            Product
+                        </a>
+
+                    </li>
+                    <li @stack('promotion')>
+                        <a href="{{ route('admin.promotion') }}">
+                            <i class="fa-regular fa-megaphone"></i>
+                            Promotion
+                        </a>
+                    </li>
+                    <li @stack('chat')>
+                        <a href="{{ url('adminChat2') }}">
                             <i class="fa-brands fa-rocketchat"></i>
                             Support Chat
-                    </a>
+                        </a>
                     </li>
-                    <li><a href="#">
+                    <li @stack('order')>
+                        <a href="#">
                             <i class="fa-regular fa-box"></i>
-                            Order</a>
+                            Order
+                        </a>
                     </li>
-                    <li><a href="#">
+                    <li @stack('customer')>
+                        <a href="#">
                             <i class="fa-regular fa-user"></i>
-                            Customer</a>
+                            Customer
+                        </a>
+                    </li>
+                    <li @stack('report')>
+                        <a type="button" data-bs-toggle="collapse" href="#collapseReport" role="button" aria-expanded="false" aria-controls="collapseReport">
+                            <i class="fa-regular fa-chart-bar"></i>
+                            Report
+                        </a>
+                        <div class="collapse" id="collapseReport">
+                            <ul>
+                                <li><a href="">Sales Report</a></li>
+                                <li><a href="">Product Report</a></li>
+                                <li><a href="">Customer Report</a></li>
+                            </ul>
+                        </div>
                     </li>
                 </ul>
             </div>
@@ -132,7 +161,7 @@
                 var minutes = date.getMinutes();
                 var ampm = hours >= 12 ? 'PM' : 'AM';
                 hours = hours % 12;
-                hours = hours ? hours : 12; 
+                hours = hours ? hours : 12;
                 minutes = minutes < 10 ? '0' + minutes : minutes;
                 var strTime = hours + ':' + minutes + ' ' + ampm;
                 $('.cur_time').text(strTime);

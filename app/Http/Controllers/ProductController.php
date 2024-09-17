@@ -6,9 +6,12 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Wearable;
 use App\Models\Collectible;
+use App\Models\Consumable;
 use App\Models\Rating;
-use App\Directors\ProductDirector;
-use App\Builders\ProductBuilder;
+use App\Contexts\ProductContext;
+use App\Strategies\WearableStrategy;
+use App\Strategies\CollectibleStrategy;
+use App\Strategies\ConsumableStrategy;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Exception;
 use Illuminate\Support\Facades\Log;
@@ -189,23 +192,14 @@ class ProductController extends Controller
                 'selected_groups' => 'nullable|string',
             ]);
 
-            // Build the product using ProductBuilder
-            $productBuilder = new ProductBuilder();
-
-            $productDirector = new ProductDirector($productBuilder);
-
-            $created_at = now()->addHours(8);
-
-            $product = $productDirector->buildBasicProduct(
-                $request->name,
-                $request->description,
-                $request->price,
-                $request->stock,
-                $request->status,
-                $created_at
-            );
-
-            $id = $product->product_id;
+            $product = new Product();
+            $product->name = $request->name;
+            $product->description = $request->description;
+            $product->price = $request->price;
+            $product->stock = $request->stock;
+            $product->status = $request->status;
+            $product->created_at = now()->addHours(8);
+            $product->save();
 
             // Check for specific attributes
             if ($request->has('isWearable')) {
