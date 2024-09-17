@@ -1,7 +1,7 @@
 @extends('admin.layout.main')
 
 @section('vite')
-@vite(['resources/css/app.css','resources/sass/app.scss', 'resources/js/app.js', 'resources/css/admin-nav.css','resources/js/bootstrap.js'])
+    @vite(['resources/css/app.css', 'resources/sass/app.scss', 'resources/js/app.js', 'resources/css/admin-nav.css', 'resources/js/bootstrap.js'])
 @endsection
 
 @section('css')
@@ -284,9 +284,16 @@
                 form.append('existingImages', existingImagesJson);
                 form.append('filesArray', filesArrayJson);
 
-                if (existingImages.length + files.length === 0) {
-                    alert('You must upload at least one image for the product.');
-                    return;
+                if (existingImages.length === 0) {
+                    if (filesArrayJson.length === 0) {
+                        alert('You must upload at least one image for the product.');
+                        return;
+                    }
+                } else {
+                    if (existingImages.length + files.length === 0) {
+                        alert('You must upload at least one image for the product.');
+                        return;
+                    }
                 }
 
                 filesArray.forEach(file => {

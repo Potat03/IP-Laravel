@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Directors\ProductDirector;
-use App\Builders\WearableBuilder;
+use App\Contexts\ProductContext;
+use App\Strategies\WearableStrategy;
 use App\Models\Wearable;
 use App\Models\Product;
 use Exception;
@@ -15,27 +15,32 @@ class WearableController extends Controller
     public function store(Request $request, $productId)
     {
         $request->validate([
-            'size' => 'required|string',
-            'color' => 'required|string',
-            'user_group' => 'required|string'
+            'sizes' => 'nullable|string',
+            'colors' => 'nullable|string',
+            'user_groups' => 'required|string'
         ]);
 
-        $builder = new WearableBuilder();
+        try {
+            $wearable = new Wearable();
 
-        $director = new ProductDirector($builder);
-    
-        $wearable = $director->buildWearable(
-            [
-                'size' => $request->size,
-                'color' => $request->color,
-                'user_group' => $request->user_group,
-            ],
-            $productId
-        );
-    
-        $wearable->save();
-        
-        return response()->json(['success' => true, 'message' => 'Wearable product added successfully.'], 200);
+            $wearableStrategy = new WearableStrategy($wearable);
+
+            $context = new ProductContext(specificStrategy: $wearableStrategy);
+
+            $context->applyStrategies(
+                [
+                    'size' => $request->sizes ?? '',
+                    'color' => $request->colors ?? '',
+                    'user_group' => $request->user_groups,
+                    'product_id' => $productId,
+                ]
+            );
+
+            return response()->json(['success' => true, 'message' => 'Wearable product added successfully.'], 200);
+            
+        } catch (Exception $e) {
+            return response()->json(['failure' => false, 'message' => $e->getMessage()], 400);
+        }
     }
 
     // Read all products

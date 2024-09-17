@@ -178,7 +178,7 @@
 
                     <div class="mb-3">
                         <label for="description" class="form-label">Description</label>
-                        <textarea class="form-control" id="description" name="description"></textarea>
+                        <textarea class="form-control" id="description" name="description" required></textarea>
                     </div>
 
                     <div class="mb-3 form-check form-switch">
@@ -236,6 +236,7 @@
                     document.getElementById('isWearable').value = '1';
                     document.getElementById('isConsumable').value = '0';
                     document.getElementById('isCollectible').value = '0';
+                    handleWearableFields();
                 } else if (selectedType === 'consumable') {
                     consumableSection.style.display = 'block';
                     document.getElementById('isWearable').value = '0';
@@ -261,7 +262,7 @@
 
                 form.append('filesArray', filesArrayJson);
 
-                if (filesArrayJson.length === 0) {
+                if (filesArray.length === 0) {
                     alert('You must upload at least one image for the product.');
                     return;
                 }
@@ -353,7 +354,7 @@
                         if (data.success) {
                             window.location.href = "{{ route('admin.product') }}";
                         } else {
-                            alert('Failed to update product');
+                            alert('Failed to create product');
                         }
                     })
                     .catch(error => {

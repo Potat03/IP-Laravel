@@ -6,11 +6,15 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Wearable;
 use App\Models\Collectible;
+use App\Models\Consumable;
 use App\Models\Rating;
-use App\Directors\ProductDirector;
-use App\Builders\ProductBuilder;
+use App\Contexts\ProductContext;
+use App\Strategies\WearableStrategy;
+use App\Strategies\CollectibleStrategy;
+use App\Strategies\ConsumableStrategy;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Exception;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Log;
 use Intervention\Image\ImageManagerStatic as Image;
 use Illuminate\Support\Facades\Storage;
@@ -35,18 +39,34 @@ class ProductController extends Controller
 
             $images = $request->file('images');
             if ($images) {
+                $isFirstImage = true;
+                $imageCounter = 1;
                 foreach ($images as $index => $image) {
-                    $imageName = $index === 0
-                        ? 'main.' . $image->getClientOriginalExtension()
-                        : $index . '.' . $image->getClientOriginalExtension();
+                    // Check if this is the first image
+                    if ($isFirstImage) {
+                        $imageName = 'main.' . $image->getClientOriginalExtension();
+                        $isFirstImage = false;
+                    } else {
+                        $imageName = $imageCounter . '.' . $image->getClientOriginalExtension();
+                        $imageCounter++;
+                    }
 
+                    // Move the image to the folder
                     $image->move(public_path($folderPath), $imageName);
                 }
-
                 return response()->json(['success' => true, 'data' => 'Images have been successfully uploaded.'], 200);
             }
 
             return response()->json(['success' => false, 'data' => 'No images were uploaded.'], 400);
+        } catch (ValidationException $e) {
+            // Log validation errors
+            Log::error('Validation failed for request', [
+                'errors' => $e->errors(),
+                'input' => $request->all(),
+            ]);
+
+            // Return validation error response
+            return response()->json(['errors' => $e->errors()], 422);
         } catch (Exception $e) {
             return response()->json(['success' => false, 'data' => $e->getMessage()], 400);
         }
@@ -108,9 +128,8 @@ class ProductController extends Controller
                     if (!$mainImageExists) {
                         $imageName = 'main.' . $extension;
                         $newMainImage = $imageName;
-                        $mainImageExists = true; // Mark that we have assigned a main image
+                        $mainImageExists = true;
                     } else {
-                        // Generate a unique name for the image
                         $imageName = $this->generateUniqueName($existingImages, $extension);
                     }
 
@@ -143,6 +162,15 @@ class ProductController extends Controller
             }
 
             return response()->json(['success' => true, 'data' => 'Images have been successfully updated.'], 200);
+        } catch (ValidationException $e) {
+            // Log validation errors
+            Log::error('Validation failed for request', [
+                'errors' => $e->errors(),
+                'input' => $request->all(),
+            ]);
+
+            // Return validation error response
+            return response()->json(['errors' => $e->errors()], 422);
         } catch (Exception $e) {
             Log::error('Error updating images: ' . $e->getMessage());
             return response()->json(['success' => false, 'data' => $e->getMessage()], 400);
@@ -172,11 +200,11 @@ class ProductController extends Controller
     {
         try {
             $request->validate([
-                'name' => 'required|string',
+                'name' => 'required|string|max:255',
                 'description' => 'required|string',
-                'price' => 'required|numeric',
-                'stock' => 'required|integer',
-                'status' => 'required|string',
+                'price' => 'required|numeric|min:0.01',
+                'stock' => 'required|integer|min:1',
+                'status' => 'required|string|in:active,inactive',
                 'isWearable' => 'nullable|numeric',
                 'isConsumable' => 'nullable|numeric',
                 'isCollectible' => 'nullable|numeric',
@@ -186,26 +214,17 @@ class ProductController extends Controller
                 'portion' => 'nullable|string',
                 'halal' => 'nullable|boolean',
                 'supplier' => 'nullable|string',
-                'selected_groups' => 'nullable|string',
+                'user_groups' => 'nullable|string',
             ]);
 
-            // Build the product using ProductBuilder
-            $productBuilder = new ProductBuilder();
-
-            $productDirector = new ProductDirector($productBuilder);
-
-            $created_at = now()->addHours(8);
-
-            $product = $productDirector->buildBasicProduct(
-                $request->name,
-                $request->description,
-                $request->price,
-                $request->stock,
-                $request->status,
-                $created_at
-            );
-
-            $id = $product->product_id;
+            $product = new Product();
+            $product->name = trim($request->name);
+            $product->description = htmlspecialchars($request->description, ENT_QUOTES, 'UTF-8');
+            $product->price = $request->price;
+            $product->stock = $request->stock;
+            $product->status = trim($request->status);
+            $product->created_at = now()->addHours(8);
+            $product->save();
 
             // Check for specific attributes
             if ($request->has('isWearable')) {
@@ -221,23 +240,27 @@ class ProductController extends Controller
             }
 
             // Forward request for image upload
-            // ProductController::productImageUpload($request, $id);
+            ProductController::productImageUpload($request, $product->product_id);
 
             return response()->json(['success' => true, 'message' => 'Product created successfully.'], 200);
+        } catch (ValidationException $e) {
+            // Log validation errors
+            Log::error('Validation failed for request', [
+                'errors' => $e->errors(),
+                'input' => $request->all(),
+            ]);
+
+            // Return validation error response
+            return response()->json(['errors' => $e->errors()], 422);
         } catch (Exception $e) {
+            Log::error('Adding product failed: ' . $e->getMessage());
+
             return response()->json(['failure' => false, 'message' => $e->getMessage()], 400);
         }
     }
 
     protected function createWearable($product, Request $request)
     {
-        $sizes = $request->input('sizes', []);
-        $colors = $request->input('colors', []);
-        $userGroups = $request->input('selected_groups', '');
-
-        $sizesString = is_array($sizes) ? implode(',', $sizes) : $sizes;
-        $colorsString = is_array($colors) ? implode(',', $colors) : $colors;
-
         $wearableObj = new WearableController();
 
         $wearableObj->store($request, $product->product_id);
@@ -377,11 +400,6 @@ class ProductController extends Controller
             // Fetch the product by ID
             $product = Product::findOrFail($id);
 
-            // Check if the product is active
-            if ($product->status != 'active') {
-                return response()->view('errors.404', [], 404);
-            }
-
             // Fetch ratings for the product
             $ratings = Rating::where('product_id', $id)
                 ->where('status', 'approved')
@@ -467,9 +485,9 @@ class ProductController extends Controller
             // Validate the request data
             $validatedData = $request->validate([
                 'name' => 'required|string|max:255',
-                'description' => 'nullable|string',
-                'price' => 'required|numeric',
-                'stock' => 'required|integer',
+                'description' => 'required|string',
+                'price' => 'required|numeric|min:0.01',
+                'stock' => 'required|integer|min:1',
                 'status' => 'required|string|in:active,inactive',
                 'isWearable' => 'nullable|numeric',
                 'isConsumable' => 'nullable|numeric',
@@ -482,6 +500,10 @@ class ProductController extends Controller
                 'supplier' => 'nullable|string',
                 'selected_groups' => 'nullable|string',
             ]);
+
+            $validatedData['name'] = trim($validatedData['name']);
+            $validatedData['description'] = trim($validatedData['description']);
+            $validatedData['description'] = htmlspecialchars($validatedData['description'], ENT_QUOTES, 'UTF-8');
 
             $this->productImageUploadUpdate($request, $id);
 
@@ -507,6 +529,15 @@ class ProductController extends Controller
             return response()->json(['success' => true, 'message' => 'Product updated successfully.'], 200);
         } catch (ModelNotFoundException $e) {
             return response()->json(['error' => 'Product not found.'], 404);
+        } catch (ValidationException $e) {
+            // Log validation errors
+            Log::error('Validation failed for request', [
+                'errors' => $e->errors(),
+                'input' => $request->all(),
+            ]);
+
+            // Return validation error response
+            return response()->json(['errors' => $e->errors()], 422);
         } catch (Exception $e) {
             // Log the error
             Log::error('Updating product failed: ' . $e->getMessage());
@@ -557,35 +588,46 @@ class ProductController extends Controller
         }
     }
 
-    // Delete a product
-    public function destroy($id)
-    {
-        try {
-            $product = Product::findOrFail($id);
-            $product->delete();
-
-            return response()->json(null, 204);
-        } catch (ModelNotFoundException $e) {
-            return response()->json(['error' => 'Product not found.'], 404);
-        }
-    }
-
-    // public function showNewArrivals()
+    // // Delete a product
+    // public function deleteProduct($id)
     // {
     //     try {
-    //         // Fetch new arrivals
-    //         $newArrivals = Product::where('created_at', '>=', now()->subDays(30))
-    //             ->orderBy('created_at', 'desc')
-    //             ->take(10)
-    //             ->get();
+    //         $product = Product::findOrFail($id);
 
-    //         return view('home', [
-    //             'newArrivals' => $newArrivals,
-    //         ]);
-    //     } catch (Exception $e) {
-    //         Log::error('Fetching new arrivals failed: ' . $e->getMessage());
-    //         return response()->json(['error' => 'Fetching new arrivals failed.'], 500);
+    //         // Fetch the folder path for the product images
+    //         $folderFullPath = public_path('storage/images/products/' . $id);
+
+    //         // Check if the folder exists
+    //         if (file_exists($folderFullPath) && is_dir($folderFullPath)) {
+    //             $this->deleteDirectory($folderFullPath);
+    //         }
+
+    //         $product->delete();
+
+    //         return response()->json(null, 204);
+    //     } catch (ModelNotFoundException $e) {
+    //         return response()->json(['error' => 'Product not found.'], 404);
     //     }
+    // }
+
+    // private function deleteDirectory($dir)
+    // {
+    //     if (!file_exists($dir) || !is_dir($dir)) {
+    //         return;
+    //     }
+
+    //     $items = array_diff(scandir($dir), ['.', '..']);
+
+    //     foreach ($items as $item) {
+    //         $path = $dir . '/' . $item;
+    //         if (is_dir($path)) {
+    //             $this->deleteDirectory($path);
+    //         } else {
+    //             unlink($path);
+    //         }
+    //     }
+
+    //     rmdir($dir);
     // }
 
     //at home page new arrival section

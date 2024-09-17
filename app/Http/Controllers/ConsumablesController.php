@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Directors\ProductDirector;
-use App\Builders\ConsumableBuilder;
+use App\Contexts\ProductContext;
+use App\Strategies\ConsumableStrategy;
 use App\Models\Consumable;
 use App\Models\Product;
 use Exception;
@@ -18,25 +18,34 @@ class ConsumablesController extends Controller
         $request->validate([
             'expiry_date' => 'required|date',
             'portion' => 'required|integer|min:1',
-            'is_halal' => 'required|in:0,1'
+            'halal' => 'required|in:0,1'
         ]);
 
-        $builder = new ConsumableBuilder();
+        try {
+            // Create the specific product instance
+            $consumable = new Consumable();
 
-        $director = new ProductDirector($builder);
+            // Create the specific strategy instance
+            $consumableStrategy = new ConsumableStrategy($consumable);
 
-        $consumable = $director->buildConsumable(
-            [
-                'expiry_date' => $request->expiry_date,
-                'portion' => $request->portion,
-                'is_halal' => $request->is_halal,
-            ],
-            $productId
-        );
+            // Create the context with the specific strategy
+            $context = new ProductContext($consumableStrategy);
 
-        $consumable->save();
+            // Apply the strategies and save the product
+            $context->applyStrategies(
+                [
+                    'expire_date' => $request->expiry_date,
+                    'portion' => $request->portion,
+                    'is_halal' => $request->halal,
+                    'product_id' => $productId,
+                ]
+            );
 
-        return response()->json(['success' => true, 'message' => 'Consumable product added successfully.'], 200);
+            return response()->json(['success' => true, 'message' => 'Consumable product added successfully.'], 200);
+
+        } catch (Exception $e) {
+            return response()->json(['failure' => false, 'message' => $e->getMessage()], 400);
+        }
     }
 
     public function index(Request $request)
