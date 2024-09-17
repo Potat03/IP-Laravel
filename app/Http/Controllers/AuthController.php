@@ -12,6 +12,7 @@ use Carbon\Carbon;
 use App\Mail\OtpMail;
 use Illuminate\Support\Facades\Mail;
 use App\Models\Customer;
+use App\Rules\Recaptcha;
 
 
 class AuthController extends Controller
@@ -26,8 +27,40 @@ class AuthController extends Controller
         return view('customer.profile');
     }
 
+    function verifyCaptcha($captcha_response)
+    {
+        $captcha_secret = env('RECAPTCHA_SECRET_KEY'); // Replace with your actual secret key in .env
+        $captcha_verify_url = "https://www.google.com/recaptcha/api/siteverify";
+        $captcha_data = [
+            'secret'   => $captcha_secret,
+            'response' => $captcha_response
+        ];
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $captcha_verify_url);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($captcha_data));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $captcha_verify = curl_exec($ch);
+        curl_close($ch);
+
+        Log::info('CAPTCHA Verification Response: ' . $captcha_verify);
+
+        return json_decode($captcha_verify, true);
+    }
+
     public function userLogin(Request $request)
     {
+        $captcha_response = $request->input('g-recaptcha-response');
+
+        Log::info('CAPTCHA Response from request: ' . $captcha_response);
+
+        $responseKeys = $this->verifyCaptcha($captcha_response);
+
+        if (!$responseKeys['success']) {
+            return response()->json(['success' => false, 'message' => 'CAPTCHA verification failed.']);
+        }
+
         if (AuthFacade::isLoggedIn()) {
             return response()->json(['success' => 'Message saved successfully!', 'data' => 'You have logged in']);
         }
@@ -36,6 +69,7 @@ class AuthController extends Controller
         $request->validate([
             'email' => 'required|email',
             'password' => 'required',
+            'g-recaptcha-response' => ['required'],
         ]);
 
         $credentials = $request->only('email', 'password');
@@ -52,7 +86,7 @@ class AuthController extends Controller
             Log::info($request->session()->token());
             Log::info(AuthFacade::getUser());
 
-            return response()->json(['success' => true, 'redirect_url' => '/profile']);
+            return response()->json(['success' => true, 'redirect_url' => '/profileSec']);
         } else {
             return response()->json(['success' => false, 'message' => 'Wrong credentials']);
         }
@@ -67,44 +101,13 @@ class AuthController extends Controller
             'password' => 'required|min:8|confirmed', //^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[!$#%]).*$
         ]);
 
-        $response = AuthFacade::register($request->all());
-
-        if ($response['success']) {
-            $otp = rand(100000, 999999);
-
-            Log::info($response);
-            Log::info($otp);
-
-            session(['customer_id' => $response['customer_id']]);
-            Log::info('Customer ID stored in session: ' . session('customer_id'));
-
-
-            $verification = Verification::create([
-                'customer_id' => $response['customer_id'],
-                'code' => $otp,
-                'status' => 'pending',
-                'expired_date' => Carbon::now()->addMinutes(5), // expire 5 minutes
-            ]);
-
-            Log::info($verification);
-
-            Mail::to($request->email)->send(new OtpMail($otp));
-
-            return response()->json(['success' => true, 'redirect_url' => route('user.verify')]);
-        } else {
-            return response()->json(['success' => false, 'message' => $response['message']]);
-        }
-    }
-
-    public function forgetPassword(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|email|unique:customer,email',
-        ]);
+        Log::info('Recaptcha URL', ['url' => 'https://www.google.com/recaptcha/api/siteverify']);
 
         $response = AuthFacade::register($request->all());
 
         if ($response['success']) {
+            session(['otp_context' => 'registration']);
+            AuthFacade::sendOtp($response);
 
             return response()->json(['success' => true, 'redirect_url' => route('user.verify')]);
         } else {
@@ -112,10 +115,32 @@ class AuthController extends Controller
         }
     }
 
-    // Handle otp
+    public function forgetPassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+        ]);
+
+        $response = AuthFacade::forgetPass($request);
+
+        if ($response['success']) {
+
+            session(['otp_context' => 'forget_password']);
+            $sendOtp_response = AuthFacade::sendOtp($response);
+
+            if ($sendOtp_response['success']) {
+                return response()->json(['success' => true, 'redirect_url' => route('user.verify')], 200);
+            } else {
+                return response()->json(['success' => false, 'message' => 'Failed to send OTP.'], 500);
+            }
+        } else {
+            return redirect()->back()->withErrors(['email' => $response['message']]);
+        }
+    }
+
+    // handle otp
     public function verify(Request $request)
     {
-        // Validate the input fields
         $request->validate([
             'otp1' => 'required|numeric',
             'otp2' => 'required|numeric',
@@ -125,55 +150,44 @@ class AuthController extends Controller
             'otp6' => 'required|numeric',
         ]);
 
-        $otp = $request->otp1 . $request->otp2 . $request->otp3 . $request->otp4 . $request->otp5 . $request->otp6;
+        $context = session('otp_context', 'forget_password');
 
+        $response = AuthFacade::verifyOtp($request, $context);
         $customer_id = session('customer_id');
-        Log::info(session('customer_id'));
 
-        if (!$customer_id) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Customer not found.',
-            ], 404);
-        }
-
-        $verificationQuery = Verification::where('customer_id', $customer_id)
-            ->where('status', 'pending')
-            ->where('expired_date', '>=', Carbon::now());
-
-        Log::info($verificationQuery->toSql());
-        Log::info($verificationQuery->getBindings());
-
-        $verification = Verification::where('customer_id', $customer_id)
-            ->where('status', 'pending')
-            ->where('expired_date', '>=', Carbon::now())
-            ->first();
-
-        Log::info($verification);
-
-        if (!$verification) {
-            return response()->json([
-                'success' => false,
-                'message' => 'OTP not found or has expired.',
-            ], 400);
-        }
-
-        if ($verification->code === $otp) {
-            $verification->status = 'verified';
-            $verification->save();
-
+        if ($response['success']) {
             $customer = Customer::find($customer_id);
             if ($customer->status !== 'active') {
                 $customer->status = 'active';
                 $customer->save();
             }
 
-            return redirect()->route(route: 'user.login')->with('message', 'Verification complete, please proceed with login');
+            if (!$customer) {
+                return redirect()->back()->withErrors($response['message']);
+            } else {
+                if ($context === 'forget_password') {
+                    return redirect()->route('user.enterForget')->with('message', 'Please enter your new password');
+                } else {
+                    return redirect()->route('user.login')->with('message', 'Verification complete, please proceed with login');
+                }
+            }
         } else {
-            return response()->json([
-                'success' => false,
-                'message' => 'Invalid OTP.',
-            ], 400);
+            return back()->withErrors(['otp' => $response['message']]);
+        }
+    }
+
+    public function updatePassword(Request $request)
+    {
+        $request->validate([
+            'password' => 'required|min:8|confirmed',
+        ]);
+
+        $response = AuthFacade::updatePass($request->all());
+
+        if ($response['success']) {
+            return response()->json(['success' => true, 'redirect_url' => route('user.login')], 200);
+        } else {
+            return response()->json(['success' => false, 'message' => $response['message']], 400);
         }
     }
 

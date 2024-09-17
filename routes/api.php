@@ -18,6 +18,10 @@
         Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout');
         Route::post('/register', [AuthController::class, 'userRegister'])->name('auth.userRegister');
         Route::post('/verify', [AuthController::class, 'verify'])->name('auth.verify');
+        Route::post('/forgetPass', [AuthController::class, 'forgetPassword'])->name('auth.forget');
+        Route::post('/verifyOtp', [AuthController::class, 'verifyOtp'])->name('auth.verifyOtp');
+        Route::get('/enterForgetPassword', [AuthController::class, 'enterForgetPassword'])->name('auth.enterForgetPassword');
+        Route::post('/updatePassword', [AuthController::class, 'updatePassword'])->name('auth.updatePassword');
         Route::post('/cartItem/upload', [CartController::class, 'addToCart'])->name('cart.add');
     });
     Route::post('/resendOtp', [AuthController::class, 'resendOtp'])->name('auth.resendOtp');

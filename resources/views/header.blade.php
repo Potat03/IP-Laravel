@@ -8,7 +8,6 @@
     @include('partials.fontawesome')
 
     <style>
-
         .nav-link:hover,
         .nav-item:hover {
             color: darkred !important;
@@ -18,8 +17,8 @@
 
 
 <body class="headerBody">
-    <nav class="navbar navbar-expand-lg navbar-light sticky-top">
-        <div class="container px-4">
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container px-4 bg-light">
             <a class="navbar-brand" href="#!">Futatabi</a>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
@@ -61,7 +60,7 @@
                                 <i class="fa-solid fa-user"></i> Profile
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="profileDropdown">
-                                <li><a class="dropdown-item" href="{{ url('/profile') }}">User Profile</a></li>
+                                <li><a class="dropdown-item" href="{{ url('/profileSec') }}">User Profile</a></li>
                                 <li>
                                     <hr class="dropdown-divider">
                                 </li>
