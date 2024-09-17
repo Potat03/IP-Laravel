@@ -84,7 +84,7 @@ class CartItemController extends Controller
 
         //    return response()->json(['cartItems'=>$cartItems, 'products'=>$products, 'promotions' => $promotions]);
            //return to view
-              return view('cart', ['cartItems'=>$cartItems, 'products'=>$products, 'promotions' => $promotions]);
+              return view('cart', ['cartItems'=>$cartItems]);
        } catch (Exception $e) {
            Log::error('Fetching cart items failed: ' . $e->getMessage());
            return response()->json(['error' => 'Fetching cart items failed.'], 500);

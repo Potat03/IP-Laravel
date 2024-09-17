@@ -11,7 +11,10 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\WearableController;
 use App\Http\Controllers\CartItemController;
 use App\Http\Controllers\PromotionController;
-use App\Http\Controllers\StripeTestController;
+use App\Http\Controllers\StripeController;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\OrderController;
+
 
 Route::get('/', function () {
     return view('welcome');
@@ -51,9 +54,12 @@ Route::get('/payment', function () {
     return view('payment');
 });
 
-Route::get('/tracking', function () {
-    return view('tracking');
-});
+Route::post('/session', [StripeController::class, 'session'])->name('session');
+// Route::get('/success', [StripeController::class, 'success'])->name('success');
+Route::get('/success', [PaymentController::class, 'processCheckout'])->name('success');
+
+Route::get('/tracking', [OrderController::class, 'getOrderByCustomerID']);    
+
 
 Route::get('/testDB', function () {
     return view('testDB');
@@ -138,4 +144,4 @@ Route::middleware([AdminAuth::class])->group(function () {
 
 
 
-Route::get('/stripe/test', [StripeTestController::class, 'testConnection']);
+

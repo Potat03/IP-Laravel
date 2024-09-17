@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+    {{-- communication security --}}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
@@ -228,8 +229,12 @@ $totalDiscount=0;
                     @endif
                 @endforeach
             @else
-                <p>No items</p>
-            @endif
+            <tr>
+                <td colspan="6">
+                <p style="width:100%;text-align:center;height:100%; display: flex;justify-content: center;align-items: center;">No Items</p>
+                </td>
+            </tr>
+                @endif
             
               
             </tbody>
@@ -608,24 +613,20 @@ function removeCartItem(id, promotion) {
     var row = document.getElementById(`cartItemRow_${id}`);
 
     if (row) {
-      if(promotion != true){
-        console.log("Promotion value:", promotion);
+        if (promotion != true) {
+            console.log("Promotion value:", promotion);
 
             var quantityInput = document.getElementById(`quantity_${id}`);
             var currentValue = parseInt(quantityInput.value, 10);
 
-            // Get the total price and unit price elements
             var totalPriceElement = document.getElementById(`totalForItem_${id}`);
             var unitPriceElement = document.getElementById(`oriUnitPrice_${id}`);
 
-            // Get the numeric value of the unit price (remove "RM" and commas, then convert to float)
             var unitPriceValue = parseFloat(unitPriceElement.textContent.replace('RM', '').replace(',', ''));
             var totalPriceValue = parseFloat(totalPriceElement.textContent.replace('RM', '').replace(',', ''));
 
-            // Calculate the new total price
             var productTotalPrice = totalPriceValue;
 
-            // Update the subtotal
             var totalDiscountDiv = document.getElementById("totalDiscount");
             var totalDiscountValue = parseFloat(totalDiscountDiv.textContent.replace('Discount RM ', '').replace(',', ''));
             var subtotalDiv = document.getElementById("subtotal");
@@ -633,118 +634,130 @@ function removeCartItem(id, promotion) {
             var totalDiv = document.getElementById("total");
             var totalValue = parseFloat(totalDiv.textContent.replace('Total RM ', '').replace(',', ''));
 
-            // Add the unit price to the subtotal
             var newSubtotal = subtotalValue - productTotalPrice;
             var newTotal = totalValue - productTotalPrice;
             var newTotalDiscount = totalDiscountValue;
 
-            // Update the subtotal value, formatted with RM
             totalDiscountDiv.textContent = `Discount RM ${totalDiscountValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
             subtotalDiv.textContent = `Subtotal RM ${newSubtotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
             totalDiv.textContent = `Total RM ${newTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
-
             var payload = {
-            newSubtotal: newSubtotal.toFixed(2),
-            newTotal: newTotal.toFixed(2),
-            newTotalDiscount: newTotalDiscount.toFixed(2)
+                newSubtotal: newSubtotal.toFixed(2),
+                newTotal: newTotal.toFixed(2),
+                newTotalDiscount: newTotalDiscount.toFixed(2)
             };
+
             fetch(`/api/cartItem/removeCartItem/${id}`, {
-            method: 'POST',
-            body: JSON.stringify({ 
-                newSubtotal: newSubtotal,
-            newTotal: newTotal,
-            newTotalDiscount: newTotalDiscount
-             }),
-        headers: {
-        'Content-Type': 'application/json'
-    }
-          
+                method: 'POST',
+                body: JSON.stringify(payload),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
                     console.log('Cart item updated successfully');
                     row.remove();
+                    checkIfAnyRowsExist();
                 } else {
                     console.error('Error updating cart item');
                 }
             })
-            .catch(error => console.error('Error:', error));   
-       
-            
-        row.remove();
-      }else {
-        console.log("Promotion value:", promotion);
+            .catch(error => console.error('Error:', error));
+        } else {
+            console.log("Promotion value:", promotion);
 
-        var quantityInput = document.getElementById(`quantity_${id}`);
-        var currentValue = parseInt(quantityInput.value, 10);
+            var quantityInput = document.getElementById(`quantity_${id}`);
+            var currentValue = parseInt(quantityInput.value, 10);
 
-        // Get the total price and unit price elements
-        var oriUnitPriceElement = document.getElementById(`oriUnitPrice_${id}`);
-        var disUnitPriceElement = document.getElementById(`disUnitPrice_${id}`);
+            var oriUnitPriceElement = document.getElementById(`oriUnitPrice_${id}`);
+            var disUnitPriceElement = document.getElementById(`disUnitPrice_${id}`);
 
-        // Get the numeric value of the unit price (remove "RM" and commas, then convert to float)
-        var oriUnitPriceValue = parseFloat(oriUnitPriceElement.textContent.replace('RM', '').replace(',', ''));
-        var disUnitPriceValue = parseFloat(disUnitPriceElement.textContent.replace('RM', '').replace(',', ''));
+            var oriUnitPriceValue = parseFloat(oriUnitPriceElement.textContent.replace('RM', '').replace(',', ''));
+            var disUnitPriceValue = parseFloat(disUnitPriceElement.textContent.replace('RM', '').replace(',', ''));
 
-        // Calculate the new total price
-        var newSubtotalPrice = oriUnitPriceValue * currentValue;
-        var totalPriceValue = disUnitPriceValue * currentValue;
-        var newDiscountValue = newSubtotalPrice - totalPriceValue;
+            var newSubtotalPrice = oriUnitPriceValue * currentValue;
+            var totalPriceValue = disUnitPriceValue * currentValue;
+            var newDiscountValue = newSubtotalPrice - totalPriceValue;
 
-        // Update the subtotal
-        var totalDiscountDiv = document.getElementById("totalDiscount");
-        var totalDiscountValue = parseFloat(totalDiscountDiv.textContent.replace('Discount RM ', '').replace(',', ''));
-        var subtotalDiv = document.getElementById("subtotal");
-        var subtotalValue = parseFloat(subtotalDiv.textContent.replace('Subtotal RM ', '').replace(',', ''));
-        var totalDiv = document.getElementById("total");
-        var totalValue = parseFloat(totalDiv.textContent.replace('Total RM ', '').replace(',', ''));
+            var totalDiscountDiv = document.getElementById("totalDiscount");
+            var totalDiscountValue = parseFloat(totalDiscountDiv.textContent.replace('Discount RM ', '').replace(',', ''));
+            var subtotalDiv = document.getElementById("subtotal");
+            var subtotalValue = parseFloat(subtotalDiv.textContent.replace('Subtotal RM ', '').replace(',', ''));
+            var totalDiv = document.getElementById("total");
+            var totalValue = parseFloat(totalDiv.textContent.replace('Total RM ', '').replace(',', ''));
 
-        // Add the unit price to the subtotal
-        var newSubtotal = subtotalValue - newSubtotalPrice;
-        var newTotal = totalValue - totalPriceValue;
-        var newTotalDiscount = totalDiscountValue - newDiscountValue;
+            var newSubtotal = subtotalValue - newSubtotalPrice;
+            var newTotal = totalValue - totalPriceValue;
+            var newTotalDiscount = totalDiscountValue - newDiscountValue;
 
-        // Update the subtotal value, formatted with RM
-        totalDiscountDiv.textContent = `Discount RM ${newTotalDiscount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-        subtotalDiv.textContent = `Subtotal RM ${newSubtotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-        totalDiv.textContent = `Total RM ${newTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-            
-        
+            totalDiscountDiv.textContent = `Discount RM ${newTotalDiscount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            subtotalDiv.textContent = `Subtotal RM ${newSubtotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            totalDiv.textContent = `Total RM ${newTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
             var payload = {
-            newSubtotal: newSubtotal.toFixed(2),
-            newTotal: newTotal.toFixed(2),
-            newTotalDiscount: newTotalDiscount.toFixed(2)
+                newSubtotal: newSubtotal.toFixed(2),
+                newTotal: newTotal.toFixed(2),
+                newTotalDiscount: newTotalDiscount.toFixed(2)
             };
+
             fetch(`/api/cartItem/removeCartItem/${id}`, {
-            method: 'POST',
-            body: JSON.stringify({ 
-                newSubtotal: newSubtotal,
-            newTotal: newTotal,
-            newTotalDiscount: newTotalDiscount
-             }),
-        headers: {
-        'Content-Type': 'application/json'
-    }
-          
+                method: 'POST',
+                body: JSON.stringify(payload),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
                     console.log('Cart item updated successfully');
                     row.remove();
+                    checkIfAnyRowsExist();
                 } else {
                     console.error('Error updating cart item');
                 }
             })
-            .catch(error => console.error('Error:', error));   
-       
+            .catch(error => console.error('Error:', error));
         }
     } else {
         console.error('Row not found.');
     }
 }
+
+// Function to check if any rows with the class 'animate-row' still exist
+function checkIfAnyRowsExist() {
+    var rows = document.querySelectorAll('tr.animate-row');
+    var tableBody = document.querySelector('#cart-items-table tbody');
+
+    if (rows.length === 0) {
+        // Clear the table body
+        tableBody.innerHTML = '';
+
+        // Create and insert the <p> element with the desired style
+        var noItemsMessage = document.createElement('p');
+        noItemsMessage.textContent = 'No Items';
+
+        // Apply the style
+        noItemsMessage.style.width = '100%';
+        noItemsMessage.style.textAlign = 'center';
+        noItemsMessage.style.height = '100%';
+        noItemsMessage.style.display = 'flex';
+        noItemsMessage.style.justifyContent = 'center';
+        noItemsMessage.style.alignItems = 'center';
+
+        // Insert the <p> element into the table body
+        var noItemsRow = document.createElement('tr');
+        var noItemsCell = document.createElement('td');
+        noItemsCell.colSpan = 6;  // Set the colspan to cover the entire table width
+        noItemsCell.appendChild(noItemsMessage);
+        noItemsRow.appendChild(noItemsCell);
+        tableBody.appendChild(noItemsRow);
+    }
+}
+
 
 
 function showDiscount() {

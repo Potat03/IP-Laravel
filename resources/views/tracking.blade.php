@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+    {{-- communication security --}}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
@@ -106,24 +107,72 @@
         <div class="container">
             <table class="table">
                 <tbody>
+                    <tr>
+                        <th style="width:10%;text-align:left!important">ORDER ID</th>
+                        <th style="width:30%;text-align:left!important;">DELIVERY ADDRESS</th>
+                        <th style="width:15%;text-align:left!important;">TOTAL</th>
+                        <th style="width:20%;text-align:left!important;">CREATED AT</th>
+                        <th style="width:15%;text-align:left!important;">TRACKING NUMBER</th>
+                        <th style="width:15%;text-align:right!important;">STATUS</th>
+                    </tr>
+            
+                    
+                    @if(count($orders) > 0)
+                    @php
+                    $x = 1;
+                @endphp
+                @foreach($orders as $order)
+                @if($order->status == 'prepare')
+                    <tr class="animate-row" style="animation-delay:'. 0.05 * $x .'s;">
+                        <td style="text-align:left!important">
+                           {{$order->order_id}}
+                        </td>
+                        <td style="text-align:left!important;">
+                           {{$order->delivery_address}}
+                        </td>
+                        <td style="text-align:left!important;">
+                           RM {{$order->total}}
+                        </td>
+                        <td style="text-align:left!important;">{{ \Carbon\Carbon::parse($order->created_at)->format('d-m-Y h:iA') }}</td>
+                        <td style="text-align:left!important;">-</td>
+                        <td style="text-align:right!important;"><button type="button" class="btn btn-secondary">PREPARE</button></td>
+                    </tr>
+                @elseif($order->status =="delivery")
+                <tr class="animate-row" style="animation-delay:'. 0.05 * $x .'s;">
+                    <td style="text-align:left!important">
+                       {{$order->order_id}}
+                    </td>
+                    <td style="text-align:left!important;">
+                       {{$order->delivery_address}}
+                    </td>
+                    <td style="text-align:left!important;">
+                       RM {{$order->total}}
+                    </td>
+                    <td style="text-align:left!important;">{{ \Carbon\Carbon::parse($order->created_at)->format('d-m-Y h:iA') }}</td>
+                    <td style="text-align:left!important;">{{$order->tracking_number}}</td>
+                    <td style="text-align:right!important;"><button type="button" class="btn btn-secondary">DELIVERY</button></td>
+                </tr>
+                @elseif($order->status =="delivered")
+                <tr class="animate-row" style="animation-delay:'. 0.05 * $x .'s;">
+                    <td style="text-align:left!important">
+                       {{$order->order_id}}
+                    </td>
+                    <td style="text-align:left!important;">
+                       {{$order->delivery_address}}
+                    </td>
+                    <td style="text-align:left!important;">
+                       RM {{$order->total}}
+                    </td>
+                    <td style="text-align:left!important;">{{ \Carbon\Carbon::parse($order->created_at)->format('d-m-Y h:iA') }}</td>
+                    <td style="text-align:left!important;">{{$order->tracking_number}}</td>
+                    <td style="text-align:right!important;"><button type="button" class="btn btn-secondary">DELIVERED</button></td>
+                </tr>
+                @endif
+                @endforeach
 
-                    <?php
-for ($x = 0; $x <= 10; $x++) {
-    echo '
-      <tr class="animate-row" style="animation-delay:'. 0.05 * $x .'s;">
-        <td style="width:15%;text-align:left!important">
-            <img src="' . URL('storage/images/pika.jpg') . '" alt="pokemon" width="135" height="135">
-        </td>
-        <td style="width:55%;text-align:left!important;vertical-align:top">
-            <p>Pokemon Card</p>
-            <p>RM8.00</p>
-            <p>x1</p>
-        </td>
-        <td style="width:15%;">Total: RM8.00</td>
-        <td style="width:15%;"><button type="button" class="btn btn-secondary">STATUS</button></td>
-      </tr>';
-}
-?>
+                    @endif
+
+
 
                 </tbody>
 
@@ -134,7 +183,18 @@ for ($x = 0; $x <= 10; $x++) {
 </body>
 
 </html>
-
+{{-- <tr class="animate-row" style="animation-delay:'. 0.05 * $x .'s;">
+    <td style="width:15%;text-align:left!important">
+    {{$order->order_id}}
+    </td>
+    <td style="width:55%;text-align:left!important;vertical-align:top">
+        <p>Pokemon Card</p>
+        <p>RM8.00</p>
+        <p>x1</p>
+    </td>
+    <td style="width:15%;">Total: RM8.00</td>
+    <td style="width:15%;"><button type="button" class="btn btn-secondary">STATUS</button></td>
+</tr> --}}
 <script>
 function setActive(clickedButton) {
     const buttons = document.querySelectorAll('.btn');
@@ -142,5 +202,26 @@ function setActive(clickedButton) {
 
     clickedButton.classList.add('tracking-page-btn-active');
 }
+
+    // This function will be triggered to fetch the orders in JSON format
+    // function fetchOrders() {
+    //     fetch('/tracking', { // Adjust the URL to match your route
+    //         method: 'GET',
+    //         headers: {
+    //             'Accept': 'application/json'  // Expect JSON response
+    //         }
+    //     })
+    //     .then(response => response.json())  // Parse the JSON response
+    //     .then(data => {
+    //         console.log('Orders:', data);  // You can see the response in the console
+    //     })
+    //     .catch(error => {
+    //         console.error('Error fetching orders:', error);
+    //     });
+    // }
+
+    // // Call the function (e.g., after page load)
+    // fetchOrders();
+
 
 </script>

@@ -18,11 +18,11 @@ return new class extends Migration
             $table->unsignedBigInteger('promotion_id')->nullable()->default(null)->references('promotion_id')->on('promotion');    
             $table->integer('quantity');
             $table->decimal('subtotal', 8, 2);
-            $table->string('discount');
+            $table->string('discount')->nullable()->default(null);
             $table->decimal('total', 8, 2);
             $table->timestamps();
 
-            $table->unique(['order_id', 'product_id']);
+           
         });
     }
 
@@ -31,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('order_item');
+        Schema::dropIfExists('order_items');
     }
 };

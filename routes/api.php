@@ -8,8 +8,7 @@
     use App\Http\Controllers\PaymentController;
     use App\Http\Controllers\CartItemController;
     use App\Http\Controllers\CartController;
-    use App\Http\Controllers\StripePaymentController;
-    use App\Http\Controllers\StripeTestController;
+
 
 
     // Route::get('/user', function (Request $request) {
@@ -57,12 +56,7 @@
     Route::post('/checkout', [PaymentController::class, 'processCheckout']);
 
 
-    //Stripe API
-    Route::get('stripe', [StripePaymentController::class, 'stripe']);
-    Route::post('stripe', [StripePaymentController::class, 'stripePost'])->name('stripe.post');
 
-    // In web.php or api.php
-    Route::get('/stripe/test', [StripeTestController::class, 'testConnection']);
 
 
 

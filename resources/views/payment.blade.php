@@ -2,7 +2,8 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
+    {{-- communication security --}}
+    <meta charset="UTF-8">  
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     @vite(['resources/sass/app.scss','resources/js/app.js','resources/css/general.css'])
@@ -62,7 +63,7 @@
 
 
     <div class="container-xl content-div">
-        <form id="payment_form" method="POST" action="">
+        <form id="payment_form" method="POST" action="/session">
             <div class="mb-3 bottom-outline-div" >
                 <label class="form-label">Delivery Details</label>
                 <div class="row input-layout">
@@ -84,7 +85,7 @@
                 <input type="text" class="form-control input-layout" id="input_phonenumber" name="phone_number" placeholder="Phone Number" value="0123456789">
 
             </div>
-            <div class="mb-3">
+            {{-- <div class="mb-3">
                 <label for="exampleInputPassword1" class="form-label">Card Details</label>
                 <input type="text" class="form-control input-layout" id="input_nameoncard" name="name_on_card" placeholder="Name on Card" value="John Doe">
                 <input name="card_number" type="text" class="form-control input-layout" id="input_cardnumber"  name="card_number"  placeholder="Card Number" value="1234123412341234">
@@ -100,10 +101,11 @@
                 </div>
 
 
-            </div>
+            </div> --}}
 
 
             <div class="d-flex justify-content-end">
+                 <input type="hidden" name="_token" value="{{csrf_token()}}">
                 <button type="submit" class="btn btn-success" >Checkout</button>
             </div>
         </form>
@@ -144,52 +146,52 @@ form.addEventListener('submit', function(e) {
 
 
     function validateForm() {
-        // event.preventDefault(); // Prevent form from submitting automatically
+        event.preventDefault(); // Prevent form from submitting automatically
 
-        // // Get input elements
-        // var firstName = document.getElementById('input_firstname').value.trim();
-        // var lastName = document.getElementById('input_lastname').value.trim();
-        // var deliveryAddress = document.getElementById('input_deliveryaddress').value.trim();
-        // var email = document.getElementById('input_email').value.trim();
-        // var phoneNumber = document.getElementById('input_phonenumber').value.trim();
+        // Get input elements
+        var firstName = document.getElementById('input_firstname').value.trim();
+        var lastName = document.getElementById('input_lastname').value.trim();
+        var deliveryAddress = document.getElementById('input_deliveryaddress').value.trim();
+        var email = document.getElementById('input_email').value.trim();
+        var phoneNumber = document.getElementById('input_phonenumber').value.trim();
         // var nameOnCard = document.getElementById('input_nameoncard').value.trim();
         // var cardNumber = document.getElementById('input_cardnumber').value.trim();
         // var ccv = document.getElementById('input_ccv').value.trim();
         // var expiryDate = document.getElementById('input_mmyy').value.trim();
 
-        // // Patterns for validation
-        // var namePattern = /^[a-zA-Z\s]+$/;  // Only letters and spaces
-        // var emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;  // Email validation
-        // var phonePattern = /^[0-9]{10,15}$/;  // Only numbers (10-15 digits)
+        // Patterns for validation
+        var namePattern = /^[a-zA-Z\s]+$/;  // Only letters and spaces
+        var emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;  // Email validation
+        var phonePattern = /^[0-9]{10,15}$/;  // Only numbers (10-15 digits)
         // var cardNumberPattern = /^[0-9]{16}$/;  // 16 digits for card number
         // var ccvPattern = /^[0-9]{3,4}$/;  // 3 or 4 digits for CVV
         // var expiryDatePattern = /^(0[1-9]|1[0-2])\/[0-9]{2}$/;  // MM/YY format for expiry date
 
-        // // Validations
-        // if (!namePattern.test(firstName)) {
-        //     alert('First name must contain only letters and spaces');
-        //     return false;
-        // }
+        // Validations
+        if (!namePattern.test(firstName)) {
+            alert('First name must contain only letters and spaces');
+            return false;
+        }
 
-        // if (!namePattern.test(lastName)) {
-        //     alert('Last name must contain only letters and spaces');
-        //     return false;
-        // }
+        if (!namePattern.test(lastName)) {
+            alert('Last name must contain only letters and spaces');
+            return false;
+        }
 
-        // if (deliveryAddress === "") {
-        //     alert('Delivery address cannot be empty');
-        //     return false;
-        // }
+        if (deliveryAddress === "") {
+            alert('Delivery address cannot be empty');
+            return false;
+        }
 
-        // if (!emailPattern.test(email)) {
-        //     alert('Please enter a valid email address');
-        //     return false;
-        // }
+        if (!emailPattern.test(email)) {
+            alert('Please enter a valid email address');
+            return false;
+        }
 
-        // if (!phonePattern.test(phoneNumber)) {
-        //     alert('Phone number must contain only numbers (10 to 15 digits)');
-        //     return false;
-        // }
+        if (!phonePattern.test(phoneNumber)) {
+            alert('Phone number must contain only numbers (10 to 15 digits)');
+            return false;
+        }
 
         // if (!namePattern.test(nameOnCard)) {
         //     alert('Name on card must contain only letters and spaces');
@@ -211,8 +213,8 @@ form.addEventListener('submit', function(e) {
         //     return false;
         // }
 
-        // alert('Form is valid!');
-        // If all validations pass, submit the form (or perform further processing)
+        alert('Form is valid!');
+        If all validations pass, submit the form (or perform further processing)
     }
 
   
