@@ -387,49 +387,52 @@ class ProductController extends Controller
     public function show($id)
     {
         try {
-            // Fetch the product by ID
             $product = Product::findOrFail($id);
 
-            // Fetch ratings for the product
             $ratings = Rating::where('product_id', $id)
                 ->where('status', 'approved')
                 ->get();
 
-            // Calculate average rating and number of reviews
             $averageRating = $ratings->avg('star_rating') ?? 0;
             $reviewsCount = $ratings->count();
 
-            // Return view with product and rating information
+            $imageFiles = Storage::files('public/images/products/' . $id);
+            $images = array_map(function ($file) {
+                return basename($file);
+            }, $imageFiles);
+
+            $mainImageExtension = $this->getMainImageExtension($id);
+
             return view('product', [
                 'product' => $product,
                 'averageRating' => $averageRating,
                 'reviewsCount' => $reviewsCount,
+                'images' => $images,
+                'mainImageExtension' => $mainImageExtension,
             ]);
         } catch (ModelNotFoundException $e) {
-            return response()->view('errors.404');
-            // return response()->json(['error' => 'Product not found.'], 404);
+            return response()->json(['error' => 'Product not found.'], 404);
         } catch (Exception $e) {
-            // Log the error
             Log::error('Fetching product failed: ' . $e->getMessage());
             return response()->json(['error' => 'Fetching product failed.'], 500);
         }
     }
 
     // Show product images
-    public function showProductImages($id)
-    {
-        $product = Product::find($id);
+    // public function showProductImages($id)
+    // {
+    //     $product = Product::find($id);
 
-        $mainImageExtension = $this->getMainImageExtension($id);
+    //     $mainImageExtension = $this->getMainImageExtension($id);
 
-        // Get all images for this product from the storage directory
-        $imageFiles = Storage::files('public/images/products/' . $id);
-        $images = array_map(function ($file) {
-            return basename($file);
-        }, $imageFiles);
+    //     // Get all images for this product from the storage directory
+    //     $imageFiles = Storage::files('public/images/products/' . $id);
+    //     $images = array_map(function ($file) {
+    //         return basename($file);
+    //     }, $imageFiles);
 
-        return view('product', compact('product', 'images', 'mainImageExtension'));
-    }
+    //     return view('product', compact('product', 'images', 'mainImageExtension'));
+    // }
 
     // Show product images for admin product
     public function showProductImagesAdmin($id)

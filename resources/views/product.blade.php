@@ -193,6 +193,8 @@
 @endpush
 
 @section('top')
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
     <div class="container product-detail-container">
         <div class="container mt-4 product-image">
             <!-- Main Image Display -->
@@ -562,10 +564,15 @@
 
                     // Extract data from the button
                     const productId = button.getAttribute('data-product-id');
-                    const type = button.getAttribute('data-ptype');
                     const productType = button.getAttribute('data-product-type');
-                    const size = e.target.getAttribute('data-size');
-                    const color = e.target.getAttribute('data-color');
+                    const size = button.getAttribute(
+                        'data-size'); // Update to get from button or relevant element
+                    const color = button.getAttribute(
+                        'data-color'); // Update to get from button or relevant element
+
+                    console.log('Product Type:', productType);
+                    console.log('Size:', size);
+                    console.log('Color:', color);
 
                     // Prepare the payload
                     let payload = {
@@ -574,8 +581,13 @@
                         quantity: quantity,
                     };
 
-                    // Add size and color if applicable
-                    if (type === 'wearable') {
+                    // Validate for wearable products
+                    if (productType === 'wearable') {
+                        if (size == '' || color == '') {
+                            console.log('No size or color selected.');
+                            alert('Please select both size and color for wearable products.');
+                            return;
+                        }
                         payload.size = size;
                         payload.color = color;
                     }
@@ -586,22 +598,26 @@
                         return;
                     }
 
-                    try {
-                        fetch("{{ route('cart.add') }}", {
-                                method: 'POST',
-                                body: JSON.stringify(payload),
-                            })
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.success) {
-                                    alert('Item added to cart successfully!');
-                                } else {
-                                    alert('Failed to add item to cart.');
-                                }
-                            });
-                    } catch (error) {
-                        console.error('Error:', error);
-                    }
+                    fetch("{{ route('cart.add') }}", {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector(
+                                    'meta[name="csrf-token"]').getAttribute('content')
+                            },
+                            body: JSON.stringify(payload),
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                alert('Item added to cart successfully!');
+                            } else {
+                                alert('Failed to add item to cart.');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                        });
                 });
             });
         });

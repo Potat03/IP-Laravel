@@ -41,9 +41,6 @@ Route::get('/shop/consumable', [ConsumablesController::class, 'index'])->name('s
 Route::get('/shop/collectible', [CollectiblesController::class, 'index'])->name('shop.collectible');
 Route::get('/shop/new-arrivals', [ProductController::class, 'newArrivals'])->name('shop.newArrivals');
 
-Route::get('/product/{id}', [ProductController::class, 'show'])->name('product');
-Route::get('/product/{id}', [ProductController::class, 'showProductImages']);
-
 // Route::get('/cart', function () {
 //     return view('cart');
 // });
@@ -132,6 +129,8 @@ Route::middleware([CustomerAuth::class])->group(function () {
     Route::get('/shippingSec', [CustomerController::class, 'shippingSec'])->name('profile.shippingSec');
     Route::get('/supportChatSec', [CustomerController::class, 'supportChatSec'])->name('profile.supportChatSec');
     Route::get('/settingSec', [CustomerController::class, 'settingSec'])->name('profile.settingSec');
+
+    Route::get('/product/{id}', [ProductController::class, 'show'])->name('product');
 });
 
 
