@@ -38,14 +38,19 @@ class ProductController extends Controller
 
             $images = $request->file('images');
             if ($images) {
+                $isFirstImage = true; // Flag to check if it's the first image
                 foreach ($images as $index => $image) {
-                    $imageName = $index === 0
-                        ? 'main.' . $image->getClientOriginalExtension()
-                        : $index . '.' . $image->getClientOriginalExtension();
+                    // Check if this is the first image
+                    if ($isFirstImage) {
+                        $imageName = 'main.' . $image->getClientOriginalExtension();
+                        $isFirstImage = false; // Reset the flag after processing the first image
+                    } else {
+                        $imageName = ($index + 1) . '.' . $image->getClientOriginalExtension();
+                    }
 
+                    // Move the image to the folder
                     $image->move(public_path($folderPath), $imageName);
                 }
-
                 return response()->json(['success' => true, 'data' => 'Images have been successfully uploaded.'], 200);
             }
 
@@ -111,9 +116,8 @@ class ProductController extends Controller
                     if (!$mainImageExists) {
                         $imageName = 'main.' . $extension;
                         $newMainImage = $imageName;
-                        $mainImageExists = true; // Mark that we have assigned a main image
+                        $mainImageExists = true;
                     } else {
-                        // Generate a unique name for the image
                         $imageName = $this->generateUniqueName($existingImages, $extension);
                     }
 
@@ -175,11 +179,11 @@ class ProductController extends Controller
     {
         try {
             $request->validate([
-                'name' => 'required|string',
+                'name' => 'required|string|max:255',
                 'description' => 'required|string',
-                'price' => 'required|numeric',
-                'stock' => 'required|integer',
-                'status' => 'required|string',
+                'price' => 'required|numeric|min:0.01',
+                'stock' => 'required|integer|min:1',
+                'status' => 'required|string|in:active,inactive',
                 'isWearable' => 'nullable|numeric',
                 'isConsumable' => 'nullable|numeric',
                 'isCollectible' => 'nullable|numeric',
@@ -189,15 +193,15 @@ class ProductController extends Controller
                 'portion' => 'nullable|string',
                 'halal' => 'nullable|boolean',
                 'supplier' => 'nullable|string',
-                'selected_groups' => 'nullable|string',
+                'user_groups' => 'nullable|string',
             ]);
 
             $product = new Product();
-            $product->name = $request->name;
-            $product->description = $request->description;
+            $product->name = trim($request->name);
+            $product->description = htmlspecialchars($request->description, ENT_QUOTES, 'UTF-8');
             $product->price = $request->price;
             $product->stock = $request->stock;
-            $product->status = $request->status;
+            $product->status = trim($request->status);
             $product->created_at = now()->addHours(8);
             $product->save();
 
@@ -215,7 +219,7 @@ class ProductController extends Controller
             }
 
             // Forward request for image upload
-            // ProductController::productImageUpload($request, $id);
+            ProductController::productImageUpload($request, $product->product_id);
 
             return response()->json(['success' => true, 'message' => 'Product created successfully.'], 200);
         } catch (Exception $e) {
@@ -225,13 +229,6 @@ class ProductController extends Controller
 
     protected function createWearable($product, Request $request)
     {
-        $sizes = $request->input('sizes', []);
-        $colors = $request->input('colors', []);
-        $userGroups = $request->input('selected_groups', '');
-
-        $sizesString = is_array($sizes) ? implode(',', $sizes) : $sizes;
-        $colorsString = is_array($colors) ? implode(',', $colors) : $colors;
-
         $wearableObj = new WearableController();
 
         $wearableObj->store($request, $product->product_id);
@@ -371,11 +368,6 @@ class ProductController extends Controller
             // Fetch the product by ID
             $product = Product::findOrFail($id);
 
-            // Check if the product is active
-            if ($product->status != 'active') {
-                return response()->view('errors.404', [], 404);
-            }
-
             // Fetch ratings for the product
             $ratings = Rating::where('product_id', $id)
                 ->where('status', 'approved')
@@ -461,9 +453,9 @@ class ProductController extends Controller
             // Validate the request data
             $validatedData = $request->validate([
                 'name' => 'required|string|max:255',
-                'description' => 'nullable|string',
-                'price' => 'required|numeric',
-                'stock' => 'required|integer',
+                'description' => 'required|string',
+                'price' => 'required|numeric|min:0.01',
+                'stock' => 'required|integer|min:1',
                 'status' => 'required|string|in:active,inactive',
                 'isWearable' => 'nullable|numeric',
                 'isConsumable' => 'nullable|numeric',
@@ -476,6 +468,10 @@ class ProductController extends Controller
                 'supplier' => 'nullable|string',
                 'selected_groups' => 'nullable|string',
             ]);
+
+            $validatedData['name'] = trim($validatedData['name']);
+            $validatedData['description'] = trim($validatedData['description']);
+            $validatedData['description'] = htmlspecialchars($validatedData['description'], ENT_QUOTES, 'UTF-8');
 
             $this->productImageUploadUpdate($request, $id);
 

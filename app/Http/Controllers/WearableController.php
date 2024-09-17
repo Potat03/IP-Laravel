@@ -15,9 +15,9 @@ class WearableController extends Controller
     public function store(Request $request, $productId)
     {
         $request->validate([
-            'size' => 'required|string',
-            'color' => 'required|string',
-            'user_group' => 'required|string'
+            'sizes' => 'nullable|string',
+            'colors' => 'nullable|string',
+            'user_groups' => 'required|string'
         ]);
 
         try {
@@ -29,9 +29,9 @@ class WearableController extends Controller
 
             $context->applyStrategies(
                 [
-                    'size' => $request->size,
-                    'color' => $request->color,
-                    'user_group' => $request->user_group,
+                    'size' => $request->sizes ?? '',
+                    'color' => $request->colors ?? '',
+                    'user_group' => $request->user_groups,
                     'product_id' => $productId,
                 ]
             );

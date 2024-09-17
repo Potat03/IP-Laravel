@@ -18,7 +18,7 @@ class ConsumablesController extends Controller
         $request->validate([
             'expiry_date' => 'required|date',
             'portion' => 'required|integer|min:1',
-            'is_halal' => 'required|in:0,1'
+            'halal' => 'required|in:0,1'
         ]);
 
         try {
@@ -34,9 +34,9 @@ class ConsumablesController extends Controller
             // Apply the strategies and save the product
             $context->applyStrategies(
                 [
-                    'expiry_date' => $request->expiry_date,
+                    'expire_date' => $request->expiry_date,
                     'portion' => $request->portion,
-                    'is_halal' => $request->is_halal,
+                    'is_halal' => $request->halal,
                     'product_id' => $productId,
                 ]
             );
