@@ -14,6 +14,7 @@ use App\Strategies\CollectibleStrategy;
 use App\Strategies\ConsumableStrategy;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Exception;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Log;
 use Intervention\Image\ImageManagerStatic as Image;
 use Illuminate\Support\Facades\Storage;
@@ -57,6 +58,15 @@ class ProductController extends Controller
             }
 
             return response()->json(['success' => false, 'data' => 'No images were uploaded.'], 400);
+        } catch (ValidationException $e) {
+            // Log validation errors
+            Log::error('Validation failed for request', [
+                'errors' => $e->errors(),
+                'input' => $request->all(),
+            ]);
+
+            // Return validation error response
+            return response()->json(['errors' => $e->errors()], 422);
         } catch (Exception $e) {
             return response()->json(['success' => false, 'data' => $e->getMessage()], 400);
         }
@@ -152,6 +162,15 @@ class ProductController extends Controller
             }
 
             return response()->json(['success' => true, 'data' => 'Images have been successfully updated.'], 200);
+        } catch (ValidationException $e) {
+            // Log validation errors
+            Log::error('Validation failed for request', [
+                'errors' => $e->errors(),
+                'input' => $request->all(),
+            ]);
+
+            // Return validation error response
+            return response()->json(['errors' => $e->errors()], 422);
         } catch (Exception $e) {
             Log::error('Error updating images: ' . $e->getMessage());
             return response()->json(['success' => false, 'data' => $e->getMessage()], 400);
@@ -224,6 +243,15 @@ class ProductController extends Controller
             ProductController::productImageUpload($request, $product->product_id);
 
             return response()->json(['success' => true, 'message' => 'Product created successfully.'], 200);
+        } catch (ValidationException $e) {
+            // Log validation errors
+            Log::error('Validation failed for request', [
+                'errors' => $e->errors(),
+                'input' => $request->all(),
+            ]);
+
+            // Return validation error response
+            return response()->json(['errors' => $e->errors()], 422);
         } catch (Exception $e) {
             return response()->json(['failure' => false, 'message' => $e->getMessage()], 400);
         }
@@ -499,6 +527,15 @@ class ProductController extends Controller
             return response()->json(['success' => true, 'message' => 'Product updated successfully.'], 200);
         } catch (ModelNotFoundException $e) {
             return response()->json(['error' => 'Product not found.'], 404);
+        } catch (ValidationException $e) {
+            // Log validation errors
+            Log::error('Validation failed for request', [
+                'errors' => $e->errors(),
+                'input' => $request->all(),
+            ]);
+
+            // Return validation error response
+            return response()->json(['errors' => $e->errors()], 422);
         } catch (Exception $e) {
             // Log the error
             Log::error('Updating product failed: ' . $e->getMessage());
@@ -549,35 +586,46 @@ class ProductController extends Controller
         }
     }
 
-    // Delete a product
-    public function destroy($id)
-    {
-        try {
-            $product = Product::findOrFail($id);
-            $product->delete();
-
-            return response()->json(null, 204);
-        } catch (ModelNotFoundException $e) {
-            return response()->json(['error' => 'Product not found.'], 404);
-        }
-    }
-
-    // public function showNewArrivals()
+    // // Delete a product
+    // public function deleteProduct($id)
     // {
     //     try {
-    //         // Fetch new arrivals
-    //         $newArrivals = Product::where('created_at', '>=', now()->subDays(30))
-    //             ->orderBy('created_at', 'desc')
-    //             ->take(10)
-    //             ->get();
+    //         $product = Product::findOrFail($id);
 
-    //         return view('home', [
-    //             'newArrivals' => $newArrivals,
-    //         ]);
-    //     } catch (Exception $e) {
-    //         Log::error('Fetching new arrivals failed: ' . $e->getMessage());
-    //         return response()->json(['error' => 'Fetching new arrivals failed.'], 500);
+    //         // Fetch the folder path for the product images
+    //         $folderFullPath = public_path('storage/images/products/' . $id);
+
+    //         // Check if the folder exists
+    //         if (file_exists($folderFullPath) && is_dir($folderFullPath)) {
+    //             $this->deleteDirectory($folderFullPath);
+    //         }
+
+    //         $product->delete();
+
+    //         return response()->json(null, 204);
+    //     } catch (ModelNotFoundException $e) {
+    //         return response()->json(['error' => 'Product not found.'], 404);
     //     }
+    // }
+
+    // private function deleteDirectory($dir)
+    // {
+    //     if (!file_exists($dir) || !is_dir($dir)) {
+    //         return;
+    //     }
+
+    //     $items = array_diff(scandir($dir), ['.', '..']);
+
+    //     foreach ($items as $item) {
+    //         $path = $dir . '/' . $item;
+    //         if (is_dir($path)) {
+    //             $this->deleteDirectory($path);
+    //         } else {
+    //             unlink($path);
+    //         }
+    //     }
+
+    //     rmdir($dir);
     // }
 
     //at home page new arrival section

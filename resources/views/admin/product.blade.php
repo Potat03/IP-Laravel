@@ -1,7 +1,7 @@
 @extends('admin.layout.main')
 
 @section('vite')
-@vite(['resources/css/app.css','resources/sass/app.scss', 'resources/js/app.js', 'resources/css/admin-nav.css','resources/js/bootstrap.js'])
+    @vite(['resources/css/app.css', 'resources/sass/app.scss', 'resources/js/app.js', 'resources/css/admin-nav.css', 'resources/js/bootstrap.js'])
 @endsection
 
 @section('css')
@@ -60,7 +60,6 @@
                                 <button class="btn btn-warning"
                                     onclick="window.location.href='{{ route('admin.product.edit', $product->product_id) }}'"><i
                                         class="fa-regular fa-pen-to-square pe-2"></i>Edit</button>
-                                <button class="btn btn-danger"><i class="fa-solid fa-trash-can pe-2"></i>Delete</button>
                             </td>
                         </tr>
                     @endforeach
