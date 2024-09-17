@@ -38,14 +38,16 @@ class ProductController extends Controller
 
             $images = $request->file('images');
             if ($images) {
-                $isFirstImage = true; // Flag to check if it's the first image
+                $isFirstImage = true;
+                $imageCounter = 1;
                 foreach ($images as $index => $image) {
                     // Check if this is the first image
                     if ($isFirstImage) {
                         $imageName = 'main.' . $image->getClientOriginalExtension();
-                        $isFirstImage = false; // Reset the flag after processing the first image
+                        $isFirstImage = false;
                     } else {
-                        $imageName = ($index + 1) . '.' . $image->getClientOriginalExtension();
+                        $imageName = $imageCounter . '.' . $image->getClientOriginalExtension();
+                        $imageCounter++;
                     }
 
                     // Move the image to the folder
