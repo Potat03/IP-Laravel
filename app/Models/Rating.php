@@ -11,7 +11,8 @@ class Rating extends Model
 
     protected $table = 'rating';
 
-    protected $primaryKey = ['product_id', 'customer_id'];
+    // protected $primaryKey = ['product_id', 'customer_id'];
+    protected $primaryKey = 'id';
 
     protected $fillable = [
         'product_id',

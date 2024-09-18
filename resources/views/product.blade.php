@@ -197,8 +197,14 @@
         <div class="container mt-4 product-image">
             <!-- Main Image Display -->
             <div class="main-image mb-3">
-                <img id="mainImage" src="{{ asset('storage/images/products/' . $product->product_id . '/' . $images[0]) }}"
-                    class="img-fluid main-square" alt="Main Product Image" draggable="false">
+                @php
+                    $mainImageUrl = $mainImageExtension
+                        ? asset('storage/images/products/' . $product->product_id . '/main.' . $mainImageExtension)
+                        : asset('storage/images/products/default.jpg'); // Default image
+                @endphp
+                <img id="mainImage" src="{{ $mainImageUrl }}" class="img-fluid main-square" alt="Main Product Image"
+                    draggable="false">
+
             </div>
 
             <!-- Thumbnail Images -->
@@ -207,7 +213,8 @@
                     <div class="thumbnail-wrapper">
                         <img src="{{ asset('storage/images/products/' . $product->product_id . '/' . $image) }}"
                             class="thumbnail img-thumbnail thumbnail-square" alt="Thumbnail Image"
-                            data-image="{{ asset('storage/images/products/' . $product->product_id . '/' . $image) }}" draggable="false">
+                            data-image="{{ asset('storage/images/products/' . $product->product_id . '/' . $image) }}"
+                            draggable="false">
                     </div>
                 @endforeach
             </div>
@@ -263,7 +270,7 @@
                                 @foreach ($sizes as $size)
                                     @php
                                         // Capitalize the first letter of each size and trim any extra spaces
-                                        $size = ucfirst(trim($size));
+                                        $size = strtoupper(trim($size));
                                     @endphp
                                     <button type="button" class="btn btn-variation btn-outline-dark fw-bold"
                                         onclick="selectVariation(this)">{{ trim($size) }}</button>

@@ -19,6 +19,7 @@ class Product extends Model
         'description',
         'price',
         'stock',
+        'status',
         'created_at'
     ];
 
@@ -84,5 +85,36 @@ class Product extends Model
         }
 
         return 'Other'; // or return null if you prefer
+    }
+
+     // Common methods
+     public function setName($name)
+     {
+         $this->name = $name;
+     }
+ 
+     public function setDescription($description)
+     {
+         $this->description = $description;
+     }
+ 
+     public function setPrice($price)
+     {
+         $this->price = $price;
+     }
+ 
+     public function setStock($stock)
+     {
+         $this->stock = $stock;
+     }
+ 
+     public function setStatus($status)
+     {
+         $this->status = $status;
+     }
+ 
+     public function saveProduct()
+    {
+        $this->save();
     }
 }

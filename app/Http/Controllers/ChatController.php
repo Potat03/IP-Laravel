@@ -77,4 +77,5 @@ class ChatController extends Controller
             'message' => 'Message not found',
         ], 404);
     }
+
 }

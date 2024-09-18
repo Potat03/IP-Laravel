@@ -4,13 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
-//for state design pattern 
 use App\States\OrderState;
 use App\States\PrepareState;
 use App\States\DeliveryState;
 use App\States\DeliveredState;
-
 
 class Order extends Model
 {
@@ -30,42 +27,50 @@ class Order extends Model
         'delivery_address',
         'delivery_method',
         'tracking_number',
+        'rating',
         'created_at',
     ];
 
-    public function customer()
-    {
-        return $this->belongsTo(Customer::class, 'customer_id', 'customer_id');
-    }
-
-    public function payment()
-    {
-        return $this->hasOne(Payment::class, 'order_id', 'order_id');
-    }
-
-    public function orderItems()
-    {
-        return $this->hasMany(OrderItem::class, 'order_id', 'order_id');
-    }
-
-    public function orderState()
-    {
-        return $this->hasOne(OrderState::class, 'order_id', 'order_id');
-    }
-
-
-    //for state design pattern
     protected $state;
 
-    public function __construct()
+    public static function boot()
     {
-        $this->state = new PrepareState($this);  // Initialize with PrepareState
+        parent::boot();
+
+        // Hook into the retrieved event to set the state after the model is loaded
+        static::retrieved(function ($order) {
+            $order->setState();
+        });
+    }
+
+    // Set the appropriate state based on the status
+    public function setState()
+    {
+        switch ($this->status) {
+            case 'prepare':
+                $this->state = new PrepareState($this);
+                break;
+
+            case 'delivery':
+                $this->state = new DeliveryState($this);
+                break;
+
+            case 'delivered':
+                $this->state = new DeliveredState($this);
+                break;
+
+            default:
+                // Default state can be PrepareState, or handle undefined status
+                $this->state = new PrepareState($this);
+                break;
+        }
     }
 
     // Method to change state
     public function changeState(OrderState $state)
     {
         $this->state = $state;
+        $this->save();
     }
 
     // Delegates to the state
@@ -79,16 +84,9 @@ class Order extends Model
         return $this->state->canShowToUser();
     }
 
-    public function rateOrder()
+    public function rateOrder($rating)
     {
-        return $this->state->canRateOrder();
-    }
-
-    // Additional methods that states may call
-    public function generateDeliveryCode()
-    {
-        // Generate delivery code logic
-        return 'DEL' . uniqid();
+        return $this->state->rateOrder($rating);
     }
 
     public function startDelivery()
@@ -105,5 +103,5 @@ class Order extends Model
     {
         // Logic to enable user rating
     }
-    
 }
+

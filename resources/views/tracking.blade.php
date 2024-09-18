@@ -2,60 +2,59 @@
 <html lang="en">
 
 <head>
-    {{-- communication security --}}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     @vite(['resources/sass/app.scss','resources/js/app.js','resources/css/general.css'])
     <style>
-    .input-layout {
-        margin-bottom: 1.5%;
-    }
-
-    .flex-container {
-        display: flex;
-        align-items: stretch;
-    }
-
-    .tracking-page-btn {
-        flex-grow: 1;
-        background-color: transparent;
-        color: black;
-        border: none;
-        padding: 10px 20px;
-        font-size: 16px;
-        cursor: pointer;
-        transition: background-color 0.3s, color 0.3s;
-    }
-
-    .tracking-page-btn:hover {
-        background-color: #b90f0f;
-        color: white;
-    }
-
-    .tracking-page-btn-active {
-        border-bottom: #b90f0f 5px solid;
-    }
-
-    p {
-        margin-bottom: 0;
-    }
-
-    @keyframes slideIn {
-        from {
-            opacity: 0;
-            transform: translateX(100%);
+        .input-layout {
+            margin-bottom: 1.5%;
         }
 
-        to {
-            opacity: 1;
-            transform: translateX(0);
+        .flex-container {
+            display: flex;
+            align-items: stretch;
         }
-    }
 
-    .animate-row {
-        animation: slideIn 0.5s ease-out;
-    }
+        .tracking-page-btn {
+            flex-grow: 1;
+            background-color: transparent;
+            color: black;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .tracking-page-btn:hover {
+            background-color: #b90f0f;
+            color: white;
+        }
+
+        .tracking-page-btn-active {
+            border-bottom: #b90f0f 5px solid;
+        }
+
+        p {
+            margin-bottom: 0;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .animate-row {
+            animation: slideIn 0.5s ease-out;
+        }
     </style>
 </head>
 
@@ -84,144 +83,186 @@
                 </form>
 
                 <div class="navbar-nav">
-                <a class="nav-link active text-white" aria-current="page" href="#">Home</a>
+                    <a class="nav-link active text-white" aria-current="page" href="#">Home</a>
                     <a class="nav-link text-white" href="#">Product</a>
                     <a class="nav-link text-white" href="{{ url('/cart') }}">Cart</a>
                     <a class="nav-link disabled text-white" aria-disabled="true">Profile</a>
                 </div>
             </div>
-
-
+        </div>
     </nav>
-
-
 
     <div class="container-xl content-div">
         <div class="d-flex justify-content-between" style="margin-bottom:0.5%">
-            <button type="button" class="btn tracking-page-btn tracking-page-btn-active"
-                onclick="setActive(this)">All</button>
-            <button type="button" class="btn tracking-page-btn" onclick="setActive(this)">To Ship</button>
-            <button type="button" class="btn tracking-page-btn" onclick="setActive(this)">To Receive</button>
-            <button type="button" class="btn tracking-page-btn" onclick="setActive(this)">Completed</button>
+            <button type="button" class="btn tracking-page-btn tracking-page-btn-active" id="allBtn"
+                onclick="filterRows('all',this)">All</button>
+            <button type="button" class="btn tracking-page-btn" id="toShipBtn" onclick="filterRows('prepare',this)">To Ship</button>
+            <button type="button" class="btn tracking-page-btn" id="toReceiveBtn" onclick="filterRows('delivery',this)">To Receive</button>
+            <button type="button" class="btn tracking-page-btn" id="completedBtn" onclick="filterRows('delivered',this)">Completed</button>
         </div>
         <div class="container">
             <table class="table">
                 <tbody>
-                    <tr>
-                        <th style="width:10%;text-align:left!important">ORDER ID</th>
-                        <th style="width:30%;text-align:left!important;">DELIVERY ADDRESS</th>
+                    <tr class="th">
+                        <th style="width:8%;text-align:left!important">ORDER ID</th>
+                        <th style="width:20%;text-align:left!important;">DELIVERY ADDRESS</th>
                         <th style="width:15%;text-align:left!important;">TOTAL</th>
-                        <th style="width:20%;text-align:left!important;">CREATED AT</th>
+                        <th style="width:15%;text-align:left!important;">CREATED AT</th>
                         <th style="width:15%;text-align:left!important;">TRACKING NUMBER</th>
+                        <th style="width:17%;text-align:left!important;">RATING</th>
                         <th style="width:15%;text-align:right!important;">STATUS</th>
                     </tr>
-            
-                    
+
                     @if(count($orders) > 0)
                     @php
                     $x = 1;
-                @endphp
-                @foreach($orders as $order)
-                @if($order->status == 'prepare')
-                    <tr class="animate-row" style="animation-delay:'. 0.05 * $x .'s;">
-                        <td style="text-align:left!important">
-                           {{$order->order_id}}
-                        </td>
-                        <td style="text-align:left!important;">
-                           {{$order->delivery_address}}
-                        </td>
-                        <td style="text-align:left!important;">
-                           RM {{$order->total}}
-                        </td>
-                        <td style="text-align:left!important;">{{ \Carbon\Carbon::parse($order->created_at)->format('d-m-Y h:iA') }}</td>
-                        <td style="text-align:left!important;">-</td>
-                        <td style="text-align:right!important;"><button type="button" class="btn btn-secondary">PREPARE</button></td>
-                    </tr>
-                @elseif($order->status =="delivery")
-                <tr class="animate-row" style="animation-delay:'. 0.05 * $x .'s;">
-                    <td style="text-align:left!important">
-                       {{$order->order_id}}
-                    </td>
-                    <td style="text-align:left!important;">
-                       {{$order->delivery_address}}
-                    </td>
-                    <td style="text-align:left!important;">
-                       RM {{$order->total}}
-                    </td>
-                    <td style="text-align:left!important;">{{ \Carbon\Carbon::parse($order->created_at)->format('d-m-Y h:iA') }}</td>
-                    <td style="text-align:left!important;">{{$order->tracking_number}}</td>
-                    <td style="text-align:right!important;"><button type="button" class="btn btn-secondary">DELIVERY</button></td>
-                </tr>
-                @elseif($order->status =="delivered")
-                <tr class="animate-row" style="animation-delay:'. 0.05 * $x .'s;">
-                    <td style="text-align:left!important">
-                       {{$order->order_id}}
-                    </td>
-                    <td style="text-align:left!important;">
-                       {{$order->delivery_address}}
-                    </td>
-                    <td style="text-align:left!important;">
-                       RM {{$order->total}}
-                    </td>
-                    <td style="text-align:left!important;">{{ \Carbon\Carbon::parse($order->created_at)->format('d-m-Y h:iA') }}</td>
-                    <td style="text-align:left!important;">{{$order->tracking_number}}</td>
-                    <td style="text-align:right!important;"><button type="button" class="btn btn-secondary">DELIVERED</button></td>
-                </tr>
-                @endif
-                @endforeach
+                    @endphp
+                    @foreach($orders as $order)
+                    @if($order->status == 'prepare')
+                        <tr class="animate-row prepare" style="animation-delay: 0.05s * {{ $x }};">
+                            <td style="text-align:left!important">{{ $order->order_id }}</td>
+                            <td style="text-align:left!important;">{{ $order->delivery_address }}</td>
+                            <td style="text-align:left!important;">RM {{ $order->total }}</td>
+                            <td style="text-align:left!important;">{{ \Carbon\Carbon::parse($order->created_at)->format('d-m-Y h:iA') }}</td>
+                            <td style="text-align:left!important;">-</td>
+                            <td style="text-align:left!important;">-</td>
 
+                            <td style="text-align:right!important;"><button type="button" class="btn btn-secondary">PREPARE</button></td>
+                        </tr>
+                    @elseif($order->status =="delivery")
+                        <tr class="animate-row delivery" style="animation-delay: 0.05s * {{ $x }};">
+                            <td style="text-align:left!important">{{ $order->order_id }}</td>
+                            <td style="text-align:left!important;">{{ $order->delivery_address }}</td>
+                            <td style="text-align:left!important;">RM {{ $order->total }}</td>
+                            <td style="text-align:left!important;">{{ \Carbon\Carbon::parse($order->created_at)->format('d-m-Y h:iA') }}</td>
+                            <td style="text-align:left!important;">{{ $order->tracking_number }}</td>
+                            <td style="text-align:left!important;">-</td>
+                            <td style="text-align:right!important;"><button type="button" class="btn btn-secondary">DELIVERY</button></td>
+                        </tr>
+                    @elseif($order->status =="delivered")
+                        <tr class="animate-row delivered" style="animation-delay: 0.05s * {{ $x }};">
+                            <td style="text-align:left!important">{{ $order->order_id }}</td>
+                            <td style="text-align:left!important;">{{ $order->delivery_address }}</td>
+                            <td style="text-align:left!important;">RM {{ $order->total }}</td>
+                            <td style="text-align:left!important;">{{ \Carbon\Carbon::parse($order->created_at)->format('d-m-Y h:iA') }}</td>
+                            <td style="text-align:left!important;">{{ $order->tracking_number }}</td>
+                            <td style="text-align:left!important;">
+                                @if($order->rating == 1)
+                                <span id="star1_{{$order->order_id}}"style="font-size:200%;color:yellow;cursor:pointer;" onclick="rateOrder(1,{{$order->order_id}})">&starf;</span>
+                                <span id="star2_{{$order->order_id}}"style="font-size:200%;color:yellow;cursor:pointer;" onclick="rateOrder(2,{{$order->order_id}})">&star;</span>
+                                <span id="star3_{{$order->order_id}}"style="font-size:200%;color:yellow;cursor:pointer;" onclick="rateOrder(3,{{$order->order_id}})">&star;</span>
+                                <span id="star4_{{$order->order_id}}"style="font-size:200%;color:yellow;cursor:pointer;" onclick="rateOrder(4,{{$order->order_id}})">&star;</span>
+                                <span id="star5_{{$order->order_id}}"style="font-size:200%;color:yellow;cursor:pointer;" onclick="rateOrder(5,{{$order->order_id}})">&star;</span>
+                              
+                                @elseif($order->rating == 2)
+                                <span id="star1_{{$order->order_id}}"style="font-size:200%;color:yellow;cursor:pointer;" onclick="rateOrder(1,{{$order->order_id}})">&starf;</span>
+                                <span id="star2_{{$order->order_id}}"style="font-size:200%;color:yellow;cursor:pointer;" onclick="rateOrder(2,{{$order->order_id}})">&starf;</span>
+                                <span id="star3_{{$order->order_id}}"style="font-size:200%;color:yellow;cursor:pointer;" onclick="rateOrder(3,{{$order->order_id}})">&star;</span>
+                                <span id="star4_{{$order->order_id}}"style="font-size:200%;color:yellow;cursor:pointer;" onclick="rateOrder(4,{{$order->order_id}})">&star;</span>
+                                <span id="star5_{{$order->order_id}}"style="font-size:200%;color:yellow;cursor:pointer;" onclick="rateOrder(5,{{$order->order_id}})">&star;</span>
+                                @elseif($order->rating == 3)
+                                <span id="star1_{{$order->order_id}}"style="font-size:200%;color:yellow;cursor:pointer;" onclick="rateOrder(1,{{$order->order_id}})">&starf;</span>
+                                <span id="star2_{{$order->order_id}}"style="font-size:200%;color:yellow;cursor:pointer;" onclick="rateOrder(2,{{$order->order_id}})">&starf;</span>
+                                <span id="star3_{{$order->order_id}}"style="font-size:200%;color:yellow;cursor:pointer;" onclick="rateOrder(3,{{$order->order_id}})">&starf;</span>
+                                <span id="star4_{{$order->order_id}}"style="font-size:200%;color:yellow;cursor:pointer;" onclick="rateOrder(4,{{$order->order_id}})">&star;</span>
+                                <span id="star5_{{$order->order_id}}"style="font-size:200%;color:yellow;cursor:pointer;" onclick="rateOrder(5,{{$order->order_id}})">&star;</span>
+                                @elseif($order->rating == 4)
+                                <span id="star1_{{$order->order_id}}"style="font-size:200%;color:yellow;cursor:pointer;" onclick="rateOrder(1,{{$order->order_id}})">&starf;</span>
+                                <span id="star2_{{$order->order_id}}"style="font-size:200%;color:yellow;cursor:pointer;" onclick="rateOrder(2,{{$order->order_id}})">&starf;</span>
+                                <span id="star3_{{$order->order_id}}"style="font-size:200%;color:yellow;cursor:pointer;" onclick="rateOrder(3,{{$order->order_id}})">&starf;</span>
+                                <span id="star4_{{$order->order_id}}"style="font-size:200%;color:yellow;cursor:pointer;" onclick="rateOrder(4,{{$order->order_id}})">&starf;</span>
+                                <span id="star5_{{$order->order_id}}"style="font-size:200%;color:yellow;cursor:pointer;" onclick="rateOrder(5,{{$order->order_id}})">&star;</span>
+                                @elseif($order->rating == 5)
+                                <span id="star1_{{$order->order_id}}"style="font-size:200%;color:yellow;cursor:pointer;" onclick="rateOrder(1,{{$order->order_id}})">&starf;</span>
+                                <span id="star2_{{$order->order_id}}"style="font-size:200%;color:yellow;cursor:pointer;" onclick="rateOrder(2,{{$order->order_id}})">&starf;</span>
+                                <span id="star3_{{$order->order_id}}"style="font-size:200%;color:yellow;cursor:pointer;" onclick="rateOrder(3,{{$order->order_id}})">&starf;</span>
+                                <span id="star4_{{$order->order_id}}"style="font-size:200%;color:yellow;cursor:pointer;" onclick="rateOrder(4,{{$order->order_id}})">&starf;</span>
+                                <span id="star5_{{$order->order_id}}"style="font-size:200%;color:yellow;cursor:pointer;" onclick="rateOrder(5,{{$order->order_id}})">&starf;</span>
+                              @else
+                                    <span id="star1_{{$order->order_id}}" style="font-size:200%;color:yellow;cursor:pointer;" onclick="rateOrder(1,{{$order->order_id}})">&star;</span>
+                                    <span id="star2_{{$order->order_id}}" style="font-size:200%;color:yellow;cursor:pointer;" onclick="rateOrder(2,{{$order->order_id}})">&star;</span>
+                                    <span id="star3_{{$order->order_id}}" style="font-size:200%;color:yellow;cursor:pointer;" onclick="rateOrder(3,{{$order->order_id}})">&star;</span>
+                                    <span id="star4_{{$order->order_id}}" style="font-size:200%;color:yellow;cursor:pointer;" onclick="rateOrder(4,{{$order->order_id}})">&star;</span>
+                                    <span id="star5_{{$order->order_id}}" style="font-size:200%;color:yellow;cursor:pointer;" onclick="rateOrder(5,{{$order->order_id}})">&star;</span>
+                                @endif
+                                </td>
+                            <td style="text-align:right!important;"><button type="button" class="btn btn-secondary">DELIVERED</button></td>
+                        </tr>
                     @endif
-
-
-
+                    @endforeach
+                    @endif
                 </tbody>
-
             </table>
         </div>
     </div>
 
+    <script>
+        function setActive(clickedButton) {
+            const buttons = document.querySelectorAll('.btn.tracking-page-btn');
+            buttons.forEach(button => button.classList.remove('tracking-page-btn-active'));
+
+            clickedButton.classList.add('tracking-page-btn-active');
+        }
+
+        function filterRows(status,clickedButton) {
+            const rows = document.querySelectorAll('tr');
+
+            rows.forEach(row => {
+                if (status === 'all') {
+                    row.style.display = '';
+                } else if (row.classList.contains(status)) {
+                    row.style.display = '';
+                }else if (row.classList.contains("th")) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            // Update active button
+          setActive(clickedButton);
+        }
+
+        function rateOrder(rating, id) {
+            var star1 = document.getElementById(`star1_${id}`);
+            var star2 = document.getElementById(`star2_${id}`);
+            var star3 = document.getElementById(`star3_${id}`);
+            var star4 = document.getElementById(`star4_${id}`);
+            var star5 = document.getElementById(`star5_${id}`);
+
+            star1.innerHTML = '&star;';
+            star2.innerHTML = '&star;';
+            star3.innerHTML = '&star;';
+            star4.innerHTML = '&star;';
+            star5.innerHTML = '&star;';
+
+               // Fill the stars up to the clicked rating
+        if (rating >= 1) star1.innerHTML = '&starf;';
+        if (rating >= 2) star2.innerHTML = '&starf;';
+        if (rating >= 3) star3.innerHTML = '&starf;';
+        if (rating >= 4) star4.innerHTML = '&starf;';
+        if (rating >= 5) star5.innerHTML = '&starf;';
+    
+        fetch(`/api/order/rating/${id}`, {
+                method: 'POST',
+                body: JSON.stringify({ rating: rating }),
+                headers: {
+                 'Content-Type': 'application/json'
+             }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log('Order updated successfully');
+                    alert("You clicked the star to rate the order!");
+                } else {
+                    console.error('Error updating order');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+       
+    }
+    </script>
 </body>
 
 </html>
-{{-- <tr class="animate-row" style="animation-delay:'. 0.05 * $x .'s;">
-    <td style="width:15%;text-align:left!important">
-    {{$order->order_id}}
-    </td>
-    <td style="width:55%;text-align:left!important;vertical-align:top">
-        <p>Pokemon Card</p>
-        <p>RM8.00</p>
-        <p>x1</p>
-    </td>
-    <td style="width:15%;">Total: RM8.00</td>
-    <td style="width:15%;"><button type="button" class="btn btn-secondary">STATUS</button></td>
-</tr> --}}
-<script>
-function setActive(clickedButton) {
-    const buttons = document.querySelectorAll('.btn');
-    buttons.forEach(button => button.classList.remove('tracking-page-btn-active'));
-
-    clickedButton.classList.add('tracking-page-btn-active');
-}
-
-    // This function will be triggered to fetch the orders in JSON format
-    // function fetchOrders() {
-    //     fetch('/tracking', { // Adjust the URL to match your route
-    //         method: 'GET',
-    //         headers: {
-    //             'Accept': 'application/json'  // Expect JSON response
-    //         }
-    //     })
-    //     .then(response => response.json())  // Parse the JSON response
-    //     .then(data => {
-    //         console.log('Orders:', data);  // You can see the response in the console
-    //     })
-    //     .catch(error => {
-    //         console.error('Error fetching orders:', error);
-    //     });
-    // }
-
-    // // Call the function (e.g., after page load)
-    // fetchOrders();
-
-
-</script>

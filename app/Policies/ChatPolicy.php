@@ -10,6 +10,8 @@ class ChatPolicy
 {
     use HandlesAuthorization;
 
+
+
     public function viewAny(UserInterface $user)
     {
         return $user->getRole() === 'customer' || $user->getRole() === 'manager' || $user->getRole() === 'customer_service';
@@ -17,7 +19,7 @@ class ChatPolicy
 
     public function viewChat(UserInterface $user, Chat $chat)
     {
-        return $user->getID() === $chat->admin_id || $user->getID() === $chat->customer_id || $chat->status === 'ended' || $chat->status === 'waiting';
+        return ($user->getID() === $chat->admin_id && $user->getRole() === 'customer_service') || ($user->getID() === $chat->customer_id && $user->getRole() === 'customer') && ($chat->status === 'pending' || $chat->status === 'active');
     }
  
     public function sendMessages(UserInterface $user, Chat $chat)

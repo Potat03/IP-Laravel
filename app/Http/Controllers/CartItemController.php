@@ -16,7 +16,6 @@ class CartItemController extends Controller
 {
 
     
-   //product image upload
    public function addToCart(Request $request)
    {
        try {

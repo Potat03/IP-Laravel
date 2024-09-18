@@ -1,5 +1,9 @@
 @extends('admin.layout.main')
 
+@section('vite')
+@vite(['resources/css/app.css','resources/sass/app.scss', 'resources/js/app.js', 'resources/css/admin-nav.css','resources/js/bootstrap.js'])
+@endsection
+
 @section('css')
 <style>
     .btn {
@@ -38,8 +42,8 @@
                 <div class="mb-3">
                     <label for="product_id" class="form-label">Type</label>
                     <select class="form-select" id="type" name="type" required>
-                        <option value="1">Single</option>
-                        <option value="2">Bundle</option>
+                        <option value="single">Single</option>
+                        <option value="bundle">Bundle</option>
                     </select>
                 </div>
                 <div class="mb-3">
@@ -141,7 +145,8 @@
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-        let productLimit = document.getElementById('limit').value;
+        let productLimit = document.getElementById('limit').value == "single" ? 1 : 0;
+        console.log(productLimit);
 
         $('#start_date').on('change', function() {
             $('#end_date').attr('min', this.value);
@@ -154,7 +159,7 @@
 
         document.getElementById('type').addEventListener('change', function() {
             let type = this.value;
-            if (type == 1) {
+            if (type == "single") {
                 selected_products.splice(1, selected_products.length);
                 displayProducts()
                 productLimit = 1;
@@ -199,7 +204,6 @@
 
         });
 
-        //ajax request to add promotion
         document.querySelector('form').addEventListener('submit', function(e) {
             e.preventDefault();
             let form = new FormData(this);

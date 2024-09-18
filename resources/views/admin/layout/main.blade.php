@@ -6,10 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title')</title>
 
-    @vite(['resources/css/app.css','resources/sass/app.scss', 'resources/js/app.js', 'resources/css/admin-nav.css','resources/js/bootstrap.js'])
     @include('partials.fontawesome')
-    <link href="{{ asset('css/admin_support.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/admin_nav.css') }}" rel="stylesheet">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    @yield('vite')
     @yield('css')
 </head>
 
@@ -29,12 +29,12 @@
 
         <div class="top_content">
             <div class="top_left">
-                <h1 class="fw-bold">Futatabi</h1>
+                <h1>Futatabi</h1>
             </div>
             <div class="top_middle">
                 <div class="current_time">
-                    <p class="cur_date">12/12/2021</p>
-                    <p class="cur_time">12:00 AM</p>
+                    <p class="cur_date m-0">12/12/2021</p>
+                    <p class="cur_time m-0">12:00 AM</p>
                 </div>
             </div>
             <div class="top_right">
@@ -132,7 +132,7 @@
                 var minutes = date.getMinutes();
                 var ampm = hours >= 12 ? 'PM' : 'AM';
                 hours = hours % 12;
-                hours = hours ? hours : 12; // the hour '0' should be '12'
+                hours = hours ? hours : 12; 
                 minutes = minutes < 10 ? '0' + minutes : minutes;
                 var strTime = hours + ':' + minutes + ' ' + ampm;
                 $('.cur_time').text(strTime);

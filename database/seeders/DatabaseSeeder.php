@@ -9,9 +9,11 @@ use App\Models\CartItem;
 use App\Models\Promotion;
 use App\Models\PromotionItem;
 use Carbon\Carbon;
-
+use App\Models\Wearable;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+
+use function Symfony\Component\String\b;
 
 class DatabaseSeeder extends Seeder
 {
@@ -27,7 +29,7 @@ class DatabaseSeeder extends Seeder
             'tier' => 'gold',
             'phone_number' => '081234567890',
             'email' => 'customer@gmail.com',
-            'password' => 'password',
+            'password' =>  bcrypt('password'),
             'status' => 'active',
         ]);
 
@@ -61,6 +63,20 @@ class DatabaseSeeder extends Seeder
             'price' => '1000',
             'stock' => '0',
             'status' => 'active',
+        ]);
+
+        Wearable::create([
+            'product_id' => '1',
+            'size' => 'M,L,XL',
+            'color' => 'black,white',
+            'user_group' => 'men'
+        ]);
+
+        Wearable::create([
+            'product_id' => '2',
+            'size' => 'M,L,XL',
+            'color' => 'black,green',
+            'user_group' => 'men'
         ]);
 
         Cart::create([

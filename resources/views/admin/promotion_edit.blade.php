@@ -1,5 +1,9 @@
 @extends('admin.layout.main')
 
+@section('vite')
+@vite(['resources/css/app.css','resources/sass/app.scss', 'resources/js/app.js', 'resources/css/admin-nav.css','resources/js/bootstrap.js'])
+@endsection
+
 @section('css')
 <style>
     .btn {
@@ -37,9 +41,9 @@
                 </div>
                 <div class="mb-3">
                     <label for="product_id" class="form-label">Type</label>
-                    <select class="form-select" id="type" name="type" value="{{ $promotion->type }}" required>
-                        <option value="1">Single</option>
-                        <option value="2">Bundle</option>
+                    <select class="form-select" id="type" name="type" required>
+                        <option value="single" selected="{{ $promotion->type == 'single' ? 'selected' : '' }}">Single</option>
+                        <option value="bundle" selected="{{ $promotion->type == 'bundle' ? 'selected' : '' }}">Bundle</option>
                     </select>
                 </div>
                 <div class="mb-3">
@@ -93,7 +97,7 @@
 @section('js')
 <script>
     let product_list = @json($products);
-    let selected_products = @json($promotion - > product_list);
+    let selected_products = @json($promotion->product_list);
 
     function displayProducts() {
         let display = document.getElementById('product_list');
@@ -138,7 +142,7 @@
     }
     document.addEventListener('DOMContentLoaded', function() {
 
-        let productLimit = parseInt(document.getElementById('limit').value);
+        let productLimit = document.getElementById('limit').value == "single" ? 1 : 0;
 
         displayProducts()
 
@@ -152,7 +156,7 @@
 
         document.getElementById('type').addEventListener('change', function() {
             let type = this.value;
-            if (type == 1) {
+            if (type == "single") {
                 selected_products.splice(1, selected_products.length);
                 displayProducts()
                 productLimit = 1;
