@@ -431,6 +431,7 @@
         $('.action_bar').addClass('chat_hide');
         $('.paste_area img').remove();
         $('.paste_area').removeClass('show');
+        $('.paste_area_remove').remove();
         $('.chat_msg').remove();
         last_msg_id = 0;
         if (live_update_interval) {
@@ -547,6 +548,7 @@
             data: {
                 chat_id: chat_id,
                 last_msg_id: last_msg_id,
+                by_customer: 0,
                 _token: "{{ csrf_token() }}"
             },
             success: function(response) {
@@ -594,7 +596,9 @@
                 }
             },
             error: function(xhr) {
-                console.log(xhr.responseText);
+                const response = JSON.parse(xhr.responseText);
+                showErrorMsg(response.info);
+                clearInterval(live_update_interval);
             }
         });
     }

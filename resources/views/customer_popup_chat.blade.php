@@ -51,6 +51,7 @@
         <div class="popup_box_body">
             <div class="popup_box_body_chat">
                 <div class="start_message">Enter message to start</div>
+                <div class="chat_ended_message hide">Chat is ended<br>Enter message to start again</div>
             </div>
             <div class="paste_area">
                 <p class="paste_area_txt">Upload Image</p>
@@ -231,12 +232,23 @@
 
                 var message = $('.popup_box_body_input_txt').val();
                 // if in newline of text area add <br> to the message
+                var images = $('.paste_area img');
+                var imageSrc = images.length > 0 ? images.first().attr('src') : null;
+
+                // if no input ignore
+                if (message === '' && !imageSrc) {
+                    return;
+                }
+
+                $('.popup_box_body_input_txt').val('');
+                $('.paste_area img').remove();
+                $('.paste_area_remove').remove();
+                $('.paste_area').removeClass('show');
+                fixTextarea();
+
                 if (message.includes('\n')) {
                     message = message.replace(/\n/g, '<br>');
                 }
-
-                var images = $('.paste_area img');
-                var imageSrc = images.length > 0 ? images.first().attr('src') : null;
 
                 var chat_id = $('.popup_box_body_chat').attr('chat-id');
 
@@ -245,6 +257,7 @@
                 };
 
                 if (!chat_id) return;
+
 
                 clearInterval(intervalId);
                 if (imageSrc) {
@@ -265,10 +278,7 @@
                         success: function(response) {
                             if (response.success == true) {
                                 fetchNewMessages();
-                                $('.popup_box_body_input_txt').val('');
-                                $('.paste_area img').remove();
-                                $('.paste_area').removeClass('show');
-                                fixTextarea();
+
                             } else {
                                 showErrorMsg(response.info);
                             }
@@ -294,10 +304,6 @@
                         success: function(response) {
                             if (response.success == true) {
                                 fetchNewMessages();
-                                $('.popup_box_body_input_txt').val('');
-                                $('.paste_area img').remove();
-                                $('.paste_area').removeClass('show');
-                                fixTextarea();
 
                             } else {
                                 showErrorMsg(response.info);
@@ -328,6 +334,7 @@
                         if (response['success']) {
                             $('.popup_box_body_chat').attr('chat-id', response['chat_id']);
                             $('.start_message').hide();
+                            $('.chat_ended_message').addClass('hide');
                             resolve(response['chat_id']);
                         } else {
                             showErrorMsg(response.info);
@@ -426,6 +433,7 @@
                 data: {
                     chat_id: chat_id,
                     last_msg_id: last_msg_id,
+                    by_customer: 1,
                     _token: "{{ csrf_token() }}"
                 },
                 success: function(response) {
@@ -473,7 +481,20 @@
                     }
                 },
                 error: function(xhr) {
-                    console.log(xhr.responseText);
+                    const response = JSON.parse(xhr.responseText);
+                    
+                    if(response.info === 'Chat is ended'){
+                        $('.start_message').hide();
+                        $('.popup_box_body_chat_msg').remove();
+                        $('.chat_ended_message').removeClass('hide');
+                        $('.popup_box_body_chat').attr('chat-id', '');
+                        last_msg_id = 0;
+                        //remove all chat msg direct dun use parent
+                    }else{
+                        showErrorMsg(response.info);
+                    }
+
+                    clearInterval(intervalId);
                 }
             });
         }

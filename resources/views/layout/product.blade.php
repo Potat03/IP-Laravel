@@ -33,7 +33,6 @@
         @endif
     </main>
 
-    <!-- Scripts -->
     @stack('scripts')
 </body>
 

@@ -33,7 +33,6 @@ class CollectiblesController extends Controller
             );
 
             return response()->json(['success' => true, 'message' => 'Collectible product added successfully.'], 200);
-
         } catch (Exception $e) {
             return response()->json(['failure' => false, 'message' => $e->getMessage()], 400);
         }
@@ -51,9 +50,16 @@ class CollectiblesController extends Controller
             }
 
             $products = Product::whereIn('product_id', $collectibleIds)->paginate(20);
-            // return view('shop.collectible', ['products' => $products]);
 
-            return $this->fetchRatingsForCollectible($collectibleIds, $products);
+            $productController = new ProductController();
+            $mainImages = $productController->getMainImages($collectibleIds);
+
+            $productsWithRatings = $this->fetchRatingsForCollectible($collectibleIds, $products);
+
+            return view('shop.collectible', [
+                'products' => $productsWithRatings, 
+                'mainImages' => $mainImages,
+            ]);
         } catch (Exception $e) {
             Log::error('Fetching collectibles failed: ' . $e->getMessage());
             return response()->json(['error' => 'Fetching collectibles failed.'], 500);

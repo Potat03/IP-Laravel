@@ -69,6 +69,11 @@ class ChatMessageController extends Controller
     public function initAdminChatList()
     {
         try {
+            // Check if got logged in
+            if (!Auth::guard('admin')->check()) {
+                return response()->json(['success' => false, 'info' => 'Please login to continue'], 403);
+            }
+
             $user = Auth::guard('admin')->user();
 
             //use guard to check if allowed
@@ -152,18 +157,25 @@ class ChatMessageController extends Controller
     public function sendMessage(Request $request)
     {
         try {
-            // Check if got logged in
-            if (!Auth::guard('customer')->check() && !Auth::guard('admin')->check()) {
-                return response()->json(['success' => false, 'info' => 'Unauthorized'], 403);
-            }
 
-            $user = Auth::guard('customer')->user() ?? Auth::guard('admin')->user();
 
             // Validate the request data for chat_id
             $request->validate([
                 'chat_id' => 'required|integer',
                 'by_customer' => 'required|integer|in:0,1',
             ]);
+
+            $user = null;
+
+            if($request->by_customer == 1){
+                $user = Auth::guard('customer')->user();
+            }else{
+                $user = Auth::guard('admin')->user();
+            }
+
+            if(!$user){
+                return response()->json(['success' => false, 'info' => 'Unauthorized'], 403);
+            }
 
             $chat_id = $request->chat_id;
 
@@ -253,6 +265,11 @@ class ChatMessageController extends Controller
     public function adminGetMessage(Request $request)
     {
         try {
+            // Check if got logged in
+            if (!Auth::guard('admin')->check()) {
+                return response()->json(['success' => false, 'info' => 'Unauthorized'], 403);
+            }
+
             $user = Auth::guard('admin')->user();
 
             $chat_id = $request->chat_id;
@@ -281,18 +298,24 @@ class ChatMessageController extends Controller
     public function fetchLatestMessages(Request $request)
     {
         try {
-            // Check if got logged in
-            if (!Auth::guard('customer')->check() && !Auth::guard('admin')->check()) {
-                return response()->json(['success' => false, 'info' => 'Unauthorized'], 403);
-            }
-
-            $user = Auth::guard('customer')->user() ?? Auth::guard('admin')->user();
-
             // Validate the request data for chat_id
             $request->validate([
                 'chat_id' => 'required|integer',
                 'last_msg_id' => 'required|integer',
+                'by_customer' => 'required|integer|in:0,1',
             ]);
+
+            $user = null;
+
+            if($request->by_customer == 1){
+                $user = Auth::guard('customer')->user();
+            }else{
+                $user = Auth::guard('admin')->user();
+            }
+
+            if(!$user){
+                return response()->json(['success' => false, 'info' => 'Unauthorized'], 403);
+            }
 
             $chat_id = $request->chat_id;
             $last_msg_id = $request->last_msg_id;
@@ -357,11 +380,11 @@ class ChatMessageController extends Controller
     {
         try {
             // Check if got logged in
-            if (!Auth::guard('customer')->check() && !Auth::guard('admin')->check()) {
+            if (!Auth::guard('admin')->check()) {
                 return response()->json(['success' => false, 'info' => 'Unauthorized'], 403);
             }
 
-            $user = Auth::guard('customer')->user() ?? Auth::guard('admin')->user();
+            $user = Auth::guard('admin')->user();
 
             // Validate the request data for chat_id
             $request->validate([
@@ -411,11 +434,11 @@ class ChatMessageController extends Controller
     {
         try {
             // Check if got logged in
-            if (!Auth::guard('customer')->check() && !Auth::guard('admin')->check()) {
+            if (!Auth::guard('admin')->check()) {
                 return response()->json(['success' => false, 'info' => 'Unauthorized'], 403);
             }
 
-            $user = Auth::guard('customer')->user() ?? Auth::guard('admin')->user();
+            $user = Auth::guard('admin')->user();
 
             // Validate the request data for chat_id
             $request->validate([
@@ -465,11 +488,11 @@ class ChatMessageController extends Controller
         try {
 
             // Check if got logged in
-            if (!Auth::guard('customer')->check() && !Auth::guard('admin')->check()) {
+            if (!Auth::guard('customer')->check()) {
                 return response()->json(['success' => false, 'info' => 'Unauthorized'], 403);
             }
 
-            $user = Auth::guard('customer')->user() ?? Auth::guard('admin')->user();
+            $user = Auth::guard('customer')->user();
 
             if (Gate::forUser($user)->denies('createChat')) {
                 return response()->json(['success' => false, 'info' => 'You are not allowed to create chat.'], 403);
@@ -477,6 +500,15 @@ class ChatMessageController extends Controller
 
             $customer_id = $user->customer_id;
 
+            // Check if the user have an active/pending chat
+            $active_chat = Chat::where('customer_id', $customer_id)->whereIn('status', ['active', 'pending'])->first();
+
+            if ($active_chat) {
+                return response()->json([
+                    'success' => false,
+                    'info' => 'You already have an ongoing chat'
+                ], 400);
+            }
 
             $chat = new Chat();
             $chat->customer_id = $customer_id;

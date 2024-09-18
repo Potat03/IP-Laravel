@@ -6,7 +6,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     @vite(['resources/sass/app.scss', 'resources/js/app.js', 'resources/css/userlogin.css'])
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <title>User Login</title>
+    <style>
+        html {
+            overflow: hidden;
+        }
+    </style>
 </head>
 
 <body>
@@ -29,7 +35,17 @@
                                     <span>Password</span>
                                     <input class="logInput" type="password" name="password" required />
                                 </label>
-                                <p class="forgot-pass">Forgot password?</p>
+                                <label class="formlabel">
+                                    <a class="forgot-pass" style="color:red;" href="{{ route('user.forget') }}">Forgot
+                                        password?</a>
+                                </label>
+                                <script src="<https://www.google.com/recaptcha/api.js>" async defer></script>
+                                <div class="d-flex">
+                                    <div class="mx-auto">
+                                    <div class="g-recaptcha" data-sitekey="{{ env('RECAPTCHA_SITE_KEY') }}"></div>
+                                    </div>
+                                </div>
+                                
                                 <button type="submit" class="submit authsubmit">Sign In</button>
                             </form>
                         </div>
@@ -66,21 +82,24 @@
                                             <input class="regInput" type="text" name="phone" required />
                                         </label>
                                         <label class="formlabel">
-                                            <span>Birthday</span>
-                                            <input class="regInput" type="date" name="birthday" required />
-                                        </label>
-                                    </div>
-                                    <div class="form-row">
-                                        <label class="formlabel">
                                             <span>Password</span>
                                             <input class="regInput" type="password" name="password" required />
                                         </label>
+                                    </div>
+                                    <div class="form-row">
                                         <label class="formlabel">
                                             <span>Confirm Password</span>
                                             <input class="regInput" type="password" name="password_confirmation"
                                                 required />
                                         </label>
                                     </div>
+                                    <div class="form-row">
+                                        <label class="formlabel" style="display:block;width:fit-content;">
+                                            <input type="checkbox" name="terms" required />
+                                            I agree to the <a href="#">terms and conditions</a>
+                                        </label>
+                                    </div>
+
                                     <button type="submit" class="submit authsubmit">Sign Up</button>
                                 </form>
                             </div>
