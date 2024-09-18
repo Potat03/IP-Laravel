@@ -8,6 +8,8 @@ use App\Http\Controllers\ChatMessageController;
 use App\Http\Controllers\CollectiblesController;
 use App\Http\Controllers\ConsumablesController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ProductCategoryController;
 use App\Http\Controllers\WearableController;
 use App\Http\Controllers\CartItemController;
 use App\Http\Controllers\PromotionController;
@@ -121,6 +123,8 @@ Route::middleware([AdminAuth::class])->group(function () {
     Route::get('/admin/product', action: [ProductController::class, 'getAll'])->name('admin.product');
     Route::get('/admin/product/add', action: [ProductController::class, 'addProduct'])->name('admin.product.add');
     Route::get('/admin/product/edit/{id}', [ProductController::class, 'editProduct'])->name('admin.product.edit');
+    Route::get('/admin/category/add', action: [CategoryController::class, 'addCategory'])->name('admin.category.add');
+    Route::get('/admin/category/edit/{id}', action: [CategoryController::class, 'editCategory'])->name('admin.category.edit');
 
     Route::get('/admin/promotion', [PromotionController::class, 'adminList'])->name('admin.promotion');
     Route::get('/admin/promotion/add', [PromotionController::class, 'addPromotion'])->name('admin.promotion.add');

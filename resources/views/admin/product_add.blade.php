@@ -1,7 +1,7 @@
 @extends('admin.layout.main')
 
 @section('vite')
-@vite(['resources/css/app.css','resources/sass/app.scss', 'resources/js/app.js', 'resources/css/admin-nav.css','resources/js/bootstrap.js'])
+    @vite(['resources/css/app.css', 'resources/sass/app.scss', 'resources/js/app.js', 'resources/css/admin-nav.css', 'resources/js/bootstrap.js'])
 @endsection
 
 @section('css')
@@ -181,6 +181,17 @@
                         <textarea class="form-control" id="description" name="description" required></textarea>
                     </div>
 
+                    <div class="mb-3">
+                        <label for="categories" class="form-label">Categories:</label>
+                        <div class="form-group">
+                            <select class="form-control" id="categories" name="categories[]" multiple required>
+                                @foreach ($categories as $category)
+                                    <option value="{{ $category->category_name }}">{{ $category->category_name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+
                     <div class="mb-3 form-check form-switch">
                         <input class="form-check-input" type="checkbox" id="statusSwitch" name="status" value="active"
                             checked>
@@ -255,6 +266,22 @@
 
                 // Collect common attributes
                 const form = new FormData(productForm);
+
+                // Get the selected options from the select element
+                var select = document.getElementById('categories');
+                var selectedOptions = Array.from(select.selectedOptions);
+
+                // Check if any options are selected
+                if (selectedOptions.length === 0) {
+                    alert('You must select at least one category for the product.');
+                } else {
+                    // Convert the selected options to an array of values
+                    var categoryValues = selectedOptions.map(option => option.value);
+
+                    // Append the category array to FormData, using JSON.stringify
+                    form.append('categories', JSON.stringify(categoryValues));
+                }
+
                 const files = imageInput.files;
 
                 const filesArrayJson = JSON.stringify(filesArray.map(file => file
@@ -365,7 +392,8 @@
             });
 
             statusLabel.textContent = statusSwitch.checked ? 'Active' : 'Inactive';
-            statusHidden.value = statusSwitch.checked ? 'active' : 'inactive';
+            statusHidden.value =
+                statusSwitch.checked ? 'active' : 'inactive';
 
             statusSwitch.addEventListener('change', function() {
                 const status = statusSwitch.checked ? 'active' : 'inactive';
@@ -515,11 +543,13 @@
                     reader.onload = function(e) {
                         const newImageSrc = e.target.result;
                         const thumbnailWrapper = document.createElement('div');
-                        thumbnailWrapper.classList.add('thumbnail-wrapper', 'position-relative', 'new');
+                        thumbnailWrapper.classList.add('thumbnail-wrapper', 'position-relative',
+                            'new');
 
                         const imgElement = document.createElement('img');
                         imgElement.src = newImageSrc;
-                        imgElement.classList.add('thumbnail', 'img-thumbnail', 'thumbnail-square');
+                        imgElement.classList.add('thumbnail', 'img-thumbnail',
+                            'thumbnail-square');
                         imgElement.alt = 'Thumbnail Image';
                         imgElement.draggable = false;
 
@@ -534,10 +564,12 @@
                         thumbnailsContainer.appendChild(thumbnailWrapper);
 
                         removeButton.addEventListener('click', function() {
-                            const index = parseInt(this.dataset.index, 10); // Parse index
+                            const index = parseInt(this.dataset.index,
+                                10); // Parse index
                             if (!isNaN(index)) {
                                 filesArray.splice(index, 1); // Remove from filesArray
-                                const thumbnailWrapper = this.closest('.thumbnail-wrapper');
+                                const thumbnailWrapper = this.closest(
+                                    '.thumbnail-wrapper');
                                 thumbnailWrapper.remove();
                                 updateThumbnails(); // Update thumbnails
                             }
