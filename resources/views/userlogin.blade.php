@@ -40,7 +40,12 @@
                                         password?</a>
                                 </label>
                                 <script src="<https://www.google.com/recaptcha/api.js>" async defer></script>
-                                <div class="g-recaptcha" data-sitekey="{{ env('RECAPTCHA_SITE_KEY') }}"></div>
+                                <div class="d-flex">
+                                    <div class="mx-auto">
+                                    <div class="g-recaptcha" data-sitekey="{{ env('RECAPTCHA_SITE_KEY') }}"></div>
+                                    </div>
+                                </div>
+                                
                                 <button type="submit" class="submit authsubmit">Sign In</button>
                             </form>
                         </div>

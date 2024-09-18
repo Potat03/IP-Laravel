@@ -29,7 +29,7 @@
 
         <div class="top_content">
             <div class="top_left">
-                <h1>Futatabi</h1>
+                <img src="{{ asset('images/logo.png') }}" width="40" height="40"><h1>Futatabi</h1>
             </div>
             <div class="top_middle">
                 <div class="current_time">
@@ -48,7 +48,7 @@
                                 Profile
                             </a>
                         </li>
-                        <li><a href="{{ route('admin.logout') }}">
+                        <li><a href="{{ route('auth.adminLogout') }}">
                                 <div class="li_icon_wrap">
                                     <i class="fa-regular fa-person-from-portal"></i>
                                 </div>

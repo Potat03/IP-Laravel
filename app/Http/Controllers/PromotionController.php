@@ -233,7 +233,7 @@ class PromotionController extends Controller
 
         $html = $proc->transformToXML($xml);
 
-        return view('admin.promotion_report', ['html' => $html]);
+        return view('admin.promotion_report', ['html' => $html], ['promotions' => $promotions]);
     }
 
     private function generateXMLContent($promotions)

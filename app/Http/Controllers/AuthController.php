@@ -245,7 +245,7 @@ class AuthController extends Controller
                 return response()->json(['success' => false, 'message' => 'Sorry, we can\'t find your account'], 403);
             }
         } catch (\Exception $e) {
-            Log::error('Admin login failed: ' . $e->getMessage()); // Kepp a log let developer know the problem
+            Log::error('Admin login failed: ' . $e->getMessage()); // Keep a log let developer know the problem
             return response()->json(['success' => false, 'message' => 'Something went wrong. Please try again later.'], 500); // 500 = internal server error
         }
     }

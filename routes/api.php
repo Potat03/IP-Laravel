@@ -22,7 +22,11 @@
         Route::post('/verifyOtp', [AuthController::class, 'verifyOtp'])->name('auth.verifyOtp');
         Route::get('/enterForgetPassword', [AuthController::class, 'enterForgetPassword'])->name('auth.enterForgetPassword');
         Route::post('/updatePassword', [AuthController::class, 'updatePassword'])->name('auth.updatePassword');
+
         Route::post('/cartItem/upload', [CartController::class, 'addToCart'])->name('cart.add');
+
+        Route::post('/admin/login', [AuthController::class, 'adminLogin'])->name('auth.adminLogin');
+        Route::post('/admin/logout', [AuthController::class, 'adminLogout'])->name('auth.adminLogout');
     });
     Route::post('/resendOtp', [AuthController::class, 'resendOtp'])->name('auth.resendOtp');
 
@@ -32,9 +36,8 @@
     Route::get('/product/get/{id}', [ProductController::class, 'getOne'])->name('product.get');
     Route::post('/product/create', [ProductController::class, 'createProduct'])->name('product.create');
     Route::post('/product/update/{id}', [ProductController::class, 'updateProduct'])->name('product.update');
-    // Route::delete('/product/{id}', [ProductController::class, 'deleteProduct']);
+    Route::get('/product/generateTable', [ProductController::class, 'generateTable']);
 
-    //promotion
     Route::get('/promotion/all', [PromotionController::class, 'getPromotion']);
     Route::get('/promotion/get/{id}', [PromotionController::class, 'getPromotionById']);
     Route::post('/promotion/create', [PromotionController::class, 'createPromotion'])->name('promotion.create');
@@ -43,13 +46,6 @@
     Route::put('/promotion/edit/status/{id}', [PromotionController::class, 'togglePromotion']);
     Route::post('/promotion/restore/{id}', [PromotionController::class, 'undoDeletePromotion']);
 
-
-
-    Route::post('/product/image/upload', [ProductController::class, 'productImageUpload']);
-    Route::get('/product/generateTable', [ProductController::class, 'generateTable']);
-
-    //cart
     Route::get('/cartItem/getCartItemByCustomerID/{customerID}', [CartItemController::class, 'getCartItemByCustomerID']);
 
-    // Route::get('/cartItem/getCartItem/{id}', [CartItemController::class, 'getCartItem']);
-    // Route::post('/cartItems/get', [CartItemController::class, 'getCartItems']);
+

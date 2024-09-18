@@ -1,9 +1,9 @@
-<nav class="navbar navbar-expand-lg sticky-top px-5">
-    <a class="navbar-brand" href="#!">Futatabi</a>
+<nav class="navbar navbar-expand-lg sticky-top px-5 navbar-light bg-light">
+    <a class="navbar-brand fw-bold" href="{{ url('/') }}"><img src="{{ asset('images/logo.png') }}" width="60" height="60">Futatabi</a>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4 gap-3">
             <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="{{ url('/home') }}">Home</a>
+                <a class="nav-link active" aria-current="page" href="{{ url('/') }}">Home</a>
             </li>
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button"
@@ -24,7 +24,7 @@
 
         <!-- Cart -->
         <form class="d-flex m-0">
-            <button class="btn btn-outline-dark" type="submit">
+            <button class="btn btn-outline-dark" type="button" onclick="window.location.href=`{{ url('/cart') }}`">
                 <i class="fa-solid fa-cart-shopping"></i>
                 Cart
                 <span class="badge bg-dark text-white ms-1 rounded-pill">0</span>
