@@ -10,23 +10,40 @@
                         </div>
                     @endif
 
-                    <div class="card-img-top">
-                        <img src="{{ URL('storage/images/pokemon.png') }}" class="d-block w-100"
-                            alt="product image" width="280" height="300">
+                    <div class="card-img-top" style="height: 300px; width: 100%;">
+                        @php
+                            $mainImage = $mainImages[$product->product_id] ?? 'default.jpg';
+                        @endphp
+                        @if ($mainImage == 'default.jpg')
+                            <img src="{{ URL('storage/images/products/default.jpg') }}" class="d-block w-100"
+                                style="height: 100%; object-fit: cover;" alt="{{ $product->name }}">
+                        @else
+                            <img src="{{ URL('storage/images/products/' . $product->product_id . '/' . $mainImage) }}"
+                                class="d-block w-100" style="height: 100%; object-fit: cover;"
+                                alt="{{ $product->name }}">
+                        @endif
                     </div>
                     <div class="card-body">
                         <p class="card-text mb-1 fs-5 fs-lg-5 fs-xl-3">{{ $product->name }}</p>
                         <h4 class="card-text fw-bold mb-2 fs-5 fs-xl-3">RM {{ $product->price }}</h4>
                         <div class="d-flex justify-content align-items-center small text-warning">
-                            @for ($i = 0; $i < 5; $i++)
-                                <i class="bi bi-star-fill me-1"></i>
+                            @php
+                                $averageRating = $product->averageRating ?? 0;
+                                $reviewsCount = $product->reviewsCount ?? 0;
+
+                                $fullStars = floor($averageRating);
+                                $halfStar = $averageRating - $fullStars >= 0.5;
+                            @endphp
+                            @for ($i = 0; $i < $fullStars; $i++)
+                                <i class="fa-solid fa-star me-1"></i>
                             @endfor
-                            <span class="text-dark ms-lg-2">(20)</span>
-                        </div>
-                    </div>
-                    <div class="card-footer p-3 pt-0 border-top-0 bg-transparent">
-                        <div class="text-center text-uppercase">
-                            <a class="btn btn-outline-dark mt-auto w-100 fw-bold" href="#">Add to Cart</a>
+                            @if ($halfStar)
+                                <i class="fa-solid fa-star-half-stroke me-1"></i>
+                            @endif
+                            @for ($i = $fullStars + ($halfStar ? 1 : 0); $i < 5; $i++)
+                                <i class="fa-regular fa-star me-1"></i>
+                            @endfor
+                            <span class="text-dark ms-lg-2">({{ $reviewsCount }})</span>
                         </div>
                     </div>
                 </div>

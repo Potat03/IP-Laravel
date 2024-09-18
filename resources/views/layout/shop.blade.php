@@ -188,6 +188,56 @@
             @yield('prodTitle')
         @endif
 
+        @if (request()->is('shop'))
+            <div class="flex-shrink-0 p-3 bg-white d-flex flex-column">
+                <div class="container">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="input-group mb-3">
+                                <input type="text" class="form-control" id="search" name="search"
+                                    placeholder="Search" aria-label="Search" aria-describedby="search-btn">
+                                <button class="btn btn-outline-secondary" type="button" id="search-btn"><i
+                                        class="fa-solid fa-magnifying-glass"></i></button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="input-group mb-3">
+                                <div class="input-group-text">
+                                    <input class="form-check-input mt-0" type="checkbox" value=""
+                                        aria-label="Checkbox for following text input">
+                                </div>
+                                <input type="text" class="form-control" aria-label="Text input with checkbox"
+                                    value="category" disabled>
+                            </div>
+                            <div class="input-group mb-3">
+                                <div class="input-group-text">
+                                    <input class="form-check-input mt-0" type="checkbox" value=""
+                                        aria-label="Checkbox for following text input">
+                                </div>
+                                <input type="text" class="form-control" aria-label="Text input with checkbox"
+                                    value="category" disabled>
+                            </div>
+                            <div class="input-group mb-3">
+                                <div class="input-group-text">
+                                    <input class="form-check-input mt-0" type="checkbox" value=""
+                                        aria-label="Checkbox for following text input">
+                                </div>
+                                <input type="text" class="form-control" aria-label="Text input with checkbox"
+                                    value="category" disabled>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
+
+        <div class="flex-shrink-0 p-3 bg-white d-flex flex-column">
+            <div class="container">
+                <div class="card">
+                </div>
+            </div>
+        </div>
+
         @yield('content')
     </main>
 
@@ -195,6 +245,32 @@
     <script src="https://code.jquery.com/jquery-migrate-3.3.2.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     @yield('script')
+
+    <script>
+        $(document).ready(function() {
+            // Listen for filter changes
+            $('#search').on('change keyup', function() {
+                filterProducts();
+            });
+
+            // AJAX function to get filtered products
+            function filterProducts() {
+                let search = $('#search').val();
+                let url = window.location.pathname; // Get current page URL
+
+                $.ajax({
+                    url: url,
+                    method: 'GET',
+                    data: {
+                        search: search
+                    },
+                    success: function(response) {
+                        $('#product-list').html(response);
+                    }
+                });
+            }
+        });
+    </script>
 
 </body>
 

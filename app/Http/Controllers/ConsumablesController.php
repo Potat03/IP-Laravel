@@ -53,9 +53,11 @@ class ConsumablesController extends Controller
             $query = $request->input('search');
 
             if ($query) {
-                $consumableIds = Consumable::where('name', 'LIKE', "%$query%")->pluck('product_id');
+                $productIds = Product::where('name', 'LIKE', "%$query%")->pluck('product_id');
+                $products = Product::whereIn('product_id', $productIds)->paginate(20);
             } else {
                 $consumableIds = Consumable::pluck('product_id');
+                $products = Product::whereIn('product_id', $consumableIds)->paginate(20);
             }
 
             $products = Product::whereIn('product_id', $consumableIds)->paginate(20);
@@ -64,6 +66,13 @@ class ConsumablesController extends Controller
             $mainImages = $productController->getMainImages($consumableIds);
 
             $productsWithRatings = $this->fetchRatingsForConsumable($consumableIds, $products);
+
+            if ($request->ajax()) {
+                return view('shop.partials.product-list', [
+                    'products' => $productsWithRatings,
+                    'mainImages' => $mainImages,
+                ]);
+            }
 
             return view('shop.consumable', [
                 'products' => $productsWithRatings,

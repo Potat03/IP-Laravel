@@ -51,12 +51,12 @@ class ChatPolicy
             return false;
         }
 
-        // Only active chat can send messages
-        if ($chat->status !== 'active') {
+        // Ended chat cannot send message
+        if ($chat->status === 'ended') {
             return false;
         }
 
-        // Customer can only send to their own chat
+        // Customer can only send to their own chat that is pending or active
         if ($user->getRole() === 'customer') {
             if ($user->getID() === $chat->customer_id) {
                 return true;
@@ -64,7 +64,7 @@ class ChatPolicy
         }
         // Customer service can only send to chat they are handling
         else if ($user->getRole() === 'customer_service') {
-            if ($chat->admin_id === $user->getID()) {
+            if ($chat->admin_id === $user->getID() && $chat->status === 'active') {
                 return true;
             }
         }

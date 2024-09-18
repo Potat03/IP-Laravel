@@ -8,7 +8,7 @@
 
     @include('partials.fontawesome')
     <link href="{{ asset('css/admin_nav.css') }}" rel="stylesheet">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     @yield('vite')
     @yield('css')
 </head>
@@ -29,7 +29,8 @@
 
         <div class="top_content">
             <div class="top_left">
-                <img src="{{ asset('images/logo.png') }}" width="40" height="40"><h1>Futatabi</h1>
+                <img src="{{ asset('images/logo.png') }}" width="40" height="40">
+                <h1>Futatabi</h1>
             </div>
             <div class="top_middle">
                 <div class="current_time">
@@ -48,7 +49,11 @@
                                 Profile
                             </a>
                         </li>
-                        <li><a href="{{ route('auth.adminLogout') }}">
+                        <li onclick="logout();">
+                            <form id="logout-form" action="{{ route('auth.adminLogout') }}" method="POST" style="display: none;">
+                                @csrf
+                            </form>
+                            <a href="#">
                                 <div class="li_icon_wrap">
                                     <i class="fa-regular fa-person-from-portal"></i>
                                 </div>
@@ -177,6 +182,11 @@
                 $('.cur_date').text(strDate);
 
             }
+
+            function logout() {
+                $('#logout-form').submit();
+            }
+
         </script>
 
         @yield('js')

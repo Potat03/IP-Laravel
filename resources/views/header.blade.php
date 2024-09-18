@@ -13,7 +13,7 @@
                     <li>
                         <hr class="dropdown-divider">
                     </li>
-                    <li><a class="dropdown-item" href="#!">Popular Items</a></li>
+                    {{-- <li><a class="dropdown-item" href="#!">Popular Items</a></li> --}}
                     <li><a class="dropdown-item" href="{{ url('/shop/new-arrivals') }}">New Arrivals</a></li>
                 </ul>
             </li>

@@ -34,12 +34,18 @@
                     </div>
                     <div class="login_input">
                         <label for="password"><i class="fa-regular fa-key"></i></label>
-                        <input type="password" name="password" placeholder="Password" id="password" required> 
+                        <input type="password" name="password" placeholder="Password" id="password" required>
+                    </div>
+                    <div class="remember_me">
+                        <input type="checkbox" class="form-check-input" id="remember" name="remember">
+                        <label for="remember">Remember Me</label>
                     </div>
 
                     <div class="error_msg_box">
                         <div class="error_msg" id="error_msg">
-
+                            @if(session('message'))
+                                {{ session('message') }}
+                            @endif
                         </div>
                     </div>
                     <div class="login_button">
@@ -61,6 +67,7 @@
                     data: {
                         email: email,
                         password: password,
+                        remember: $('#remember').is(':checked'),
                         _token: "{{ csrf_token() }}"
                     },
                     success: function(response) {
