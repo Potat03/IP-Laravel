@@ -794,7 +794,8 @@ class ProductController extends Controller
             $productNode = $xml->addChild('product');
             $productNode->addChild('id', $product->product_id);
             $productNode->addChild('name', $product->name);
-            $productNode->addChild('type', $product->type);
+            $type = $product->getProductType();
+            $productNode->addChild('type', $type);
             $productNode->addChild('price', $product->price);
             $productNode->addChild('stock', $product->stock); // Assuming there's a stock attribute
             $productNode->addChild('status', $product->status); // Assuming status is a field in your product model

@@ -6,10 +6,10 @@
     @vite(['resources/css/app.css', 'resources/sass/app.scss', 'resources/js/app.js', 'resources/css/admin-nav.css', 'resources/js/bootstrap.js'])
 @endsection
 
-@section('prev_page', route('admin.promotion'))
-@section('title', 'Promotion Report')
+@section('prev_page', route('admin.product'))
+@section('title', 'Product Report')
 @section('page_title', 'Reports')
-@section('page_gm', 'Promotion report')
+@section('page_gm', 'Product report')
 
 @section('css')
     <style>
