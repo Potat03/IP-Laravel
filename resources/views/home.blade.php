@@ -308,12 +308,6 @@
                                             <span class="text-dark ms-lg-2">({{ $reviewsCount }})</span>
                                         </div>
                                     </div>
-                                    <div class="card-footer p-3 pt-0 border-top-0 bg-transparent">
-                                        <div class="text-center text-uppercase">
-                                            <a class="btn btn-outline-dark mt-auto w-100 fw-bold" href="#">Add to
-                                                Cart</a>
-                                        </div>
-                                    </div>
                                 </div>
                             </a>
                         </div>
