@@ -70,8 +70,6 @@ Route::get('/admin/login', function () {
     return view('admin.login');
 })->name('admin.login');
 
-Route::get('/admin/logout', [AuthController::class, 'adminLogout']);
-
 
 Route::get('/userlogin', function () {
     return view('userlogin');
