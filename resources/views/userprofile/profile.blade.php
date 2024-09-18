@@ -54,6 +54,7 @@
                         disabled>
                 </div>
 
+                <button type="button" class="btn btn-secondary" id="editButton">Edit</button>
                 <button type="button" class="btn btn-primary" id="saveButton" style="display: none;">Save</button>
             </form>
         </div>
@@ -61,9 +62,8 @@
 
     <script>
         document.getElementById('editButton').addEventListener('click', function() {
-            document.querySelectorAll('#profileForm input').forEach(function(input) {
-                input.disabled = false;
-            });
+            document.getElementById('username').disabled = false;
+
             document.getElementById('editButton').style.display = 'none';
             document.getElementById('saveButton').style.display = 'inline-block';
         });
