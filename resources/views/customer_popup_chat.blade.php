@@ -226,7 +226,7 @@
             });
 
             // Send message
-            $('#msg_form').submit(function(e) {
+            $('#msg_form').submit(async function(e) {
                 e.preventDefault();
 
                 var message = $('.popup_box_body_input_txt').val();
@@ -240,7 +240,9 @@
 
                 var chat_id = $('.popup_box_body_chat').attr('chat-id');
 
-                if (!chat_id) chat_id = createChat();
+                if (!chat_id) {
+                    chat_id = await createChat()
+                };
 
                 if (!chat_id) return;
 
@@ -312,31 +314,32 @@
         });
 
         function createChat() {
+            return new Promise((resolve, reject) => {
+                const formData = new FormData();
+                formData.append('_token', "{{ csrf_token() }}");
 
-            const formData = new FormData();
-            formData.append('_token', "{{ csrf_token() }}");
-
-            $.ajax({
-                method: 'POST',
-                url: '{{ route("createChat") }}',
-                data: formData,
-                contentType: false,
-                processData: false,
-                success: function(response) {
-                    if (response['success']) {
-                        $('.popup_box_body_chat').attr('chat-id', response['chat_id']);
-                        $('.start_message').hide();
-                        return response['chat_id'];
-                    } else {
+                $.ajax({
+                    method: 'POST',
+                    url: '{{ route("createChat") }}',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function(response) {
+                        if (response['success']) {
+                            $('.popup_box_body_chat').attr('chat-id', response['chat_id']);
+                            $('.start_message').hide();
+                            resolve(response['chat_id']);
+                        } else {
+                            showErrorMsg(response.info);
+                            reject('Failed to create chat');
+                        }
+                    },
+                    error: function(xhr) {
+                        const response = JSON.parse(xhr.responseText);
                         showErrorMsg(response.info);
-                        return false;
+                        reject('Failed to create chat');
                     }
-                },
-                error: function(xhr) {
-                    const response = JSON.parse(xhr.responseText);
-                    showErrorMsg(response.info);
-                    return false;
-                }
+                });
             });
         }
 

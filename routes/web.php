@@ -144,17 +144,6 @@ Route::middleware([CustomerAuth::class])->group(function () {
 
 
 //TW blade
-Route::get('/wei', function () {
-    return view('wei');
-});
-
-Route::get('/cc', function () {
-    return view('customerChat');
-});
-
-Route::get('/cc2', function () {
-    return view('adminChat');
-});
 
 Route::get('/template', function () {
     return view('admin.error');
@@ -184,6 +173,7 @@ Route::get('/addMsg', function () {
     return view('weiTestChat');
 });
 Route::post('/sendMsg', [ChatMessageController::class, 'sendMessage'])->name('sendMsg');
+Route::post('/acceptChat', [ChatMessageController::class, 'acceptChat'])->name('acceptChat');
 Route::post('/endChat', [ChatMessageController::class, 'endChat'])->name('endChat');
 Route::post('/createChat', [ChatMessageController::class, 'createChat'])->name('createChat');
 

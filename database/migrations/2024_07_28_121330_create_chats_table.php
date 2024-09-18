@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('chat', function (Blueprint $table) {
             $table->id('chat_id');
             $table->unsignedBigInteger('customer_id')->references('customer_id')->on('customer');
-            $table->unsignedBigInteger('admin_id')->references('admin_id')->on('admin');
+            $table->unsignedBigInteger('admin_id')->references('admin_id')->on('admin')->nullable();
             $table->string('status');
             $table->date('ended_at');
             $table->timestamps();

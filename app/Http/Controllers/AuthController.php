@@ -238,7 +238,7 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        Auth::guard('admin')->logout();
+        Auth::guard('customer')->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
@@ -254,11 +254,5 @@ class AuthController extends Controller
         return redirect()->intended('adminLogin');
     }
 
-    public function simpleLogout(Request $request)
-    {
-        Auth::guard('customer')->logout();
-        Auth::guard('admin')->logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-    }
+
 }
