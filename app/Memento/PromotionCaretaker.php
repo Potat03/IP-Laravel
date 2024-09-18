@@ -24,6 +24,7 @@ class PromotionCaretaker {
 
     public function getMemento($index) {
         $memento = $this->promotionMementoList[$index];
+        unset($this->promotionMementoList[$index]);
         $_SESSION['promotionMementoList'] = $this->promotionMementoList;
         return $memento;
     }

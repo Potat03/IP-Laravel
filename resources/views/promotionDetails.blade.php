@@ -382,7 +382,6 @@
         } else {
             product.size = element.innerText;
         }
-        console.log(promo_content);
     }
 
     function selectColor(element, id, index = -1) {
@@ -416,7 +415,6 @@
         } else {
             product.color = element.innerText;
         }
-        console.log(promo_content);
     }
 
     function changeQuantity(amount) {

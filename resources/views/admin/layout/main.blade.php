@@ -104,6 +104,7 @@
                             Customer
                         </a>
                     </li>
+                    @if (Auth::guard('admin')->user()->role == 'manager') 
                     <li @stack('report')>
                         <a class="w-100" type="button" data-bs-toggle="collapse" href="#collapseReport" role="button" aria-expanded="false" aria-controls="collapseReport">
                             <i class="fa-regular fa-chart-bar"></i>
@@ -118,12 +119,13 @@
                             </ul>
                         </div>
                     </li>
+                    @endif
                 </ul>
             </div>
             <div class="right_content">
                 <div class="upper_content">
                     <div class="back_btn">
-                        <a href="#">
+                        <a href="@yield('prev_page')">
                             <i class="fa-solid fa-arrow-left"></i></a>
                     </div>
                     <div class="title">

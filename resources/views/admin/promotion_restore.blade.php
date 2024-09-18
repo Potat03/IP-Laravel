@@ -19,6 +19,7 @@
 </style>
 @endsection
 
+@section('prev_page', route('admin.promotion'))
 @section('title', 'Promotion')
 @section('page_title', 'Promotion')
 @section('page_gm', 'Restore promotion')
