@@ -299,8 +299,10 @@ class ProductController extends Controller
             // Get the product IDs based on search query
             if ($query) {
                 $productIds = Product::where('name', 'LIKE', "%$query%")->pluck('product_id');
+                $products = Product::where('name', 'like', "%{$query}%")->paginate(20);
             } else {
                 $productIds = Product::pluck('product_id');
+                $products = Product::all();
             }
 
             // Fetch the products
@@ -314,6 +316,13 @@ class ProductController extends Controller
 
             // Fetch and append ratings to the product collection
             $productsWithRatings = $ratingController->fetchRatingsForShop($productIds, $products);
+
+            if ($request->ajax()) {
+                return view('shop.partials.product-list', [
+                    'products' => $productsWithRatings,
+                    'mainImages' => $mainImages,
+                ]);
+            }
 
             // Pass the products, ratings, and images to the view
             return view('shop', [
