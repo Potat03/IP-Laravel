@@ -59,7 +59,8 @@
                     </div>
                     <div class="card-body">
                         <p class="card-text mb-1 fs-5 fs-lg-5 fs-xl-3">{{ $promotion->title }}</p>
-                        <h4 class="card-text fw-bold mb-2 fs-5 fs-xl-3">RM {{ $promotion->original_price }}</h4>
+                        <h4 class="card-text fw-bold mb-2 fs-5 fs-xl-3"><s>RM {{ $promotion->original_price }}</s></h4>
+                        <h3 class="card-text fw-bold mb-2 fs-5 fs-xl-3">RM {{ $promotion->original_price - $promotion->discount_amount }}</h3>
                         <div class="d-flex justify-content align-items-center small text-warning">
                             @for ($i = 0; $i < 5; $i++)
                                 <i class="fa-solid fa-star"></i>

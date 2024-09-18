@@ -131,6 +131,7 @@ Route::middleware([AdminAuth::class])->group(function () {
     Route::get('/admin/promotion/add', [PromotionController::class, 'addPromotion'])->name('admin.promotion.add');
     Route::get('/admin/promotion/edit/{id}', [PromotionController::class, 'editPromotion'])->name('admin.promotion.edit');
     Route::get('/admin/promotion/restore', [PromotionController::class, 'restorePromotion'])->name('admin.promotion.restore');
+    Route::get('/admin/promotion/revert', [PromotionController::class, 'undoListPromotion'])->name('admin.promotion.revert');
     Route::get('/admin/promotion/report', [PromotionController::class, 'generatePromotionReport'])->name('admin.promotion.report');
     Route::get('/admin/promotion/report/download', [PromotionController::class, 'downloadXMLReport'])->name('admin.promotion.report.download');
 });
