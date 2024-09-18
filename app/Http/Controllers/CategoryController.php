@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Category;
+use App\Models\ProductCategory;
 
 class CategoryController extends Controller
 {
@@ -58,6 +59,9 @@ class CategoryController extends Controller
     public function destroy($id)
     {
         $category = Category::findOrFail($id);
+
+        ProductCategory::where('category_name', $category->category_name)->delete();
+
         $category->delete();
 
         return redirect()->route('admin.product')->with('success', 'Category deleted successfully.');

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="products.xsl"?>
+<products>
+    <product>
+        <id>1</id>
+        <name>Product A</name>
+        <category>Wearable</category>
+        <price>50</price>
+        <stock>100</stock>
+        <status>Available</status>
+    </product>
+    <product>
+        <id>2</id>
+        <name>Product B</name>
+        <category>Collectible</category>
+        <price>150</price>
+        <stock>50</stock>
+        <status>Out of Stock</status>
+    </product>
+    <product>
+        <id>3</id>
+        <name>Product C</name>
+        <category>Consumable</category>
+        <price>20</price>
+        <stock>200</stock>
+        <status>Available</status>
+    </product>
+</products>

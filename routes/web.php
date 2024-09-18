@@ -123,6 +123,7 @@ Route::middleware([AdminAuth::class])->group(function () {
     Route::get('/admin/product', action: [ProductController::class, 'getAll'])->name('admin.product');
     Route::get('/admin/product/add', action: [ProductController::class, 'addProduct'])->name('admin.product.add');
     Route::get('/admin/product/edit/{id}', [ProductController::class, 'editProduct'])->name('admin.product.edit');
+    Route::get('/admin/promotion/report', [ProductController::class, 'generateProductReport'])->name('admin.product.report');
     Route::get('/admin/category/add', action: [CategoryController::class, 'addCategory'])->name('admin.category.add');
     Route::get('/admin/category/edit/{id}', action: [CategoryController::class, 'editCategory'])->name('admin.category.edit');
 

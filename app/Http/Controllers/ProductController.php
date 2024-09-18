@@ -752,4 +752,8 @@ class ProductController extends Controller
             return response()->json(['error' => 'Fetching new arrivals failed.'], 500);
         }
     }
+
+    public function generateProductReport()
+    {
+    }
 }

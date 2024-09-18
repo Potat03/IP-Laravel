@@ -33,16 +33,16 @@ class ProductCategoryController extends Controller
         return response()->json(['success' => true, 'message' => 'Product categories created successfully.'], 200);
     }
 
-    // Detach categories from a product
-    public function detach(Request $request, Product $product)
-    {
-        $request->validate([
-            'category_ids' => 'required|array',
-            'category_ids.*' => 'exists:categories,id',
-        ]);
+    // // Detach categories from a product
+    // public function detach(Request $request, Product $product)
+    // {
+    //     $request->validate([
+    //         'category_ids' => 'required|array',
+    //         'category_ids.*' => 'exists:categories,id',
+    //     ]);
 
-        $product->categories()->detach($request->input('category_ids'));
+    //     $product->categories()->detach($request->input('category_ids'));
 
-        return redirect()->route('products.show', $product->id)->with('success', 'Categories removed successfully.');
-    }
+    //     return redirect()->route('products.show', $product->id)->with('success', 'Categories removed successfully.');
+    // }
 }
