@@ -53,10 +53,8 @@ Route::get('/testDB', function () {
 });
 
 //Chat
-Route::get('/chat', [ChatController::class, 'index']);
-Route::post('/chat', [ChatController::class, 'store']);
-Route::get('/chat/{chatId}', [ChatController::class, 'show']);
 Route::post('/sendMsg', [ChatMessageController::class, 'sendMessage'])->name('sendMsg');
+Route::post('/acceptChat', [ChatMessageController::class, 'acceptChat'])->name('acceptChat');
 Route::post('/endChat', [ChatMessageController::class, 'endChat'])->name('endChat');
 Route::post('/createChat', [ChatMessageController::class, 'createChat'])->name('createChat');
 
@@ -73,6 +71,7 @@ Route::get('/testmsgcust', function () {
 Route::get('/admin/login', function () {
     return view('admin.login');
 })->name('admin.login');
+
 
 Route::get('/userlogin', function () {
     return view('userlogin');
@@ -134,37 +133,3 @@ Route::middleware([AdminAuth::class])->group(function () {
     Route::get('/admin/promotion/report', [PromotionController::class, 'generatePromotionReport'])->name('admin.promotion.report');
     Route::get('/admin/promotion/report/download', [PromotionController::class, 'downloadXMLReport'])->name('admin.promotion.report.download');
 });
-
-
-
-//havnt clean
-
-//TW blade
-Route::get('/wei', function () {
-    return view('wei');
-});
-
-Route::get('/cc', function () {
-    return view('customerChat');
-});
-
-Route::get('/cc2', function () {
-    return view('adminChat');
-});
-
-Route::get('/template', function () {
-    return view('admin.error');
-});
-
-//WK route
-
-
-
-
-
-
-
-
-
-
-

@@ -648,7 +648,7 @@
     border-radius: 5px;
 }
 
-.start_message{
+.start_message, .chat_ended_message{
     font-size: 1.2em;
     font-weight: 600;
     letter-spacing: -0.5px;
@@ -660,6 +660,11 @@
     width: 100%;
     transform: translateX(-50%);
     opacity: 0.8;
+    display: block;
+}
+
+.chat_ended_message.hide{
+    display: none;
 }
 
 /* End Popup */

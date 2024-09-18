@@ -17,7 +17,12 @@ class Admin extends Authenticatable implements UserInterface
         'role',
         'email',
         'password',
-        'status',
+        'session_id',
+        'status'
+    ];
+
+    protected $guarded = [
+        'remember_token',
     ];
 
     public function chats()
