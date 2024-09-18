@@ -20,6 +20,9 @@ use Illuminate\Support\Facades\Log;
 use Intervention\Image\ImageManagerStatic as Image;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\Adapters\ProductAdapter;
+use Illuminate\Support\Facades\Response;
+use DOMDocument;
+use XSLTProcessor;
 
 class ProductController extends Controller
 {
@@ -231,17 +234,17 @@ class ProductController extends Controller
 
             if ($request->has('categories')) {
                 $categoryNames = json_decode($request->input('categories'), true);
-                
+
                 // Merge the category names and product_id into the request
                 $mergedRequest = $request->merge([
                     'category_names' => $categoryNames,
                     'product_id' => $product->product_id
                 ]);
-            
+
                 // Pass the merged request to the attach method
                 $productCatControl = new ProductCategoryController();
                 $productCatControl->attach($mergedRequest, $product);
-            }            
+            }
 
             ProductController::productImageUpload($request, $product->product_id);
 
@@ -755,5 +758,48 @@ class ProductController extends Controller
 
     public function generateProductReport()
     {
+        // Fetch all products along with their associated category
+        $products = Product::all();
+
+        // Prepare XML content with the basic product details, including the category
+        $xmlContent = $this->generateXMLContentForBasicProductInfo($products);
+
+        // Save the XML content to a file (optional)
+        Storage::put('xml/product_report.xml', $xmlContent);
+
+        // Load the XSLT file for transforming the XML into HTML
+        $xslt = new \DOMDocument();
+        $xslt->load(storage_path('app/xslt/product_report.xslt'));
+
+        // Load the generated XML content
+        $xml = new \DOMDocument();
+        $xml->loadXML($xmlContent);
+
+        // Apply the XSLT transformation
+        $proc = new \XSLTProcessor();
+        $proc->importStylesheet($xslt);
+
+        // Transform XML to HTML
+        $html = $proc->transformToXML($xml);
+
+        // Return the view with the generated HTML
+        return view('admin.product_report', ['html' => $html, 'products' => $products]);
+    }
+
+    private function generateXMLContentForBasicProductInfo($products)
+    {
+        $xml = new \SimpleXMLElement('<products/>');
+
+        foreach ($products as $product) {
+            $productNode = $xml->addChild('product');
+            $productNode->addChild('id', $product->product_id);
+            $productNode->addChild('name', $product->name);
+            $productNode->addChild('type', $product->type);
+            $productNode->addChild('price', $product->price);
+            $productNode->addChild('stock', $product->stock); // Assuming there's a stock attribute
+            $productNode->addChild('status', $product->status); // Assuming status is a field in your product model
+        }
+
+        return $xml->asXML();
     }
 }

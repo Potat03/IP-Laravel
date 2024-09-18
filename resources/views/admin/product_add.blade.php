@@ -49,6 +49,7 @@
     </style>
 @endsection
 
+@section('prev_page', route('admin.product'))
 @section('title', 'Add Product')
 @section('page_title', 'Add Product')
 @section('page_gm', 'Add New Product')

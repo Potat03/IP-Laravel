@@ -113,7 +113,7 @@
                         <div class="collapse" id="collapseReport">
                             <ul class="py-3 px-1">
                                 <li><a class="text-light" href="">Sales Report</a></li>
-                                <li><a class="text-light" href="">Product Report</a></li>
+                                <li><a class="text-light" href="{{ route('admin.product.report' )}}">Product Report</a></li>
                                 <li><a class="text-light" href="{{ route('admin.promotion.report' )}}">Promotion Report</a></li>
                                 <li><a class="text-light" href="">Customer Report</a></li>
                             </ul>

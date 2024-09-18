@@ -14,6 +14,11 @@
     </style>
 @endsection
 
+@section('prev_page', route('admin.main'))
+@section('title', 'Product')
+@section('page_title', 'Product')
+@section('page_gm', 'Product List')
+
 @section('content')
     <div>
         <div class="px-2 py-3">
