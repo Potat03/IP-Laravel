@@ -328,7 +328,7 @@
     </section>
 
     <!-- Best Sellers -->
-    <section>
+    {{-- <section>
         <div class="container p-3">
             <div class="pt-4 row align-items-center">
                 <div class="col">
@@ -387,7 +387,7 @@
                 </button>
             </div>
         </div>
-    </section>
+    </section> --}}
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>

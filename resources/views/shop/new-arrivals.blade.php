@@ -3,7 +3,7 @@
 @section('title', 'New Arrivals')
 
 @section('content')
-    <div class="flex-shrink-0 p-3 bg-white d-flex flex-column">
+    {{-- <div class="flex-shrink-0 p-3 bg-white d-flex flex-column">
         <div class="container">
             <div class="card">
                 <div class="card-header">
@@ -42,11 +42,11 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
     <div class="col-md-9">
         <h1 class="mb-4">New Arrivals</h1>
 
-        <div class="row">
+        <div class="row" id="product-list">
             @forelse ($newArrivals as $product)
                 <div class="col-md-2-4 mb-4">
                     <a href="{{ url('product/' . $product['product']->product_id) }}"

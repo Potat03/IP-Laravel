@@ -4,7 +4,7 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 @section('content')
-    <div class="flex-shrink-0 p-3 bg-white d-flex flex-column">
+    {{-- <div class="flex-shrink-0 p-3 bg-white d-flex flex-column">
         <div class="container">
             <div class="card">
                 <div class="card-header">
@@ -29,28 +29,10 @@
                         </select>
                     </div>
 
-                    <!-- Availability -->
-                    <div class="input-group mb-3">
-                        <div class="input-group-text">
-                            <input class="form-check-input mt-0" type="checkbox" value="available" id="available"
-                                aria-label="Checkbox for available products">
-                        </div>
-                        <label class="form-control" for="available">Available Only</label>
-                    </div>
-
-                    <!-- New Arrivals -->
-                    <div class="input-group mb-3">
-                        <div class="input-group-text">
-                            <input class="form-check-input mt-0" type="checkbox" value="new" id="new-arrival"
-                                aria-label="Checkbox for new arrivals">
-                        </div>
-                        <label class="form-control" for="new-arrival">New Arrivals</label>
-                    </div>
-
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
     <div class="col-md-9">
         <div class="row" id="product-list">
             @forelse ($products as $product)
@@ -118,36 +100,36 @@
 @endsection
 
 <script>
-    $(document).ready(function() {
-        // Listen for filter changes
-        $('#price-sort, #available, #rating-filter, #new-arrival, #search').on('change keyup', function() {
-            filterProducts();
-        });
+    // $(document).ready(function() {
+    //     // Listen for filter changes
+    //     $('#price-sort, #available, #rating-filter, #new-arrival, #search').on('change keyup', function() {
+    //         filterProducts();
+    //     });
 
-        // AJAX function to get filtered products
-        function filterProducts() {
-            let priceSort = $('#price-sort').val();
-            let available = $('#available').is(':checked') ? 1 : 0;
-            let rating = $('#rating-filter').val();
-            let newArrival = $('#new-arrival').is(':checked') ? 1 : 0;
-            let search = $('#search').val();
+    //     // AJAX function to get filtered products
+    //     function filterProducts() {
+    //         let priceSort = $('#price-sort').val();
+    //         let available = $('#available').is(':checked') ? 1 : 0;
+    //         let rating = $('#rating-filter').val();
+    //         let newArrival = $('#new-arrival').is(':checked') ? 1 : 0;
+    //         let search = $('#search').val();
 
-            console.log('Search:', search); // Debugging line
+    //         console.log('Search:', search); // Debugging line
 
-            $.ajax({
-                url: '/shop',
-                method: 'GET',
-                data: {
-                    price_sort: priceSort,
-                    available: available,
-                    rating: rating,
-                    new_arrival: newArrival,
-                    search: search
-                },
-                success: function(response) {
-                    $('#product-list').html(response);
-                }
-            });
-        }
-    });
+    //         $.ajax({
+    //             url: '/shop',
+    //             method: 'GET',
+    //             data: {
+    //                 price_sort: priceSort,
+    //                 available: available,
+    //                 rating: rating,
+    //                 new_arrival: newArrival,
+    //                 search: search
+    //             },
+    //             success: function(response) {
+    //                 $('#product-list').html(response);
+    //             }
+    //         });
+    //     }
+    // });
 </script>
