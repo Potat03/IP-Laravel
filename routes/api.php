@@ -3,6 +3,7 @@
     use Illuminate\Http\Request;
     use Illuminate\Support\Facades\Route;
     use App\Http\Controllers\ProductController;
+    use App\Http\Controllers\CategoryController;
     use App\Http\Controllers\PromotionController;
     use App\Http\Middleware\customAuth;
     use App\Http\Controllers\CustomerController;
@@ -37,6 +38,10 @@
     Route::post('/product/create', [ProductController::class, 'createProduct'])->name('product.create');
     Route::post('/product/update/{id}', [ProductController::class, 'updateProduct'])->name('product.update');
     Route::get('/product/generateTable', [ProductController::class, 'generateTable']);
+
+    Route::post('/category/store', [CategoryController::class, 'store'])->name('admin.category.store');
+    Route::post('/category/update/{id}', [CategoryController::class, 'update'])->name('admin.category.update');
+    Route::delete('/category/{id}', [CategoryController::class, 'destroy'])->name('admin.category.delete');
 
     Route::get('/promotion/all', [PromotionController::class, 'getPromotion']);
     Route::get('/promotion/get/{id}', [PromotionController::class, 'getPromotionById']);

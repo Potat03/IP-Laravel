@@ -201,30 +201,18 @@
                             </div>
                         </div>
                         <div class="card-body">
-                            <div class="input-group mb-3">
-                                <div class="input-group-text">
-                                    <input class="form-check-input mt-0" type="checkbox" value=""
-                                        aria-label="Checkbox for following text input">
+                            @foreach ($categories as $category)
+                                <div class="input-group mb-3">
+                                    <div class="input-group-text">
+                                        <input class="form-check-input mt-0" type="checkbox"
+                                            value="{{ $category->category_name }}"
+                                            aria-label="Checkbox for {{ $category->category_name }}"
+                                            id="category-{{ $category->category_name }}">
+                                    </div>
+                                    <input type="text" class="form-control" aria-label="Text input with checkbox"
+                                        value="{{ $category->category_name }}" disabled>
                                 </div>
-                                <input type="text" class="form-control" aria-label="Text input with checkbox"
-                                    value="category" disabled>
-                            </div>
-                            <div class="input-group mb-3">
-                                <div class="input-group-text">
-                                    <input class="form-check-input mt-0" type="checkbox" value=""
-                                        aria-label="Checkbox for following text input">
-                                </div>
-                                <input type="text" class="form-control" aria-label="Text input with checkbox"
-                                    value="category" disabled>
-                            </div>
-                            <div class="input-group mb-3">
-                                <div class="input-group-text">
-                                    <input class="form-check-input mt-0" type="checkbox" value=""
-                                        aria-label="Checkbox for following text input">
-                                </div>
-                                <input type="text" class="form-control" aria-label="Text input with checkbox"
-                                    value="category" disabled>
-                            </div>
+                            @endforeach
                         </div>
                     </div>
                 </div>
@@ -248,21 +236,25 @@
 
     <script>
         $(document).ready(function() {
-            // Listen for filter changes
-            $('#search').on('change keyup', function() {
+            $('#search, .form-check-input').on('change keyup', function() {
                 filterProducts();
             });
 
-            // AJAX function to get filtered products
             function filterProducts() {
                 let search = $('#search').val();
-                let url = window.location.pathname; // Get current page URL
+                let categories = [];
+                $('.form-check-input:checked').each(function() {
+                    categories.push($(this).val());
+                });
+
+                let url = window.location.pathname;
 
                 $.ajax({
                     url: url,
                     method: 'GET',
                     data: {
-                        search: search
+                        search: search,
+                        categories: categories
                     },
                     success: function(response) {
                         $('#product-list').html(response);
