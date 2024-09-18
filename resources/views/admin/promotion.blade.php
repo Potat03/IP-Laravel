@@ -43,6 +43,7 @@
                 </div>
             </div>
             <div class="ms-auto">
+                <button class="btn btn-secondary me-2" onclick="window.location.href='{{ route('admin.promotion.revert') }}'"><i class="fa-regular fa-trash-undo pe-2"></i>Revert</button>
                 <button class="btn btn-secondary me-2" onclick="window.location.href='{{ route('admin.promotion.restore') }}'"><i class="fa-regular fa-trash-undo pe-2"></i>Restore</button>
                 <button class="btn btn-primary" onclick="window.location.href='{{ route('admin.promotion.add') }}'"><i class="fa-regular fa-plus pe-2"></i>Create</button>
             </div>

@@ -3,9 +3,7 @@
 @section('title', "Promotion")
 
 @push('styles')
-<!-- Include Bootstrap CSS -->
 <style>
-    /*Thumbnail CSS*/
     .main-square {
         width: 100%;
         max-width: 600px;
@@ -24,7 +22,6 @@
         cursor: pointer;
     }
 
-    /* Flexbox layout for thumbnails */
     .thumbnails {
         gap: 5px;
     }
@@ -32,8 +29,6 @@
     .thumbnail.active {
         border-color: rgb(17, 16, 16);
     }
-
-    /*END*/
 
     .breadcrumb-item+.breadcrumb-item::before {
         content: ' > ';
@@ -80,7 +75,6 @@
         margin-top: 10px;
     }
 
-    /* Variation Button Styling */
     .btn-variation,
     .btn-variation-2 {
         background-color: #ffffff;
@@ -118,7 +112,6 @@
         border-radius: 0.25rem;
     }
 
-    /* Bundle Deal Section */
     .bundle-deal {
         margin-top: 50px;
     }
@@ -179,7 +172,6 @@
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <div class="container product-detail-container">
     <div class="container mt-4 product-image">
-        <!-- Main Image Display -->
         <div class="main-image p-3 rounded mb-3" style="width: 500px; height: 500px;">
             <div class="row">
                 @foreach ($promotion->product_list as $product)
@@ -211,7 +203,8 @@
         </div>
         <div>
             <h1 class="fw-bold">{{ $promotion->title }}</h1>
-            <h4 class="text-muted">RM {{ $promotion->discount_amount }}</h4>
+            <h4 class="text-muted"><s>RM {{ $promotion->original_price }}</s></h4>
+            <h3 class="text-muted">RM {{ $promotion->original_price - $promotion->discount_amount}}</h3>
             <div class="d-flex align-items-center text-warning">
                 <i class="fa-solid fa-star"></i>
                 <i class="fa-solid fa-star"></i>
@@ -336,7 +329,6 @@
 @endsection
 
 @section('bottom')
-<!-- Review Section -->
 <div class="container review-section mb-5">
     <h2>Reviews</h2>
     <div class="review-item">

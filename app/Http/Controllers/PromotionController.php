@@ -13,6 +13,8 @@ use App\Models\Wearable;
 use App\Models\Consumable;
 use App\Models\Collectible;
 use App\Models\OrderItem;
+use App\Memento\PromotionMemento;
+use App\Memento\PromotionCaretaker;
 use Exception;
 
 class PromotionController extends Controller
@@ -98,6 +100,10 @@ class PromotionController extends Controller
     {
         try {
             $promotion = Promotion::find($id);
+            $old_promotion_list = PromotionItem::where('promotion_id', $id)->get();
+            $promotionMemento = new PromotionMemento($promotion->promotion_id, $promotion->title, $promotion->description, $promotion->discount, $promotion->discount_amount, $promotion->original_price, $promotion->type, $promotion->limit, $promotion->status, $promotion->start_at, $promotion->end_at, $old_promotion_list);
+            $promotionCaretaker = new PromotionCaretaker();
+            $promotionCaretaker->addMemento($promotionMemento);
 
             Cache::put('promotion_' . $id, $promotion, 86400);
 
@@ -143,6 +149,11 @@ class PromotionController extends Controller
     {
         try {
             $promotion = Promotion::find($id);
+            $old_promotion_list = PromotionItem::where('promotion_id', $id)->get();
+            $promotionMemento = new PromotionMemento($promotion->promotion_id, $promotion->title, $promotion->description, $promotion->discount, $promotion->discount_amount, $promotion->original_price, $promotion->type, $promotion->limit, $promotion->status, $promotion->start_at, $promotion->end_at, $old_promotion_list);
+            $promotionCaretaker = new PromotionCaretaker();
+            $promotionCaretaker->addMemento($promotionMemento);
+
             $promotion->status = 'deleted';
             $promotion->save();
             return response()->json(['success' => true, 'data' => $promotion], 200);
@@ -171,8 +182,58 @@ class PromotionController extends Controller
     {
         try {
             $promotion = Promotion::find($id);
-            $promotion->status = 'inactive';
+            //get the memento object
+            $promotionCaretaker = new PromotionCaretaker();
+            $promotionMemento = $promotionCaretaker->getMemento($promotion->promotion_id);
+
+            //restore the promotion
+            $promotion->title = $promotionMemento->getPromotion()['title'];
+            $promotion->description = $promotionMemento->getPromotion()['description'];
+            $promotion->discount = $promotionMemento->getPromotion()['discount'];
+            $promotion->discount_amount = $promotionMemento->getPromotion()['discount_amount'];
+            $promotion->original_price = $promotionMemento->getPromotion()['original_price'];
+            $promotion->type = $promotionMemento->getPromotion()['type'];
+            $promotion->limit = $promotionMemento->getPromotion()['limit'];
+            $promotion->status = $promotionMemento->getPromotion()['status'];
+            $promotion->start_at = $promotionMemento->getPromotion()['start_at'];
+            $promotion->end_at = $promotionMemento->getPromotion()['end_at'];
             $promotion->save();
+
+            return response()->json(['success' => true, 'data' => $promotion], 200);
+        } catch (Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
+        }
+    }
+
+    public function undoUpdatePromotion($index)
+    {
+        try {
+            $promotionCaretaker = new PromotionCaretaker();
+            $promotionMemento = $promotionCaretaker->getMemento($index);
+            $promotion = Promotion::find($promotionMemento->getPromotion()['promotion_id']);
+            
+            $promotion->title = $promotionMemento->getPromotion()['title'];
+            $promotion->description = $promotionMemento->getPromotion()['description'];
+            $promotion->discount = $promotionMemento->getPromotion()['discount'];
+            $promotion->discount_amount = $promotionMemento->getPromotion()['discount_amount'];
+            $promotion->original_price = $promotionMemento->getPromotion()['original_price'];
+            $promotion->type = $promotionMemento->getPromotion()['type'];
+            $promotion->limit = $promotionMemento->getPromotion()['limit'];
+            $promotion->status = $promotionMemento->getPromotion()['status'];
+            $promotion->start_at = $promotionMemento->getPromotion()['start_at'];
+            $promotion->end_at = $promotionMemento->getPromotion()['end_at'];
+            $promotion->save();
+
+            PromotionItem::where('promotion_id', $promotion->promotion_id)->delete();
+
+            foreach ($promotionMemento->getPromotion()['product_list'] as $product) {
+                PromotionItem::create([
+                    'promotion_id' => $promotion->promotion_id,
+                    'product_id' => $product->product_id,
+                    'quantity' => $product->quantity
+                ]);
+            }
+
             return response()->json(['success' => true, 'data' => $promotion], 200);
         } catch (Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
@@ -387,6 +448,25 @@ class PromotionController extends Controller
                 $promotion->product_list = Promotion::find($promotion->promotion_id)->product;
             }
             return view('admin.promotion_restore', ['promotions' => $promotions]);
+        } catch (Exception $e) {
+            return view('errors.404');
+        }
+    }
+
+    public function undoListPromotion() {
+        try {
+            $promotionCaretaker = new PromotionCaretaker();
+            $mementoList = $promotionCaretaker->getMementoList();
+
+            // Extract promotions from mementos
+            $promotions = array_map(function($memento) {
+                return $memento->getPromotion();
+            }, $mementoList);
+
+            //convert to object
+            $promotions = json_decode(json_encode($promotions));
+
+            return view('admin.promotion_revert', ['promotions' => $promotions]);
         } catch (Exception $e) {
             return view('errors.404');
         }

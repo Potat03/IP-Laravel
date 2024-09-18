@@ -44,8 +44,8 @@
                 <div class="mb-3">
                     <label for="product_id" class="form-label">Type</label>
                     <select class="form-select" id="type" name="type" required>
-                        <option value="single" selected="{{ $promotion->type == 'single' ? 'selected' : '' }}">Single</option>
-                        <option value="bundle" selected="{{ $promotion->type == 'bundle' ? 'selected' : '' }}">Bundle</option>
+                        <option value="single" {{ $promotion->type == 'single' ? 'selected' : '' }}>Single</option>
+                        <option value="bundle" {{ $promotion->type == 'bundle' ? 'selected' : '' }}>Bundle</option>
                     </select>
                 </div>
                 <div class="mb-3">
@@ -89,7 +89,7 @@
                     </select>
                 </div>
                 <button type="submit" class="btn btn-primary">Edit Promotion</button>
-                <button type="button" class="btn btn-secondary">Cancel</button>
+                <button type="button" class="btn btn-secondary" onclick="location.href=`{{ route('admin.promotion') }}`">Cancel</button>
             </form>
         </div>
     </div>

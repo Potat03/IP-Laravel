@@ -13,7 +13,6 @@
 
     Route::get('/auth', [AuthController::class, 'showCustomerForm'])->name('auth.showForm');
     Route::group(['middleware' => ['web']], function () {
-        //login content
         Route::post('/login', [AuthController::class, 'userLogin'])->name('auth.userLogin');
         Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout');
         Route::post('/register', [AuthController::class, 'userRegister'])->name('auth.userRegister');
@@ -45,6 +44,7 @@
     Route::delete('/promotion/{id}', [PromotionController::class, 'deletePromotion']);
     Route::put('/promotion/edit/status/{id}', [PromotionController::class, 'togglePromotion']);
     Route::post('/promotion/restore/{id}', [PromotionController::class, 'undoDeletePromotion']);
+    Route::post('/promotion/revert/{id}', [PromotionController::class, 'undoUpdatePromotion']);
 
     Route::get('/cartItem/getCartItemByCustomerID/{customerID}', [CartItemController::class, 'getCartItemByCustomerID']);
 
