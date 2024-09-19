@@ -29,7 +29,7 @@ class AuthController extends Controller
 
     function verifyCaptcha($captcha_response)
     {
-        $captcha_secret = env('RECAPTCHA_SECRET_KEY'); // Replace with your actual secret key in .env
+        $captcha_secret = env('RECAPTCHA_SECRET_KEY');
         $captcha_verify_url = "https://www.google.com/recaptcha/api/siteverify";
         $captcha_data = [
             'secret'   => $captcha_secret,
@@ -82,7 +82,7 @@ class AuthController extends Controller
 
         if (AuthFacade::login($credentials)) {
             AuthFacade::regenerateSession($request);
-
+            $request->session()->put('customer_id', $user->id);
             Log::info($request->session()->token());
             Log::info(AuthFacade::getUser());
 
@@ -98,7 +98,7 @@ class AuthController extends Controller
             'username' => 'required|string|max:50',
             'email' => 'required|email|unique:customer,email',
             'phone' => 'required|regex:/^(\+?6?01)[0-46-9]-*[0-9]{7,8}$/',
-            'password' => 'required|min:8|confirmed', //^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[!$#%]).*$
+            'password' => 'required|min:8|confirmed|regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[!$#%]).*$/',
         ]);
 
         Log::info('Recaptcha URL', ['url' => 'https://www.google.com/recaptcha/api/siteverify']);
@@ -245,7 +245,7 @@ class AuthController extends Controller
                 return response()->json(['success' => false, 'message' => 'Sorry, we can\'t find your account'], 403);
             }
         } catch (\Exception $e) {
-            Log::error('Admin login failed: ' . $e->getMessage()); // Kepp a log let developer know the problem
+            Log::error('Admin login failed: ' . $e->getMessage()); // Keep a log let developer know the problem
             return response()->json(['success' => false, 'message' => 'Something went wrong. Please try again later.'], 500); // 500 = internal server error
         }
     }

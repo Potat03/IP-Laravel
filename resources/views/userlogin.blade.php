@@ -19,11 +19,11 @@
     @include('header')
     <main class="login_content">
         <div class="container">
-            <div class="row justify-content-center align-items-center min-vh-100">
+            <div class="row justify-content-center align-items-center min-vh-100">z
                 <div class="col-lg-8 col-md-10">
                     <div class="cont">
                         <div class="form sign-in">
-                            <h1>Logo</h1>
+                            <h2><img src="{{ asset('images/logo.png') }}" width="50" height="50"></h2>
                             <h2>Welcome to Futatabi</h2>
                             <form id="loginForm" action="{{ route('auth.userLogin') }}" method="POST">
                                 @csrf
@@ -40,7 +40,12 @@
                                         password?</a>
                                 </label>
                                 <script src="<https://www.google.com/recaptcha/api.js>" async defer></script>
-                                <div class="g-recaptcha" data-sitekey="{{ env('RECAPTCHA_SITE_KEY') }}"></div>
+                                <div class="d-flex">
+                                    <div class="mx-auto">
+                                    <div class="g-recaptcha" data-sitekey="{{ env('RECAPTCHA_SITE_KEY') }}"></div>
+                                    </div>
+                                </div>
+                                
                                 <button type="submit" class="submit authsubmit">Sign In</button>
                             </form>
                         </div>

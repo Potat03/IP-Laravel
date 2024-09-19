@@ -152,7 +152,6 @@ class AuthFacade
         }
     }
 
-
     public static function forgetPass($data)
     {
 
@@ -205,6 +204,7 @@ class AuthFacade
         try {
             Cart::create([
                 'customer_id' => $customer_id,
+                
             ]);
 
             return ['success' => true, 'message' => 'Creation fail'];
