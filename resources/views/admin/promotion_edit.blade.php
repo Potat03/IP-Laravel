@@ -19,6 +19,7 @@
 </style>
 @endsection
 
+@section('prev_page', route('admin.promotion'))
 @section('title', 'Promotion')
 @section('page_title', 'Promotion')
 @section('page_gm', 'Edit promotion')
@@ -27,7 +28,7 @@
 <div class="card shadow-sm p-3 mb-5 w-100 position-static">
     <div class="overflow-auto">
         <div class="card-body">
-            <form method="POST">
+            <form method="POST"  id="promotion-form">
                 @csrf
                 <div class="mb-3">
                     <label for="name" class="form-label">Promotion Title</label>
@@ -44,8 +45,8 @@
                 <div class="mb-3">
                     <label for="product_id" class="form-label">Type</label>
                     <select class="form-select" id="type" name="type" required>
-                        <option value="single" selected="{{ $promotion->type == 'single' ? 'selected' : '' }}">Single</option>
-                        <option value="bundle" selected="{{ $promotion->type == 'bundle' ? 'selected' : '' }}">Bundle</option>
+                        <option value="single" {{ $promotion->type == 'single' ? 'selected' : '' }}>Single</option>
+                        <option value="bundle" {{ $promotion->type == 'bundle' ? 'selected' : '' }}>Bundle</option>
                     </select>
                 </div>
                 <div class="mb-3">
@@ -89,7 +90,7 @@
                     </select>
                 </div>
                 <button type="submit" class="btn btn-primary">Edit Promotion</button>
-                <button type="button" class="btn btn-secondary">Cancel</button>
+                <button type="button" class="btn btn-secondary" onclick="location.href=`{{ route('admin.promotion') }}`">Cancel</button>
             </form>
         </div>
     </div>
@@ -201,7 +202,7 @@
 
         });
 
-        document.querySelector('form').addEventListener('submit', function(e) {
+        document.getElementById('promotion-form').addEventListener('submit', function(e) {
             e.preventDefault();
             let form = new FormData(this);
             let invalid_qty = selected_products.find(p => p.quantity > p.stock);

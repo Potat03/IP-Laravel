@@ -24,6 +24,7 @@
 </style>
 @endsection
 
+@section('prev_page', route('admin.main'))
 @section('title', 'Promotion')
 @section('page_title', 'Promotion')
 @section('page_gm', 'Promotion bring smiles to faces')
@@ -43,8 +44,11 @@
                 </div>
             </div>
             <div class="ms-auto">
+            @if (Auth::guard('admin')->user()->role == 'manager' || Auth::guard('admin')->user()->role == 'admin')
+                <button class="btn btn-secondary me-2" onclick="window.location.href='{{ route('admin.promotion.revert') }}'"><i class="fa-regular fa-trash-undo pe-2"></i>Revert</button>
                 <button class="btn btn-secondary me-2" onclick="window.location.href='{{ route('admin.promotion.restore') }}'"><i class="fa-regular fa-trash-undo pe-2"></i>Restore</button>
                 <button class="btn btn-primary" onclick="window.location.href='{{ route('admin.promotion.add') }}'"><i class="fa-regular fa-plus pe-2"></i>Create</button>
+            @endif
             </div>
         </div>
         <table class="table">
@@ -85,8 +89,10 @@
                         <span class="badge {{$promotion->status == 'active' ? 'bg-success' : 'bg-danger'}}">{{$promotion->status}}</span>
                     </td>
                     <td>
+                    @if (Auth::guard('admin')->user()->role == 'manager' || Auth::guard('admin')->user()->role == 'admin')
                         <button class="btn btn-warning" onclick="window.location.href='{{ route('admin.promotion.edit', $promotion->promotion_id) }}'"><i class="fa-regular fa-edit pe-2"></i>Edit</button>
                         <button class="btn btn-danger" onclick="confirmation({{$promotion->promotion_id}})"><i class="fa-regular fa-trash pe-2"></i>Delete</button>
+                    @endif
                     </td>
                 </tr>
                 @endif

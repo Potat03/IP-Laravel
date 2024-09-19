@@ -200,12 +200,38 @@ class DatabaseSeeder extends Seeder
 
         Admin::create([
             'role' => 'manager',
-            'email' => 'test@gmail.com',
+            'email' => 'manager@gmail.com',
+            'password' => '$2y$12$SPXDqYIUQGznYrtl7pxsAet5RAxKZhVb6r.9aEgylQlbP2DI89mJO',
+            'status' => 'active',
+        ]);
+
+        Admin::create([
+            'role' => 'admin',
+            'email' => 'admin1@gmail.com',
             'password' =>  '$2y$12$SPXDqYIUQGznYrtl7pxsAet5RAxKZhVb6r.9aEgylQlbP2DI89mJO',
             'status' => 'active',
         ]);
 
+        Admin::create([
+            'role' => 'admin',
+            'email' => 'admin2@gmail.com',
+            'password' =>  '$2y$12$SPXDqYIUQGznYrtl7pxsAet5RAxKZhVb6r.9aEgylQlbP2DI89mJO',
+            'status' => 'active',
+        ]);
 
+        Admin::create([
+            'role' => 'customer_service',
+            'email' => 'cs1@gmail.com',
+            'password' =>  '$2y$12$SPXDqYIUQGznYrtl7pxsAet5RAxKZhVb6r.9aEgylQlbP2DI89mJO',
+            'status' => 'active',
+        ]);
+
+        Admin::create([
+            'role' => 'customer_service',
+            'email' => 'cs2@gmail.com',
+            'password' =>  '$2y$12$SPXDqYIUQGznYrtl7pxsAet5RAxKZhVb6r.9aEgylQlbP2DI89mJO',
+            'status' => 'active',
+        ]);
         
     }
 }

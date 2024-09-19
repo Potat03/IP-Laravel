@@ -8,6 +8,8 @@ use App\Http\Controllers\ChatMessageController;
 use App\Http\Controllers\CollectiblesController;
 use App\Http\Controllers\ConsumablesController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ProductCategoryController;
 use App\Http\Controllers\WearableController;
 use App\Http\Controllers\CartItemController;
 use App\Http\Controllers\PromotionController;
@@ -134,11 +136,15 @@ Route::middleware([AdminAuth::class])->group(function () {
     Route::get('/admin/product', action: [ProductController::class, 'getAll'])->name('admin.product');
     Route::get('/admin/product/add', action: [ProductController::class, 'addProduct'])->name('admin.product.add');
     Route::get('/admin/product/edit/{id}', [ProductController::class, 'editProduct'])->name('admin.product.edit');
+    Route::get('/admin/product/report', [ProductController::class, 'generateProductReport'])->name('admin.product.report');
+    Route::get('/admin/category/add', action: [CategoryController::class, 'addCategory'])->name('admin.category.add');
+    Route::get('/admin/category/edit/{id}', action: [CategoryController::class, 'editCategory'])->name('admin.category.edit');
 
     Route::get('/admin/promotion', [PromotionController::class, 'adminList'])->name('admin.promotion');
     Route::get('/admin/promotion/add', [PromotionController::class, 'addPromotion'])->name('admin.promotion.add');
     Route::get('/admin/promotion/edit/{id}', [PromotionController::class, 'editPromotion'])->name('admin.promotion.edit');
     Route::get('/admin/promotion/restore', [PromotionController::class, 'restorePromotion'])->name('admin.promotion.restore');
+    Route::get('/admin/promotion/revert', [PromotionController::class, 'undoListPromotion'])->name('admin.promotion.revert');
     Route::get('/admin/promotion/report', [PromotionController::class, 'generatePromotionReport'])->name('admin.promotion.report');
     Route::get('/admin/promotion/report/download', [PromotionController::class, 'downloadXMLReport'])->name('admin.promotion.report.download');
 

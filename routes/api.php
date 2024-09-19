@@ -3,6 +3,7 @@
     use Illuminate\Http\Request;
     use Illuminate\Support\Facades\Route;
     use App\Http\Controllers\ProductController;
+    use App\Http\Controllers\CategoryController;
     use App\Http\Controllers\PromotionController;
     use App\Http\Middleware\customAuth;
     use App\Http\Controllers\CustomerController;
@@ -22,7 +23,6 @@
 
     Route::get('/auth', [AuthController::class, 'showCustomerForm'])->name('auth.showForm');
     Route::group(['middleware' => ['web']], function () {
-        //login content
         Route::post('/login', [AuthController::class, 'userLogin'])->name('auth.userLogin');
         Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout');
         Route::post('/register', [AuthController::class, 'userRegister'])->name('auth.userRegister');
@@ -47,6 +47,10 @@
     Route::post('/product/update/{id}', [ProductController::class, 'updateProduct'])->name('product.update');
     Route::get('/product/generateTable', [ProductController::class, 'generateTable']);
 
+    Route::post('/category/store', [CategoryController::class, 'store'])->name('admin.category.store');
+    Route::post('/category/update/{id}', [CategoryController::class, 'update'])->name('admin.category.update');
+    Route::delete('/category/{id}', [CategoryController::class, 'destroy'])->name('admin.category.delete');
+
     Route::get('/promotion/all', [PromotionController::class, 'getPromotion']);
     Route::get('/promotion/get/{id}', [PromotionController::class, 'getPromotionById']);
     Route::post('/promotion/create', [PromotionController::class, 'createPromotion'])->name('promotion.create');
@@ -54,6 +58,7 @@
     Route::delete('/promotion/{id}', [PromotionController::class, 'deletePromotion']);
     Route::put('/promotion/edit/status/{id}', [PromotionController::class, 'togglePromotion']);
     Route::post('/promotion/restore/{id}', [PromotionController::class, 'undoDeletePromotion']);
+    Route::post('/promotion/revert/{id}', [PromotionController::class, 'undoUpdatePromotion']);
 
 
 
