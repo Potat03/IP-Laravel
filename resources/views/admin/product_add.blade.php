@@ -1,3 +1,8 @@
+{{-- 
+    Author: Lim Weng Ni
+    Date: 20/09/2024
+--}}
+
 @extends('admin.layout.main')
 
 @section('vite')
@@ -183,13 +188,17 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="categories" class="form-label">Categories:</label>
+                        <label class="form-label">Categories:</label>
                         <div class="form-group">
-                            <select class="form-control" id="categories" name="categories[]" multiple required>
-                                @foreach ($categories as $category)
-                                    <option value="{{ $category->category_name }}">{{ $category->category_name }}</option>
-                                @endforeach
-                            </select>
+                            @foreach ($categories as $category)
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="categories[]"
+                                        id="category_{{ $category->id }}" value="{{ $category->category_name }}">
+                                    <label class="form-check-label" for="category_{{ $category->id }}">
+                                        {{ $category->category_name }}
+                                    </label>
+                                </div>
+                            @endforeach
                         </div>
                     </div>
 
@@ -269,17 +278,14 @@
                 const form = new FormData(productForm);
 
                 // Get the selected options from the select element
-                var select = document.getElementById('categories');
-                var selectedOptions = Array.from(select.selectedOptions);
+                var checkboxes = document.querySelectorAll('input[name="categories[]"]:checked');
 
                 // Check if any options are selected
-                if (selectedOptions.length === 0) {
+                if (checkboxes.length === 0) {
                     alert('You must select at least one category for the product.');
                 } else {
-                    // Convert the selected options to an array of values
-                    var categoryValues = selectedOptions.map(option => option.value);
+                    var categoryValues = Array.from(checkboxes).map(checkbox => checkbox.value);
 
-                    // Append the category array to FormData, using JSON.stringify
                     form.append('categories', JSON.stringify(categoryValues));
                 }
 

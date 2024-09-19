@@ -50,7 +50,7 @@ Route::get('/promotion', [PromotionController::class, 'customerList'])->name('pr
 Route::get('/promotion/{id}', [PromotionController::class, 'viewDetails'])->name('promotion.details');
 
 //Cart
-Route::get('/product/{id}', [ProductController::class, 'showProductImages']);
+// Route::get('/product/{id}', [ProductController::class, 'showProductImages']);
 
 
 Route::get('/cart', [CartItemController::class, 'getCartItemByCustomerID']);    

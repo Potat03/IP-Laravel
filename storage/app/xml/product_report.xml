@@ -1,2 +1,53 @@
 <?xml version="1.0"?>
-<products><product><id>1</id><name>product1</name><type>Wearable</type><price>10000.00</price><stock>10</stock><status>active</status></product><product><id>2</id><name>product2</name><type>Wearable</type><price>1000.00</price><stock>50</stock><status>active</status></product><product><id>5</id><name>Testt</name><type>Collectible</type><price>12.00</price><stock>12</stock><status>active</status></product><product><id>6</id><name>T shirt</name><type>Wearable</type><price>20.00</price><stock>12</stock><status>active</status></product></products>
+<!--
+    Author: Lim Weng Ni
+    Date: 20/09/2024
+-->
+
+<report>
+    <total_value>600000.00</total_value> 
+    <inventory_turnover_rate>0.5</inventory_turnover_rate>
+
+    <products>
+        <product>
+            <id>1</id>
+            <name>product1</name>
+            <type>Wearable</type>
+            <price>10000.00</price>
+            <stock>10</stock>
+            <status>active</status>
+            <total_sold>1</total_sold>
+            <restock_recommendation>0</restock_recommendation>
+        </product>
+        <product>
+            <id>2</id>
+            <name>product2</name>
+            <type>Wearable</type>
+            <price>1000.00</price>
+            <stock>50</stock>
+            <status>active</status>
+            <total_sold>0</total_sold>
+            <restock_recommendation>0</restock_recommendation>
+        </product>
+        <product>
+            <id>5</id>
+            <name>Testt</name>
+            <type>Collectible</type>
+            <price>12.00</price>
+            <stock>12</stock>
+            <status>active</status>
+            <total_sold>0</total_sold>
+            <restock_recommendation>0</restock_recommendation>
+        </product>
+        <product>
+            <id>6</id>
+            <name>T shirt</name>
+            <type>Wearable</type>
+            <price>20.00</price>
+            <stock>12</stock>
+            <status>active</status>
+            <total_sold>0</total_sold>
+            <restock_recommendation>0</restock_recommendation>
+        </product>
+    </products>
+</report>
