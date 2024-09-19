@@ -243,13 +243,24 @@
             <div>
                 <h1 class="fw-bold">{{ $product->name }}</h1>
                 <h4 class="text-muted">RM {{ $product->price }}</h4>
-                <div class="d-flex align-items-center text-warning">
-                    <i class="bi bi-star-fill me-1"></i>
-                    <i class="bi bi-star-fill me-1"></i>
-                    <i class="bi bi-star-fill me-1"></i>
-                    <i class="bi bi-star-fill me-1"></i>
-                    <i class="bi bi-star-fill me-1"></i>
-                    <span class="text-dark ms-2">(20)</span>
+                <div class="d-flex justify-content align-items-center small text-warning">
+                    @php
+                        $averageRating = $product->averageRating ?? 0;
+                        $reviewsCount = $product->reviewsCount ?? 0;
+
+                        $fullStars = floor($averageRating);
+                        $halfStar = $averageRating - $fullStars >= 0.5;
+                    @endphp
+                    @for ($i = 0; $i < $fullStars; $i++)
+                        <i class="fa-solid fa-star me-1"></i>
+                    @endfor
+                    @if ($halfStar)
+                        <i class="fa-solid fa-star-half-stroke me-1"></i>
+                    @endif
+                    @for ($i = $fullStars + ($halfStar ? 1 : 0); $i < 5; $i++)
+                        <i class="fa-regular fa-star me-1"></i>
+                    @endfor
+                    <span class="text-dark ms-lg-2">({{ $reviewsCount }})</span>
                 </div>
                 <h4 class="text-muted pt-2">{{ $product->stock > 0 ? 'In Stock' : 'Out of Stock' }}</h4>
             </div>
@@ -341,7 +352,7 @@
             <div class="product-details mt-5">
                 <h5>Product Description:</h5>
                 <p style="font-size: 1.2rem;">
-                    {{ $product->description }}
+                    {!! $product->description !!}
                     @if ($product->collectible)
                         <hr /><span style="font-size: 1.2rem;">
                             <h5 style="display: inline; margin: 0;">Supplier:</h5>

@@ -49,8 +49,7 @@
         <div class="row" id="product-list">
             @forelse ($newArrivals as $product)
                 <div class="col-md-2-4 mb-4">
-                    <a href="{{ url('product/' . $product['product']->product_id) }}"
-                        class="text-decoration-none text-dark">
+                    <a href="{{ url('product/' . $product['product']->product_id) }}" class="text-decoration-none text-dark">
                         <div class="card h-100">
                             @if ($product['product']->is_new)
                                 <div class="badge bg-dark text-white position-absolute w-50 d-flex align-items-center justify-content-center fs-5"
@@ -60,11 +59,18 @@
                             @endif
 
                             <div class="card-img-top" style="height: 300px; width: 100%;">
-                                @if ($product['mainImage'] == '')
-                                    <img src="{{ URL('storage/images/products/default.jpg') }}" class="d-block w-100"
+                                @php
+                                    // Use the 'mainImage' directly from the $product array
+                                    $mainImage =
+                                        $product['mainImage'] ?? Storage::url('public/images/products/default.jpg');
+                                @endphp
+
+                                <!-- Display the image -->
+                                @if ($mainImage)
+                                    <img src="{{ $mainImage }}" class="d-block w-100"
                                         style="height: 100%; object-fit: cover;" alt="{{ $product['product']->name }}">
                                 @else
-                                    <img src="{{ URL('storage/images/products/' . $product['product']->product_id . '/' . $product['mainImage']) }}"
+                                    <img src="{{ Storage::url('public/images/products/default.jpg') }}"
                                         class="d-block w-100" style="height: 100%; object-fit: cover;"
                                         alt="{{ $product['product']->name }}">
                                 @endif

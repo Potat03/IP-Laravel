@@ -23,29 +23,33 @@ class CheckLowStockAndReorder extends Command
         // Fetch low stock products
         $lowStockProducts = Product::where('stock', '<', 50)->get();
 
-        // Collect product IDs
-        $productIds = $lowStockProducts->pluck('product_id')->toArray();
-
-        // Get main image URLs for these products
-        $images = $this->getMainImages($productIds);
-
         // Aggregate product details into an HTML-formatted string
-        $message = "<h2>Here are the products that are low in stock:</h2><ul>";
+        $message = "<h2>Here are the products that are low in stock:</h2>";
+        $message .= "<table border='1' cellpadding='10' cellspacing='0' style='border-collapse: collapse;'>";
+        $message .= "<thead>";
+        $message .= "<tr>";
+        $message .= "<th>Product ID</th>";
+        $message .= "<th>Product Name</th>";
+        $message .= "<th>Current Stock</th>";
+        $message .= "<th>Link</th>";
+        $message .= "</tr>";
+        $message .= "</thead>";
+        $message .= "<tbody>";
 
         foreach ($lowStockProducts as $product) {
-            $imageUrl = url('storage/images/products/' . $product->product_id . '/main.png');
-
-            $message .= "<li>";
-            $message .= "<strong>Product ID:</strong> {$product->product_id}<br>";
-            $message .= "<strong>Name:</strong> {$product->name}<br>";
-            $message .= "<strong>Current Stock:</strong> {$product->stock}<br>";
-            $message .= "<strong>Quantity to Reorder:</strong> 100<br>";
-            $message .= "<strong>Message:</strong> Please restock this item.<br>";
-            $message .= "<strong>Image:</strong><br><img src='{$imageUrl}' alt='{$product->name}' style='max-width: 200px;'><br>";
-            $message .= "</li>";
+            // Update the image URL to use the dev tunnel URL
+           
+            $message .= "<tr>";
+            $message .= "<td>{$product->product_id}</td>";
+            $message .= "<td>{$product->name}</td>";
+            $message .= "<td>{$product->stock}</td>";
+            $message .= "<td><button type='button'>Restock</button></td>";
+            $message .= "</tr>";
         }
 
-        $message .= "</ul><p>Please restock these items.</p>";
+        $message .= "</tbody>";
+        $message .= "</table>";
+        $message .= "<p>Please restock these items.</p>";
 
         // Send aggregated HTML message to Zapier
         Http::post('https://hooks.zapier.com/hooks/catch/20148429/2hvgf6e/', [
@@ -53,32 +57,5 @@ class CheckLowStockAndReorder extends Command
         ]);
 
         Log::info('Low stock data has been sent to Zapier.');
-    }
-
-    public function getMainImages($ids)
-    {
-        $images = [];
-        foreach ($ids as $id) {
-            $imageFiles = Storage::files('public/images/products/' . $id);
-
-            $mainImage = null;
-
-            foreach ($imageFiles as $file) {
-                $filename = basename($file);
-
-                if (strpos($filename, 'main') !== false && preg_match('/\.(jpg|jpeg|png)$/i', $filename)) {
-                    $mainImage = Storage::url($file);
-                    break;
-                }
-            }
-
-            if (!$mainImage) {
-                $mainImage = Storage::url('public/images/products/default.jpg'); // Ensure default image exists
-            }
-
-            $images[$id] = $mainImage;
-        }
-
-        return $images;
     }
 }

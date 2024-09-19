@@ -3,12 +3,14 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Models\Product;
 use App\Models\Wearable;
 use App\Models\Collectible;
 use App\Models\Consumable;
 use App\Models\Category;
 use App\Models\Rating;
+use App\Models\OrderItem;
 use App\Contexts\ProductContext;
 use App\Strategies\WearableStrategy;
 use App\Strategies\CollectibleStrategy;
@@ -31,7 +33,7 @@ class ProductController extends Controller
     {
         try {
             $request->validate([
-                'images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+                'images.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
                 'filesArray' => 'nullable|string',
             ]);
 
@@ -77,7 +79,7 @@ class ProductController extends Controller
     {
         try {
             $request->validate([
-                'images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+                'images.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
                 'existingImages' => 'nullable|string',
                 'filesArray' => 'nullable|string',
             ]);
@@ -373,6 +375,26 @@ class ProductController extends Controller
         }
     }
 
+    public function getAllProducts(Request $request)
+    {
+        try {
+            $products = Product::all();
+
+            $categoryController = new CategoryController();
+            $categories = $categoryController->index();
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'products' => $products,
+                    'categories' => $categories
+                ]
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
+        }
+    }
+
     public function getOne($id)
     {
         try {
@@ -459,7 +481,7 @@ class ProductController extends Controller
         }
     }
 
-    // Show product images
+    //Show product images
     // public function showProductImages($id)
     // {
     //     $product = Product::find($id);
@@ -758,47 +780,86 @@ class ProductController extends Controller
 
     public function generateProductReport()
     {
-        // Fetch all products along with their associated category
+        // Fetch all products
         $products = Product::all();
 
-        // Prepare XML content with the basic product details, including the category
-        $xmlContent = $this->generateXMLContentForBasicProductInfo($products);
+        $totalValue = Product::sum(DB::raw('price * stock'));
 
-        // Save the XML content to a file (optional)
-        Storage::put('xml/product_report.xml', $xmlContent);
+        $cogs = OrderItem::select(DB::raw('SUM(order_items.quantity * product.price) as total'))
+            ->join('product', 'order_items.product_id', '=', 'product.product_id')
+            ->whereMonth('order_items.created_at', '=', date('m'))
+            ->value('total');
+        $averageInventory = Product::avg('stock');
+        $inventoryTurnoverRate = $averageInventory ? $cogs / $averageInventory : 0;
 
-        // Load the XSLT file for transforming the XML into HTML
+        $monthlySales = OrderItem::select('product_id', DB::raw('SUM(quantity) as total_sold'))
+            ->whereMonth('created_at', '=', date('m'))
+            ->groupBy('product_id')
+            ->pluck('total_sold', 'product_id');
+
+        $averageMonthlySales = OrderItem::select('product_id', DB::raw('AVG(quantity) as average_sold'))
+            ->groupBy('product_id')
+            ->pluck('average_sold', 'product_id');
+
+        $reorderRecommendations = [];
+        $leadTimeMonths = 3;
+
+        foreach ($products as $product) {
+            $averageSold = $averageMonthlySales[$product->product_id] ?? 0;
+            $currentStock = $product->stock;
+
+            if ($averageSold > 0) {
+                $recommendedQuantity = ($averageSold * $leadTimeMonths) - $currentStock;
+                if ($recommendedQuantity > 0) {
+                    $reorderRecommendations[$product->product_id] = $recommendedQuantity;
+                }
+            }
+        }
+
+        $xmlContent = $this->generateXMLContentForBasicProductInfo($products, $monthlySales, $totalValue, $inventoryTurnoverRate, $reorderRecommendations);
+
         $xslt = new \DOMDocument();
         $xslt->load(storage_path('app/xslt/product_report.xslt'));
 
-        // Load the generated XML content
         $xml = new \DOMDocument();
         $xml->loadXML($xmlContent);
 
-        // Apply the XSLT transformation
         $proc = new \XSLTProcessor();
         $proc->importStylesheet($xslt);
 
-        // Transform XML to HTML
         $html = $proc->transformToXML($xml);
 
-        // Return the view with the generated HTML
-        return view('admin.product_report', ['html' => $html, 'products' => $products]);
+        return view('admin.product_report', [
+            'html' => $html,
+            'products' => $products,
+            'totalValue' => $totalValue,
+            'inventoryTurnoverRate' => $inventoryTurnoverRate,
+        ]);
     }
 
-    private function generateXMLContentForBasicProductInfo($products)
+    private function generateXMLContentForBasicProductInfo($products, $monthlySales, $totalValue, $inventoryTurnoverRate, $reorderRecommendations)
     {
-        $xml = new \SimpleXMLElement('<products/>');
+        $xml = new \SimpleXMLElement('<report/>');
 
+        $xml->addChild('total_value', $totalValue);
+        $xml->addChild('inventory_turnover_rate', $inventoryTurnoverRate);
+
+        $productsNode = $xml->addChild('products');
         foreach ($products as $product) {
-            $productNode = $xml->addChild('product');
+            $productNode = $productsNode->addChild('product');
             $productNode->addChild('id', $product->product_id);
             $productNode->addChild('name', $product->name);
             $type = $product->getProductType();
             $productNode->addChild('type', $type);
             $productNode->addChild('price', $product->price);
-            $productNode->addChild('stock', $product->stock); // Assuming there's a stock attribute
-            $productNode->addChild('status', $product->status); // Assuming status is a field in your product model
+            $productNode->addChild('stock', $product->stock);
+            $productNode->addChild('status', $product->status);
+
+            $totalSold = $monthlySales[$product->product_id] ?? 0;
+            $productNode->addChild('total_sold', $totalSold);
+
+            $recommendedQuantity = $reorderRecommendations[$product->product_id] ?? 0;
+            $productNode->addChild('restock_recommendation', $recommendedQuantity);
         }
 
         return $xml->asXML();
