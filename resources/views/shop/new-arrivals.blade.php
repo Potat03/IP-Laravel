@@ -1,3 +1,8 @@
+{{-- 
+    Author: Lim Weng Ni
+    Date: 20/09/2024
+--}}
+
 @extends('layout.shop')
 
 @section('title', 'New Arrivals')

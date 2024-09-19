@@ -1,4 +1,9 @@
 <?php
+/**
+ *
+ * Author: Lim Weng Ni
+ * Date: 20/09/2024
+ */
 
 namespace App\Http\Controllers;
 
@@ -777,7 +782,7 @@ class ProductController extends Controller
             ->join('product', 'order_items.product_id', '=', 'product.product_id')
             ->whereMonth('order_items.created_at', '=', date('m'))
             ->value('total');
-            
+
         $averageInventory = Product::avg('stock');
         $inventoryTurnoverRate = $averageInventory ? $cogs / $averageInventory : 0;
 

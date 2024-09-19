@@ -1,3 +1,8 @@
+{{-- 
+    Author: Lim Weng Ni
+    Date: 20/09/2024
+--}}
+
 @forelse ($products as $product)
     @if ($product->status == 'active')
         <div class="col-md-2-4 mb-4">
