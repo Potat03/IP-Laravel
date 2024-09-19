@@ -10,6 +10,8 @@
     use App\Http\Controllers\CartItemController;
     use App\Http\Controllers\AuthController;
     use App\Http\Middleware\CustomerAuth;
+    use App\Http\Middleware\AdminAuth;
+    use App\Http\Controllers\APIkeyController;
 
     Route::get('/auth', [AuthController::class, 'showCustomerForm'])->name('auth.showForm');
     Route::group(['middleware' => ['web']], function () {
@@ -27,6 +29,11 @@
 
         Route::post('/admin/login', [AuthController::class, 'adminLogin'])->name('auth.adminLogin');
         Route::post('/admin/logout', [AuthController::class, 'adminLogout'])->name('auth.adminLogout');
+
+        Route::middleware([AdminAuth::class])->group(function () {
+            Route::post('/admin/apikey/create', [APIkeyController::class, 'createKey'])->name('admin.apikey.create');
+            Route::post('/admin/apikey/delete', [APIkeyController::class, 'deleteKey'])->name('admin.apikey.delete');
+        });
     });
     Route::post('/resendOtp', [AuthController::class, 'resendOtp'])->name('auth.resendOtp');
 
@@ -45,6 +52,8 @@
     Route::delete('/promotion/{id}', [PromotionController::class, 'deletePromotion']);
     Route::put('/promotion/edit/status/{id}', [PromotionController::class, 'togglePromotion']);
     Route::post('/promotion/restore/{id}', [PromotionController::class, 'undoDeletePromotion']);
+
+
 
     Route::get('/cartItem/getCartItemByCustomerID/{customerID}', [CartItemController::class, 'getCartItemByCustomerID']);
 

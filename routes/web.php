@@ -12,9 +12,8 @@ use App\Http\Controllers\WearableController;
 use App\Http\Controllers\CartItemController;
 use App\Http\Controllers\PromotionController;
 use App\Http\Controllers\CustomerController;
-use App\Http\Controllers\AdminCustomerController;
 use App\Http\Middleware\CustomerAuth;
-use App\Http\Controllers\AuthController;
+use App\Http\Controllers\APIkeyController;
 
 //Default
 Route::get('/', function () {
@@ -55,6 +54,7 @@ Route::post('/sendMsg', [ChatMessageController::class, 'sendMessage'])->name('se
 Route::post('/acceptChat', [ChatMessageController::class, 'acceptChat'])->name('acceptChat');
 Route::post('/endChat', [ChatMessageController::class, 'endChat'])->name('endChat');
 Route::post('/createChat', [ChatMessageController::class, 'createChat'])->name('createChat');
+Route::post('/rateChat', [ChatMessageController::class, 'rateChat'])->name('rateChat');
 
 Route::get('/getCustomerChat', [ChatMessageController::class, 'initCustomerChat'])->name('getCustomerChat');
 Route::get('/getAdmChatList', [ChatMessageController::class, 'initAdminChatList'])->name('getAdmChatList');
@@ -128,4 +128,6 @@ Route::middleware([AdminAuth::class])->group(function () {
     Route::get('/admin/promotion/restore', [PromotionController::class, 'restorePromotion'])->name('admin.promotion.restore');
     Route::get('/admin/promotion/report', [PromotionController::class, 'generatePromotionReport'])->name('admin.promotion.report');
     Route::get('/admin/promotion/report/download', [PromotionController::class, 'downloadXMLReport'])->name('admin.promotion.report.download');
+
+    Route::get('/admin/apikey', [APIkeyController::class, 'listKey'])->name('admin.apikey');
 });

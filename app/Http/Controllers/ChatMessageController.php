@@ -10,6 +10,9 @@ use Illuminate\Support\Facades\Auth;
 use App\Factories\MessageFactory;
 use App\Models\Customer;
 use App\Services\WebPurifyService;
+use App\Models\Admin;
+use DOMDocument;
+use Illuminate\Support\Facades\Log;
 
 class ChatMessageController extends Controller
 {
@@ -167,13 +170,13 @@ class ChatMessageController extends Controller
 
             $user = null;
 
-            if($request->by_customer == 1){
+            if ($request->by_customer == 1) {
                 $user = Auth::guard('customer')->user();
-            }else{
+            } else {
                 $user = Auth::guard('admin')->user();
             }
 
-            if(!$user){
+            if (!$user) {
                 return response()->json(['success' => false, 'info' => 'Unauthorized'], 403);
             }
 
@@ -307,13 +310,13 @@ class ChatMessageController extends Controller
 
             $user = null;
 
-            if($request->by_customer == 1){
+            if ($request->by_customer == 1) {
                 $user = Auth::guard('customer')->user();
-            }else{
+            } else {
                 $user = Auth::guard('admin')->user();
             }
 
-            if(!$user){
+            if (!$user) {
                 return response()->json(['success' => false, 'info' => 'Unauthorized'], 403);
             }
 
@@ -331,7 +334,7 @@ class ChatMessageController extends Controller
             }
 
             if ($active_chat->status === 'ended') {
-                return response()->json(['success' => false, 'info' => 'Chat is ended'], 400);
+                return response()->json(['success' => false, 'info' => 'Chat is ended'], 200);
             }
 
             // where msg id > last_msg_id
@@ -410,6 +413,7 @@ class ChatMessageController extends Controller
 
             $chat->status = 'active';
             $chat->admin_id = $user->admin_id;
+            $chat->accepted_at = now();
             $chat->save();
 
             return response()->json([
@@ -463,7 +467,27 @@ class ChatMessageController extends Controller
             }
 
             $chat->status = 'ended';
+            $chat->ended_at = now();
             $chat->save();
+
+            //append to xml
+            $xml_data = $this->getXmlRequiredData($chat);
+            $xmlPath = storage_path('app/xml/chat.xml');
+            $dom = new DOMDocument();
+            $dom->formatOutput = true;
+
+            if (!file_exists($xmlPath)) {
+                Log::info('Creating new xml file');
+                $root = $dom->createElement('chatCollection');
+                $dom->appendChild($root);
+            } else {
+                Log::info('File found');
+                $dom->load($xmlPath);
+            }
+
+            if ($this->addChatDataToXml($dom, $xml_data)) {
+                $dom->save($xmlPath);
+            }
 
             return response()->json([
                 'success' => true,
@@ -533,6 +557,176 @@ class ChatMessageController extends Controller
                 'success' => false,
                 'info' => $e->getMessage()
             ], 500);
+        }
+    }
+
+    public function rateChat(Request $request)
+    {
+        try {
+            // Check if got logged in
+            if (!Auth::guard('customer')->check()) {
+                return response()->json(['success' => false, 'info' => 'Unauthorized'], 403);
+            }
+
+            $user = Auth::guard('customer')->user();
+
+            // Validate the request data for chat_id
+            $request->validate([
+                'chat_id' => 'required|integer',
+                'rate' => 'required|integer|between:1,5',
+            ]);
+
+            $chat_id = $request->chat_id;
+            $rating = $request->rate;
+
+            // Get the chat
+            $chat = Chat::find($chat_id);
+
+            if (!$chat) {
+                return response()->json(['success' => false, 'info' => 'Chat not found'], 404);
+            }
+
+            if ($chat->status != 'ended') {
+                return response()->json(['success' => false, 'info' => 'Chat is not ended'], 400);
+            }
+
+            if (Gate::forUser($user)->denies('rateChat', $chat)) {
+                return response()->json(['success' => false, 'info' => 'You are not allowed to rate this chat.'], 403);
+            }
+
+            $chat->rating = $rating;
+            $chat->save();
+
+            //append to xml
+            $xmlPath = storage_path('app/xml/chat.xml');
+            $dom = new DOMDocument();
+            $dom->formatOutput = true;
+
+            if (!file_exists($xmlPath)) {
+                return response()->json([
+                    'success' => false,
+                    'info' => 'File not found'
+                ], 422);
+            } 
+
+            $dom->load($xmlPath);
+            // Update the respective XML record
+            $this->updateChatRatingInXml($dom, $chat_id, $rating);
+            $dom->save($xmlPath);
+
+            return response()->json([
+                'success' => true,
+                'info' => 'Chat rated'
+            ], 200);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'info' => 'Invalid data',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'info' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    private function getXmlRequiredData(Chat $chat)
+    {
+        $admin = Admin::find($chat->admin_id);
+        $customer = Customer::find($chat->customer_id);
+
+        if (!$admin || !$customer) {
+            return [];
+        }
+
+        return [
+            'chat_id' => $chat->chat_id,
+            'admin' => [
+                'name' => $admin->name,
+                'id' => $admin->admin_id,
+            ],
+            'customer' => [
+                'name' => $customer->username,
+                'id' => $customer->customer_id,
+            ],
+            'rating' => $chat->rating,
+            'accepted_at' => $chat->accepted_at,
+            'created_at' => $chat->created_at,
+            'ended_at' => $chat->ended_at,
+        ];
+    }
+
+
+    private function addChatDataToXml(DOMDocument $dom, array $chatData)
+    {
+        try {
+            $root = $dom->documentElement;
+
+            $chatElement = $dom->createElement('chat');
+            $chatElement->setAttribute('chat_id', $chatData['chat_id']);
+
+            $adminElement = $dom->createElement('admin');
+            $adminNameElement = $dom->createElement('name', $chatData['admin']['name']);
+            $adminIdElement = $dom->createElement('id', $chatData['admin']['id']);
+            $adminElement->appendChild($adminNameElement);
+            $adminElement->appendChild($adminIdElement);
+            $chatElement->appendChild($adminElement);
+
+            $customerElement = $dom->createElement('customer');
+            $customerNameElement = $dom->createElement('name', $chatData['customer']['name']);
+            $customerIdElement = $dom->createElement('id', $chatData['customer']['id']);
+            $customerElement->appendChild($customerNameElement);
+            $customerElement->appendChild($customerIdElement);
+            $chatElement->appendChild($customerElement);
+
+            $rating = is_null($chatData['rating']) ? 0 : $chatData['rating'];
+            $ratingElement = $dom->createElement('rating', $rating);
+            $chatElement->appendChild($ratingElement);
+
+            $acceptedAtElement = $dom->createElement('accepted_at', $chatData['accepted_at']);
+            $chatElement->appendChild($acceptedAtElement);
+
+            $createdAtElement = $dom->createElement('created_at', $chatData['created_at']);
+            $chatElement->appendChild($createdAtElement);
+
+            $endedAtElement = $dom->createElement('ended_at', $chatData['ended_at']);
+            $chatElement->appendChild($endedAtElement);
+
+            $root->appendChild($chatElement);
+
+            return true;
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
+            return false;
+        }
+    }
+
+    private function updateChatRatingInXml(DOMDocument $dom, $chatId, $newRating)
+    {
+        try {
+            $xpath = new \DOMXPath($dom);
+            $chatElement = $xpath->query("//chat[@chat_id = '$chatId']")->item(0);
+
+            if ($chatElement) {
+                $ratingElement = $chatElement->getElementsByTagName('rating')->item(0);
+
+                if ($ratingElement) {
+                    $ratingElement->nodeValue = is_null($newRating) ? '0' : $newRating;
+                } else {
+                    $ratingElement = $dom->createElement('rating', is_null($newRating) ? '0' : $newRating);
+                    $chatElement->appendChild($ratingElement);
+                }
+
+                return true;
+            } else {
+                Log::error("Chat with ID $chatId not found in XML.");
+                return false;
+            }
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
+            return false;
         }
     }
 }

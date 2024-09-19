@@ -17,9 +17,10 @@ return new class extends Migration
             $table->unsignedBigInteger('customer_id')->references('customer_id')->on('customer');
             $table->unsignedBigInteger('admin_id')->references('admin_id')->on('admin')->nullable();
             $table->string('status');
+            $table->unsignedBigInteger('rating')->nullable();
+            $table->timestamp('accepted_at')->nullable();
             $table->timestamp('ended_at')->nullable();
             $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'))->nullable(false);
-            $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'))->nullable(false);
         });
     }
 

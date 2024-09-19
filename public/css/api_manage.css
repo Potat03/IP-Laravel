@@ -1,0 +1,117 @@
+@import url('color.css');
+
+.content_wrap{
+    display: flex;
+    height: 100%;
+    width: 100%;
+    border-radius: 10px;
+    box-shadow: 1px 1px 10px 0px rgba(0, 0, 0,0.30);
+    background-color: var(--grey);
+    flex-direction: column;
+}
+
+.inner_upper_content{
+    display: flex;
+    padding: 10px 20px;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.inner_upper_content button{
+    padding: 5px 10px;
+    background-color: var(--adminmain);
+    color: var(--white);
+    border-radius: 10px;
+    opacity: 0.8;
+    transition: 0.1s;
+}
+
+.inner_upper_content button:hover{
+        opacity: 1;
+}
+
+.inner_upper_content button:active{
+    transform: scale(0.98);
+}
+
+.inner_lower_content{
+    flex-grow: 1;
+    width: 100%;
+    height: 100%;
+    display: flex;
+}
+
+.table_warp{
+    padding: 20px 30px;
+    width: 100%;
+}
+
+.inner_lower_content table{
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+    height: fit-content;
+    text-align: left;
+}
+
+.inner_lower_content tr{
+    box-sizing: border-box;
+    height: 30px;
+    border: 1px solid var(--adminmain);
+}
+
+.inner_lower_content tr:first-child{
+    border-radius: 10px 10px 0 0;
+}
+
+.inner_lower_content table tr:last-of-type{
+    border-radius: 0 0 10px 10px;
+}
+
+.trash{
+    color: var(--red);
+    cursor: pointer;
+    border: 1px solid var(--red);
+    border-radius: 5px;
+    transition: 0.1s;
+    font-size: 1.2em;
+}
+
+.trash:active{
+    transform: scale(0.98);
+}
+
+.trash:hover{
+    background-color: var(--red);
+    color: var(--white);
+}
+
+.td_1{
+    padding: 10px;
+}
+
+.td_5{
+    width: fit-content;
+}
+
+.generate_wrap{
+    display: flex;
+    gap: 10px;
+}
+
+.generate_wrap input{
+    width: 100%;
+    padding: 5px 10px;
+    border: none;
+    border: 2px solid var(--adminmain);
+    border-radius: 5px;
+    background-color: transparent;
+    color: var(--white);
+    font-size: 1em;
+    font-weight: 300;
+    outline: none;
+}
+
+.generate_wrap input::{
+    color: var(--adminmain)
+}

@@ -1,0 +1,129 @@
+<?xml version="1.0"?>
+<chatCollection>
+  <chat chat_id="8">
+    <admin>
+      <name>LohTw</name>
+      <id>1</id>
+    </admin>
+    <customer>
+      <name>HuskyBoiz</name>
+      <id>1</id>
+    </customer>
+    <rating>3</rating>
+    <accepted_at>2024-09-18 23:24:30</accepted_at>
+    <created_at>2024-09-18 23:24:26</created_at>
+    <ended_at>2024-09-18 23:24:31</ended_at>
+  </chat>
+  <chat chat_id="9">
+    <admin>
+      <name>LohTw</name>
+      <id>1</id>
+    </admin>
+    <customer>
+      <name>HuskyBoiz</name>
+      <id>1</id>
+    </customer>
+    <rating>5</rating>
+    <accepted_at>2024-09-18 23:36:55</accepted_at>
+    <created_at>2024-09-18 23:36:51</created_at>
+    <ended_at>2024-09-18 23:36:58</ended_at>
+  </chat>
+  <chat chat_id="10">
+    <admin>
+      <name>LohTw</name>
+      <id>1</id>
+    </admin>
+    <customer>
+      <name>HuskyBoiz</name>
+      <id>1</id>
+    </customer>
+    <rating>4</rating>
+    <accepted_at>2024-09-18 23:37:30</accepted_at>
+    <created_at>2024-09-18 23:37:27</created_at>
+    <ended_at>2024-09-18 23:37:32</ended_at>
+  </chat>
+  <chat chat_id="11">
+    <admin>
+      <name>LohTw</name>
+      <id>1</id>
+    </admin>
+    <customer>
+      <name>HuskyBoiz</name>
+      <id>1</id>
+    </customer>
+    <rating>0</rating>
+    <accepted_at>2024-09-18 23:39:58</accepted_at>
+    <created_at>2024-09-18 23:39:51</created_at>
+    <ended_at>2024-09-18 23:40:01</ended_at>
+  </chat>
+  <chat chat_id="12">
+    <admin>
+      <name>LohTw</name>
+      <id>1</id>
+    </admin>
+    <customer>
+      <name>HuskyBoiz</name>
+      <id>1</id>
+    </customer>
+    <rating>0</rating>
+    <accepted_at>2024-09-18 23:40:16</accepted_at>
+    <created_at>2024-09-18 23:40:14</created_at>
+    <ended_at>2024-09-18 23:40:17</ended_at>
+  </chat>
+  <chat chat_id="13">
+    <admin>
+      <name>LohTw</name>
+      <id>1</id>
+    </admin>
+    <customer>
+      <name>HuskyBoiz</name>
+      <id>1</id>
+    </customer>
+    <rating>4</rating>
+    <accepted_at>2024-09-18 23:41:32</accepted_at>
+    <created_at>2024-09-18 23:41:29</created_at>
+    <ended_at>2024-09-18 23:41:34</ended_at>
+  </chat>
+  <chat chat_id="14">
+    <admin>
+      <name>LohTw</name>
+      <id>1</id>
+    </admin>
+    <customer>
+      <name>HuskyBoiz</name>
+      <id>1</id>
+    </customer>
+    <rating>4</rating>
+    <accepted_at>2024-09-18 23:42:29</accepted_at>
+    <created_at>2024-09-18 23:42:25</created_at>
+    <ended_at>2024-09-18 23:42:30</ended_at>
+  </chat>
+  <chat chat_id="15">
+    <admin>
+      <name>LohTw</name>
+      <id>1</id>
+    </admin>
+    <customer>
+      <name>HuskyBoiz</name>
+      <id>1</id>
+    </customer>
+    <rating>4</rating>
+    <accepted_at>2024-09-18 23:44:16</accepted_at>
+    <created_at>2024-09-18 23:44:13</created_at>
+    <ended_at>2024-09-18 23:44:17</ended_at>
+  </chat>
+  <chat chat_id="16">
+    <admin>
+      <name>LohTw</name>
+      <id>1</id>
+    </admin>
+    <customer>
+      <name>HuskyBoiz</name>
+      <id>1</id>
+    </customer>
+    <rating>4</rating>
+    <accepted_at>2024-09-18 23:45:27</accepted_at>
+    <created_at>2024-09-18 23:45:24</created_at>
+    <ended_at>2024-09-18 23:45:31</ended_at>
+  </chat>
+</chatCollection>
