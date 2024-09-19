@@ -375,6 +375,26 @@ class ProductController extends Controller
         }
     }
 
+    public function getAllProducts(Request $request)
+    {
+        try {
+            $products = Product::all();
+
+            $categoryController = new CategoryController();
+            $categories = $categoryController->index();
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'products' => $products,
+                    'categories' => $categories
+                ]
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
+        }
+    }
+
     public function getOne($id)
     {
         try {

@@ -47,6 +47,10 @@
     Route::post('/product/update/{id}', [ProductController::class, 'updateProduct'])->name('product.update');
     Route::get('/product/generateTable', [ProductController::class, 'generateTable']);
 
+    //provide api return json responses
+    Route::get('/products', [ProductController::class, 'getAllProducts'])->name('api.products');
+    Route::get('/products/product/{id}', [ProductController::class, 'getOneProduct'])->name('api.product');
+
     Route::post('/category/store', [CategoryController::class, 'store'])->name('admin.category.store');
     Route::post('/category/update/{id}', [CategoryController::class, 'update'])->name('admin.category.update');
     Route::delete('/category/{id}', [CategoryController::class, 'destroy'])->name('admin.category.delete');
@@ -63,7 +67,7 @@
 
 
     Route::post('/product/image/upload', [ProductController::class, 'productImageUpload']);
-    Route::get('/product/generateTable', [ProductController::class, 'generateTable']);
+    // Route::get('/product/generateTable', [ProductController::class, 'generateTable']);
 
     Route::post('/cartItem/upload', [CartController::class, 'addToCart'])->name('cart.add');
 
