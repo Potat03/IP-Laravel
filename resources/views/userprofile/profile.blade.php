@@ -54,16 +54,20 @@
                         disabled>
                 </div>
 
+                <button type="button" class="btn btn-secondary" id="editButton">Edit</button>
                 <button type="button" class="btn btn-primary" id="saveButton" style="display: none;">Save</button>
+            </form>
+            <!-- Change Password Button -->
+            <form method="POST" action="{{ route('profile.requestOtp') }}" id="changePasswordForm">
+                @csrf
+                <button type="submit" class="btn btn-danger">Change Password</button>
             </form>
         </div>
     </div>
 
     <script>
         document.getElementById('editButton').addEventListener('click', function() {
-            document.querySelectorAll('#profileForm input').forEach(function(input) {
-                input.disabled = false;
-            });
+            document.getElementById('username').disabled = false;
             document.getElementById('editButton').style.display = 'none';
             document.getElementById('saveButton').style.display = 'inline-block';
         });

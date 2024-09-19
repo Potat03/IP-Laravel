@@ -1,5 +1,11 @@
 <?php
 
+/**
+ *
+ * Author: Lim Weng Ni
+ * Date: 20/09/2024
+ */
+
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
@@ -31,7 +37,7 @@ class CheckLowStockAndReorder extends Command
         $message .= "<th>Product ID</th>";
         $message .= "<th>Product Name</th>";
         $message .= "<th>Current Stock</th>";
-        $message .= "<th>Link</th>";
+        $message .= "<th>Message</th>";
         $message .= "</tr>";
         $message .= "</thead>";
         $message .= "<tbody>";
@@ -42,8 +48,8 @@ class CheckLowStockAndReorder extends Command
             $message .= "<tr>";
             $message .= "<td>{$product->product_id}</td>";
             $message .= "<td>{$product->name}</td>";
-            $message .= "<td>{$product->stock}</td>";
-            $message .= "<td><button type='button'>Restock</button></td>";
+            $message .= "<td style='color: red; font-weight: bold;'>{$product->stock}</td>";
+            $message .= "<td>Restock required</td>";
             $message .= "</tr>";
         }
 

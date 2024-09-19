@@ -99,7 +99,7 @@
                         </a>
                     </li>
                     <li @stack('customer')>
-                        <a href="#" style="width: 100%;display: block;">
+                        <a href="{{ route('admin.customer') }}" style="width: 100%;display: block;">
                             <i class="fa-regular fa-user"></i>
                             Customer
                         </a>
@@ -115,7 +115,7 @@
                                 <li><a class="text-light" href="">Sales Report</a></li>
                                 <li><a class="text-light" href="{{ route('admin.product.report' )}}">Product Report</a></li>
                                 <li><a class="text-light" href="{{ route('admin.promotion.report' )}}">Promotion Report</a></li>
-                                <li><a class="text-light" href="">Customer Report</a></li>
+                                <li><a class="text-light" href="{{ route('admin.customer.report' )}}">Customer Report</a></li>
                             </ul>
                         </div>
                     </li>

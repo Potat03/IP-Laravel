@@ -157,7 +157,7 @@
         if (countdown === 0) {
             clearInterval(interval);
             resendBtn.innerText = "Resend OTP";
-            resendBtn.disabled = false; // Enable the button
+            resendBtn.disabled = false;
         }
     }, 1000);
 

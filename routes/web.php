@@ -40,6 +40,12 @@ Route::get('/shop/collectible', [CollectiblesController::class, 'index'])->name(
 Route::get('/shop/new-arrivals', [ProductController::class, 'newArrivals'])->name('shop.newArrivals');
 Route::get('/product/{id}', [ProductController::class, 'show'])->name('product');
 
+Route::get('/product/{id}', [ProductController::class, 'show'])->name('product');
+Route::get('/product/{id}', [ProductController::class, 'showProductImages']);
+
+// Route::get('/cart', function () {
+//     return view('cart');
+// });
 //Promotion
 Route::get('/promotion', [PromotionController::class, 'customerList'])->name('promotion');
 Route::get('/promotion/{id}', [PromotionController::class, 'viewDetails'])->name('promotion.details');
@@ -112,7 +118,12 @@ Route::middleware([CustomerAuth::class])->group(function () {
     Route::get('/shippingSec', [CustomerController::class, 'shippingSec'])->name('user.shippingSec');
     Route::get('/supportChatSec', [CustomerController::class, 'supportChatSec'])->name('user.supportChatSec');
     Route::get('/settingSec', [CustomerController::class, 'settingSec'])->name('user.settingSec');
+    Route::get('/otpVerify', [CustomerController::class, 'otpVerification'])->name('profile.otpVerification');
+    Route::get('/enterNewPassword', [CustomerController::class, 'enterNewPassword'])->name('profile.enterNewPassword');
     Route::put('/profile/update', [CustomerController::class, 'updateProfile'])->name('profile.update');
+    Route::post('/profile/requestOtp', [CustomerController::class, 'requestOtp'])->name('profile.requestOtp');
+    Route::post('/profile/verifyOtp', [CustomerController::class, 'verifyOtp'])->name('profile.verifyOtp');
+    Route::put('/profile/change-password', [CustomerController::class, 'changePassword'])->name('profile.changePassword');
 });
 
 Route::middleware([AdminAuth::class])->group(function () {
@@ -149,12 +160,15 @@ Route::middleware([AdminAuth::class])->group(function () {
     Route::get('/admin/promotion/report', [PromotionController::class, 'generatePromotionReport'])->name('admin.promotion.report');
     Route::get('/admin/promotion/report/download', [PromotionController::class, 'downloadXMLReport'])->name('admin.promotion.report.download');
 
+    Route::get('/admin/customer', [AdminCustomerController::class, 'getAll'])->name('admin.customer');
+    Route::post('/admin/customer/{id}/update', [AdminCustomerController::class, 'update'])->name('admin.customer.update');
+    Route::get('/admin/customer/report', [AdminCustomerController::class, 'showReportPage'])->name('admin.customer.report');
+    Route::get('/admin/customer/report/generateXML', [AdminCustomerController::class, 'generateXMLReport'])->name('admin.customer.generateXML');
+    Route::get('/admin/customer/report/generateXSLT', [AdminCustomerController::class, 'generateXSLTReport'])->name('admin.customer.generateXSLT');
     Route::get('/admin/orders/prepare', [OrderController::class, 'getPrepareOrders'])->name('admin.orders_prepare');
     Route::get('/admin/orders/delivery', [OrderController::class, 'getDeliveryOrders'])->name('admin.orders_delivery');
     Route::get('/admin/orders/delivered', [OrderController::class, 'getDeliveredOrders'])->name('admin.orders_delivered');
     Route::get('/admin/orders/orderStatusReport', [OrderController::class, 'generateOrderStatusReport'])->name('admin.orders.sales_report');
-
-
 });
 
 //TW blade
@@ -203,15 +217,9 @@ Route::get('/getAdmChatList', [ChatMessageController::class, 'initAdminChatList'
 Route::get('/getChatMessage', [ChatMessageController::class, 'adminGetMessage'])->name('getChatMessage');
 Route::get('/getNewMessages', [ChatMessageController::class, 'fetchLatestMessages'])->name('getNewMessages');
 
-
-
-
 use App\Http\Controllers\AdminController;
 Route::post('/admin', [AdminController::class, 'create'])->name('admin.create');
-
-
 Route::get('login2', [AuthController::class, 'showLoginForm'])->name('login2');
-
 Route::middleware([AdminAuth::class])->group(function () {
     Route::get('/testchat', function () {
         return view('chatConnectionTest');
@@ -222,9 +230,6 @@ Route::middleware([AdminAuth::class])->group(function () {
     Route::post('/send-message', [ChatMessageController::class, 'sendMessage'])->name('send.message');
     Route::get('/get-messages', [ChatMessageController::class, 'getMessages'])->name('get.messages');
 });
-
-
-
 
 Route::get('/testmsgcust', function () {
     return view('customer_popup_chat');

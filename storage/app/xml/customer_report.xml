@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<customers>
+  <customer>
+    <id>2</id>
+    <username>VVV12345</username>
+    <email>vkloo2010@gmail.com</email>
+    <tier>Basic</tier>
+    <status>active</status>
+    <total_spent/>
+  </customer>
+</customers>

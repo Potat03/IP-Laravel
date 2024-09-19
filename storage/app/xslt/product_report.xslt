@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Author: Lim Weng Ni
+    Date: 20/09/2024
+-->
+
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
     <xsl:output method="html" indent="yes"/>
 
@@ -33,7 +38,14 @@
                 </xsl:for-each>
             </tbody>
         </table>
-        <h4>Total Inventory Value: RM <xsl:value-of select="/report/total_value"/></h4>
-        <h4>Inventory Turnover Rate: <xsl:value-of select="/report/inventory_turnover_rate"/></h4>
+        <h4 style="font-size: 1.5em; font-weight: bold; color: #333; margin-top: 20px;">Summary</h4>
+        <p style="font-size: 1.2em; color: #555; margin-bottom: 10px;">
+            Total Inventory Value: 
+            <span style="font-weight: bold; color: #000;">RM <xsl:value-of select="/report/total_value"/></span>
+        </p>
+        <p style="font-size: 1.2em; color: #555;">
+            Inventory Turnover Rate: 
+            <span style="font-weight: bold; color: #000;"><xsl:value-of select="/report/inventory_turnover_rate"/></span>
+        </p>
     </xsl:template>
 </xsl:stylesheet>

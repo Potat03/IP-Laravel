@@ -1,4 +1,9 @@
 <?xml version="1.0"?>
+<!--
+    Author: Lim Weng Ni
+    Date: 20/09/2024
+-->
+
 <report>
     <total_value>600000.00</total_value> 
     <inventory_turnover_rate>0.5</inventory_turnover_rate>
