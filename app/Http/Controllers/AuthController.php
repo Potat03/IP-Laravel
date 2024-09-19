@@ -155,24 +155,28 @@ class AuthController extends Controller
 
         if ($response['success']) {
             $customer = Customer::find($customer_id);
+
+            if (!$customer) {
+                return redirect()->back()->withErrors($response['message']);
+            }
+
             if ($customer->status !== 'active') {
                 $customer->status = 'active';
                 $customer->save();
             }
 
-            if (!$customer) {
-                return redirect()->back()->withErrors($response['message']);
+            if ($context === 'forget_password') {
+                return redirect()->route('user.enterForget')->with('message', 'Please enter your new password');
             } else {
-                if ($context === 'forget_password') {
-                    return redirect()->route('user.enterForget')->with('message', 'Please enter your new password');
-                } else {
-                    return redirect()->route('user.login')->with('message', 'Verification complete, please proceed with login');
-                }
+                AuthFacade::createCart();
+
+                return redirect()->route('user.login')->with('message', 'Verification complete, please proceed with login');
             }
         } else {
             return back()->withErrors(['otp' => $response['message']]);
         }
     }
+
 
     public function updatePassword(Request $request)
     {
@@ -231,7 +235,7 @@ class AuthController extends Controller
             $credentials = request(['email', 'password']);
             $remember = $request->remember === 'true' ? true : false;
 
-            if(Auth::guard('admin')->check()){
+            if (Auth::guard('admin')->check()) {
                 $this->adminLogoutFucntion($request);
             }
 
@@ -241,7 +245,7 @@ class AuthController extends Controller
                 if ($admin->status == 'active' && $admin instanceof Admin) {
                     if ($admin->session_id !== session()->getId()) {
                         $request->session()->regenerate();
-                        if(!$remember){
+                        if (!$remember) {
                             $admin->remember_token = null;
                         }
                         $admin->session_id = session()->getId();
@@ -273,7 +277,7 @@ class AuthController extends Controller
     private function adminLogoutFucntion(Request $request)
     {
         $admin = Auth::guard('admin')->user();
-        if($admin instanceof Admin){
+        if ($admin instanceof Admin) {
             $admin->session_id = null;
             $admin->remember_token = null;
             $admin->save();

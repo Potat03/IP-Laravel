@@ -42,7 +42,6 @@ class AuthFacade
     public static function register($data)
     {
         try {
-            // Create a new customer and capture the instance
             $customer = Customer::create([
                 'username' => $data['username'],
                 'tier' => 'Basic',
@@ -201,17 +200,28 @@ class AuthFacade
     {
         $customer_id = session('customer_id');
 
+        if (!$customer_id) {
+            Log::error("Failed to create cart: customer_id not found in session.");
+            return;
+        }
+
+        Log::info("Creating cart for customer ID: " . $customer_id);
+
         try {
             Cart::create([
                 'customer_id' => $customer_id,
-                
+                'subtotal' => 0,
+                'delivery_fee' => 5,
+                'total_discount' => 0,
+                'total' => 0,
             ]);
 
-            return ['success' => true, 'message' => 'Creation fail'];
+            Log::info("Cart created successfully for customer ID: " . $customer_id);
         } catch (Exception $e) {
-            return ['failure' => false, 'message' => $e->getMessage()];
+            Log::error("Failed to create cart for customer ID: $customer_id. Error: " . $e->getMessage());
         }
     }
+
 
     public static function logout()
     {

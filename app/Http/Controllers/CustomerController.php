@@ -121,12 +121,17 @@ class CustomerController extends Controller
     public function changePassword(Request $request)
     {
         $request->validate([
-            'password' => 'required|min:8|confirmed',
+            'password' => 'required|min:8|confirmed|regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[!$#%]).*$/',
         ]);
-
+    
+        if (Hash::check($request->password, $this->customer->password)) {
+            return back()->withErrors(['password' => 'The new password cannot be the same as your current password.']);
+        }
+    
         $this->customer->password = Hash::make($request->password);
         $this->customer->save();
-
+    
         return redirect()->route('user.profileSec')->with('message', 'Password has been changed successfully.');
     }
+    
 }

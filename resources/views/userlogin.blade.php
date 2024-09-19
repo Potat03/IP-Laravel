@@ -19,7 +19,7 @@
     @include('header')
     <main class="login_content">
         <div class="container">
-            <div class="row justify-content-center align-items-center min-vh-100">z
+            <div class="row justify-content-center align-items-center min-vh-100">
                 <div class="col-lg-8 col-md-10">
                     <div class="cont">
                         <div class="form sign-in">
