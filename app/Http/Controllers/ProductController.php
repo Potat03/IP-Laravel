@@ -690,25 +690,20 @@ class ProductController extends Controller
     public function showNewArrivals()
     {
         try {
-            // Get new arrivals
             $newArrivals = Product::where('created_at', '>=', now()->subDays(30))
                 ->where('status', 'active')
                 ->orderBy('created_at', 'desc')
                 ->take(10)
                 ->get();
 
-            // Get product IDs
             $newArrivalsIds = $newArrivals->pluck('product_id')->toArray();
 
-            // Fetch main images
             $mainImages = $this->getMainImages($newArrivalsIds);
 
             $ratingcontroller = new RatingController();
 
-            // Fetch ratings
             $groupedRatings = $ratingcontroller->fetchRatings($newArrivalsIds);
 
-            /// Prepare data for the view
             $data = $newArrivals->map(function ($product) use ($mainImages, $groupedRatings) {
                 $productId = (int) $product->product_id;
                 $productRatings = $groupedRatings[$productId] ?? [];
@@ -735,24 +730,19 @@ class ProductController extends Controller
     public function newArrivals()
     {
         try {
-            // Get new arrivals
             $newArrivals = Product::where('created_at', '>=', now()->subDays(30))
                 ->where('status', 'active')
                 ->orderBy('created_at', 'desc')
                 ->paginate(20);
 
-            // Get product IDs
             $newArrivalsIds = $newArrivals->pluck('product_id')->toArray();
 
-            // Fetch main images
             $mainImages = $this->getMainImages($newArrivalsIds);
 
             $ratingController = new RatingController();
 
-            // Fetch ratings
             $groupedRatings = $ratingController->fetchRatings($newArrivalsIds);
 
-            // Prepare data for the view
             $data = $newArrivals->getCollection()->map(function ($product) use ($mainImages, $groupedRatings) {
                 $productId = (int) $product->product_id;
                 $productRatings = $groupedRatings[$productId] ?? [];
@@ -768,7 +758,6 @@ class ProductController extends Controller
                 ];
             });
 
-            // Update the paginated collection with transformed data
             $newArrivals->setCollection($data);
 
             return view('shop.new-arrivals', ['newArrivals' => $newArrivals]);
@@ -780,7 +769,6 @@ class ProductController extends Controller
 
     public function generateProductReport()
     {
-        // Fetch all products
         $products = Product::all();
 
         $totalValue = Product::sum(DB::raw('price * stock'));

@@ -31,7 +31,6 @@ class CheckLowStockAndReorder extends Command
         $message .= "<th>Product ID</th>";
         $message .= "<th>Product Name</th>";
         $message .= "<th>Current Stock</th>";
-        $message .= "<th>Link</th>";
         $message .= "</tr>";
         $message .= "</thead>";
         $message .= "<tbody>";
@@ -43,7 +42,6 @@ class CheckLowStockAndReorder extends Command
             $message .= "<td>{$product->product_id}</td>";
             $message .= "<td>{$product->name}</td>";
             $message .= "<td>{$product->stock}</td>";
-            $message .= "<td><button type='button'>Restock</button></td>";
             $message .= "</tr>";
         }
 
