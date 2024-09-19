@@ -19,8 +19,9 @@ return new class extends Migration
             $table->decimal('total', 8, 2);
             $table->string('status');
             $table->string('delivery_address');
+            $table->string('delivery_method')->nullable()->default(null);
             $table->string('tracking_number')->nullable()->default(null);
-            $table->integer('rating')->nullable()->default(0);
+            $table->boolean('received')->default(false);
             $table->timestamps();
         });
     }

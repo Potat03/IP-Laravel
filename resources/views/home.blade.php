@@ -261,7 +261,13 @@
 
             <div id="carouselExampleControls" class="carousel">
                 <div class="carousel-inner">
-                    @foreach ($newArrivals as $index => $product)
+                    @foreach ($newArrivals as $index => $data)
+                        @php
+                            $product = $data['product'];
+                            $mainImage = $data['mainImage'];
+                            $averageRating = $data['averageRating'];
+                            $reviewsCount = $data['reviewsCount'];
+                        @endphp
                         <div class="carousel-item {{ $index == 0 ? 'active' : '' }}">
                             <a href="{{ url('product/' . $product->product_id) }}"
                                 class="text-decoration-none text-dark" draggable="false">
@@ -270,18 +276,23 @@
                                         style="top: 0.5rem; left: 0rem; border-radius: 0 5px 5px 0;">
                                         <span class="fs-4">New</span>
                                     </div>
-                                    <div class="card-img-top">
-                                        <img src="{{ URL('storage/images/pokemon.png') }}" class="d-block w-100"
-                                            alt="{{ $product->name }}" width="280" height="300">
+                                    <div class="card-img-top" style="height: 300px; width: 100%;">
+                                        <!-- Use the main image URL -->
+                                        @if ($mainImage == '')
+                                            <img src="{{ URL('storage/images/products/default.jpg') }}"
+                                                class="d-block w-100" style="height: 100%; object-fit: cover;"
+                                                alt="{{ $product->name }}">
+                                        @else
+                                            <img src="{{ URL('storage/images/products/' . $product->product_id . '/' . $mainImage) }}"
+                                                class="d-block w-100" style="height: 100%; object-fit: cover;"
+                                                alt="{{ $product->name }}">
+                                        @endif
                                     </div>
                                     <div class="card-body">
                                         <p class="card-text mb-1 fs-5 fs-lg-5 fs-xl-3">{{ $product->name }}</p>
                                         <h4 class="card-text fw-bold mb-2 fs-5 fs-xl-3">RM {{ $product->price }}</h4>
                                         <div class="d-flex justify-content align-items-center small text-warning">
                                             @php
-                                                $averageRating = $product->averageRating ?? 0;
-                                                $reviewsCount = $product->reviewsCount ?? 0;
-
                                                 $fullStars = floor($averageRating);
                                                 $halfStar = $averageRating - $fullStars >= 0.5;
                                             @endphp
@@ -297,25 +308,19 @@
                                             <span class="text-dark ms-lg-2">({{ $reviewsCount }})</span>
                                         </div>
                                     </div>
-                                    <div class="card-footer p-3 pt-0 border-top-0 bg-transparent">
-                                        <div class="text-center text-uppercase">
-                                            <a class="btn btn-outline-dark mt-auto w-100 fw-bold" href="#">Add
-                                                to Cart</a>
-                                        </div>
-                                    </div>
                                 </div>
                             </a>
                         </div>
                     @endforeach
                 </div>
 
-                <button class="carousel-control-prev bg-dark" type="button"
-                    data-bs-target="#carouselExampleControls" data-bs-slide="prev">
+                <button class="carousel-control-prev bg-dark" type="button" data-bs-target="#carouselExampleControls"
+                    data-bs-slide="prev">
                     <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                     <span class="visually-hidden">Previous</span>
                 </button>
-                <button class="carousel-control-next bg-dark" type="button"
-                    data-bs-target="#carouselExampleControls" data-bs-slide="next">
+                <button class="carousel-control-next bg-dark" type="button" data-bs-target="#carouselExampleControls"
+                    data-bs-slide="next">
                     <span class="carousel-control-next-icon" aria-hidden="true"></span>
                     <span class="visually-hidden">Next</span>
                 </button>
@@ -323,7 +328,7 @@
     </section>
 
     <!-- Best Sellers -->
-    <section>
+    {{-- <section>
         <div class="container p-3">
             <div class="pt-4 row align-items-center">
                 <div class="col">
@@ -382,7 +387,7 @@
                 </button>
             </div>
         </div>
-    </section>
+    </section> --}}
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>

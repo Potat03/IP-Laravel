@@ -29,6 +29,7 @@
 
         <div class="top_content">
             <div class="top_left">
+                <img src="{{ asset('images/logo.png') }}" width="40" height="40">
                 <h1>Futatabi</h1>
             </div>
             <div class="top_middle">
@@ -48,7 +49,11 @@
                                 Profile
                             </a>
                         </li>
-                        <li><a href="#">
+                        <li onclick="logout();">
+                            <form id="logout-form" action="{{ route('auth.adminLogout') }}" method="POST" style="display: none;">
+                                @csrf
+                            </form>
+                            <a href="#">
                                 <div class="li_icon_wrap">
                                     <i class="fa-regular fa-person-from-portal"></i>
                                 </div>
@@ -62,26 +67,56 @@
         <div class="bottom_content">
             <div class="left_bar">
                 <ul>
-                    <li><a href="#">
-                            <i class="fa-solid fa-square-poll-vertical"></i>
-                            DashBoard</a>
+                    <li @stack('main')>
+                        <a href="{{ route('admin.main') }}" style="width: 100%;display: block;">
+                            <i class="fa-regular fa-square-poll-vertical"></i>
+                            DashBoard
+                        </a>
                     </li>
-                    <li><a href="#">
+                    <li @stack('product')>
+                        <a href="{{ route('admin.product') }}" style="width: 100%;display: block;">
                             <i class="fa-regular fa-teddy-bear"></i>
-                            Product</a>
-                    </li><a href="#">
-                        <li class="active">
+                            Product
+                        </a>
+
+                    </li>
+                    <li @stack('promotion')>
+                        <a href="{{ route('admin.promotion') }}" style="width: 100%;display: block;">
+                            <i class="fa-regular fa-megaphone"></i>
+                            Promotion
+                        </a>
+                    </li>
+                    <li @stack('chat')>
+                        <a href="{{ url('adminChat2') }}" style="width: 100%;display: block;">
                             <i class="fa-brands fa-rocketchat"></i>
                             Support Chat
-                    </a>
+                        </a>
                     </li>
-                    <li><a href="#">
+                    <li @stack('order')>
+                        <a href="#" style="width: 100%;display: block;">
                             <i class="fa-regular fa-box"></i>
-                            Order</a>
+                            Order
+                        </a>
                     </li>
-                    <li><a href="#">
+                    <li @stack('customer')>
+                        <a href="#" style="width: 100%;display: block;">
                             <i class="fa-regular fa-user"></i>
-                            Customer</a>
+                            Customer
+                        </a>
+                    </li>
+                    <li @stack('report')>
+                        <a class="w-100" type="button" data-bs-toggle="collapse" href="#collapseReport" role="button" aria-expanded="false" aria-controls="collapseReport">
+                            <i class="fa-regular fa-chart-bar"></i>
+                            Report
+                        </a>
+                        <div class="collapse" id="collapseReport">
+                            <ul class="py-3 px-1">
+                                <li><a class="text-light" href="">Sales Report</a></li>
+                                <li><a class="text-light" href="">Product Report</a></li>
+                                <li><a class="text-light" href="{{ route('admin.promotion.report' )}}">Promotion Report</a></li>
+                                <li><a class="text-light" href="">Customer Report</a></li>
+                            </ul>
+                        </div>
                     </li>
                 </ul>
             </div>
@@ -132,7 +167,7 @@
                 var minutes = date.getMinutes();
                 var ampm = hours >= 12 ? 'PM' : 'AM';
                 hours = hours % 12;
-                hours = hours ? hours : 12; 
+                hours = hours ? hours : 12;
                 minutes = minutes < 10 ? '0' + minutes : minutes;
                 var strTime = hours + ':' + minutes + ' ' + ampm;
                 $('.cur_time').text(strTime);
@@ -147,6 +182,11 @@
                 $('.cur_date').text(strDate);
 
             }
+
+            function logout() {
+                $('#logout-form').submit();
+            }
+
         </script>
 
         @yield('js')

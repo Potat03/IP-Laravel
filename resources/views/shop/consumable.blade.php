@@ -1,9 +1,10 @@
 @extends('layout.shop')
 
 @section('title', 'Consumable')
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 @section('content')
-    <div class="flex-shrink-0 p-3 bg-white d-flex flex-column">
+    {{-- <div class="flex-shrink-0 p-3 bg-white d-flex flex-column">
         <div class="container">
             <div class="card">
                 <div class="card-header">
@@ -42,10 +43,10 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
     <div class="col-md-9">
         <h1 class="mb-4">Consumable</h1>
-        <div class="row">
+        <div class="row" id="product-list">
             @forelse ($products as $product)
                 @if ($product->status == 'active')
                     <div class="col-md-2-4 mb-4">
@@ -59,9 +60,18 @@
                                     </div>
                                 @endif
 
-                                <div class="card-img-top">
-                                    <img src="{{ URL('storage/images/pokemon.png') }}" class="d-block w-100"
-                                        alt="product image" width="280" height="300">
+                                <div class="card-img-top" style="height: 300px; width: 100%;">
+                                    @php
+                                        $mainImage = $mainImages[$product->product_id] ?? 'default.jpg';
+                                    @endphp
+                                    @if ($mainImage == 'default.jpg')
+                                        <img src="{{ URL('storage/images/products/default.jpg') }}" class="d-block w-100"
+                                            style="height: 100%; object-fit: cover;" alt="{{ $product->name }}">
+                                    @else
+                                        <img src="{{ URL('storage/images/products/' . $product->product_id . '/' . $mainImage) }}"
+                                            class="d-block w-100" style="height: 100%; object-fit: cover;"
+                                            alt="{{ $product->name }}">
+                                    @endif
                                 </div>
                                 <div class="card-body">
                                     <p class="card-text mb-1 fs-5 fs-lg-5 fs-xl-3">{{ $product->name }}</p>
@@ -75,22 +85,15 @@
                                             $halfStar = $averageRating - $fullStars >= 0.5;
                                         @endphp
                                         @for ($i = 0; $i < $fullStars; $i++)
-                                            <i class="bi bi-star-fill me-1"></i>
+                                            <i class="fa-solid fa-star me-1"></i>
                                         @endfor
                                         @if ($halfStar)
-                                            <i class="bi bi-star-half me-1"></i>
+                                            <i class="fa-solid fa-star-half-stroke me-1"></i>
                                         @endif
                                         @for ($i = $fullStars + ($halfStar ? 1 : 0); $i < 5; $i++)
-                                            <i class="bi bi-star me-1"></i>
+                                            <i class="fa-regular fa-star me-1"></i>
                                         @endfor
                                         <span class="text-dark ms-lg-2">({{ $reviewsCount }})</span>
-                                    </div>
-                                </div>
-                                <div class="card-footer p-3 pt-0 border-top-0 bg-transparent">
-                                    <div class="text-center text-uppercase">
-                                        <a class="btn btn-outline-dark mt-auto w-100 fw-bold" href="#">Add
-                                            to
-                                            Cart</a>
                                     </div>
                                 </div>
                             </div>

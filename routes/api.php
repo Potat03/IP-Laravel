@@ -27,19 +27,26 @@
         Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout');
         Route::post('/register', [AuthController::class, 'userRegister'])->name('auth.userRegister');
         Route::post('/verify', [AuthController::class, 'verify'])->name('auth.verify');
+        Route::post('/forgetPass', [AuthController::class, 'forgetPassword'])->name('auth.forget');
+        Route::post('/verifyOtp', [AuthController::class, 'verifyOtp'])->name('auth.verifyOtp');
+        Route::get('/enterForgetPassword', [AuthController::class, 'enterForgetPassword'])->name('auth.enterForgetPassword');
+        Route::post('/updatePassword', [AuthController::class, 'updatePassword'])->name('auth.updatePassword');
+
+        Route::post('/cartItem/upload', [CartController::class, 'addToCart'])->name('cart.add');
+
+        Route::post('/admin/login', [AuthController::class, 'adminLogin'])->name('auth.adminLogin');
+        Route::post('/admin/logout', [AuthController::class, 'adminLogout'])->name('auth.adminLogout');
     });
     Route::post('/resendOtp', [AuthController::class, 'resendOtp'])->name('auth.resendOtp');
 
-    Route::post('/cartItem/upload', [CartItemController::class, 'addToCart']);
     Route::post('/product/image/upload/{id}', [ProductController::class, 'productImageUpload']);
     Route::get('/product/index', [ProductController::class, 'index'])->name('product.index');
     Route::get('/product/all', [ProductController::class, 'getAll'])->name('product.getAll');
     Route::get('/product/get/{id}', [ProductController::class, 'getOne'])->name('product.get');
     Route::post('/product/create', [ProductController::class, 'createProduct'])->name('product.create');
     Route::post('/product/update/{id}', [ProductController::class, 'updateProduct'])->name('product.update');
-    Route::delete('/product/delete/{id}', [ProductController::class, 'deleteProduct']);
+    Route::get('/product/generateTable', [ProductController::class, 'generateTable']);
 
-    //promotion
     Route::get('/promotion/all', [PromotionController::class, 'getPromotion']);
     Route::get('/promotion/get/{id}', [PromotionController::class, 'getPromotionById']);
     Route::post('/promotion/create', [PromotionController::class, 'createPromotion'])->name('promotion.create');
@@ -57,6 +64,9 @@
 
     //Cart Item
     Route::get('/cartItem/getCartItemByCustomerID/{customerID}', [CartItemController::class, 'getCartItemByCustomerID']);
+
+
+
     Route::post('/cartItem/updateQuantity/{id}', [CartItemController::class, 'updateQuantity']);
     Route::post('/cartItem/updateDiscount/{id}', [CartItemController::class, 'updateDiscount']);
     Route::post('/cartItem/updateSubtotal/{id}', [CartItemController::class, 'updateSubtotal']);
@@ -74,7 +84,7 @@
 
     //Order
     Route::post('/order/proceedToNext/{id}', [OrderController::class, 'proceedToNext']);
-    Route::post('/order/rating/{id}', [OrderController::class, 'rateOrder']);
+    Route::post('/order/receive/{id}', [OrderController::class, 'receiveOrder']);
 
 
 

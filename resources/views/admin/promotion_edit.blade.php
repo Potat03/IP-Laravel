@@ -1,5 +1,7 @@
 @extends('admin.layout.main')
 
+@push('promotion', 'class="active"')
+
 @section('vite')
 @vite(['resources/css/app.css','resources/sass/app.scss', 'resources/js/app.js', 'resources/css/admin-nav.css','resources/js/bootstrap.js'])
 @endsection
@@ -22,7 +24,7 @@
 @section('page_gm', 'Edit promotion')
 
 @section('content')
-<div class="card shadow-sm p-3 mb-5 w-100">
+<div class="card shadow-sm p-3 mb-5 w-100 position-static">
     <div class="overflow-auto">
         <div class="card-body">
             <form method="POST">

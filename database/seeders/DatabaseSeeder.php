@@ -10,6 +10,9 @@ use App\Models\Promotion;
 use App\Models\PromotionItem;
 use Carbon\Carbon;
 use App\Models\Wearable;
+use App\Models\Order;
+use App\Models\OrderItem;
+use App\Models\Admin;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -175,9 +178,34 @@ class DatabaseSeeder extends Seeder
             'total' => '2000', 
         ]);
 
+        Order::create([
+            'customer_id' => '1',
+            'subtotal' => '10000',
+            'total_discount' => '0',
+            'total' => '10000',
+            'status' => 'pending',
+            'delivery_address' => 'Jl. Raya Bogor',
+            'delivery_method' => 'JNE',
+            'tracking_number' => '1234567890',
+        ]);
+
+        OrderItem::create([
+            'order_id' => '1',
+            'promotion_id' => '1',
+            'quantity' => '1',
+            'subtotal' => '10000',
+            'discount' => '0',
+            'total' => '10000',
+        ]);
+
+        Admin::create([
+            'role' => 'manager',
+            'email' => 'test@gmail.com',
+            'password' =>  '$2y$12$SPXDqYIUQGznYrtl7pxsAet5RAxKZhVb6r.9aEgylQlbP2DI89mJO',
+            'status' => 'active',
+        ]);
+
 
         
-
-
     }
 }

@@ -42,7 +42,6 @@ class ConsumablesController extends Controller
             );
 
             return response()->json(['success' => true, 'message' => 'Consumable product added successfully.'], 200);
-
         } catch (Exception $e) {
             return response()->json(['failure' => false, 'message' => $e->getMessage()], 400);
         }
@@ -54,15 +53,31 @@ class ConsumablesController extends Controller
             $query = $request->input('search');
 
             if ($query) {
-                $consumableIds = Consumable::where('name', 'LIKE', "%$query%")->pluck('product_id');
+                $productIds = Product::where('name', 'LIKE', "%$query%")->pluck('product_id');
+                $products = Product::whereIn('product_id', $productIds)->paginate(20);
             } else {
                 $consumableIds = Consumable::pluck('product_id');
+                $products = Product::whereIn('product_id', $consumableIds)->paginate(20);
             }
 
             $products = Product::whereIn('product_id', $consumableIds)->paginate(20);
-            // return view('shop.consumable', ['products' => $products]);
 
-            return $this->fetchRatingsForConsumable($consumableIds, $products);
+            $productController = new ProductController();
+            $mainImages = $productController->getMainImages($consumableIds);
+
+            $productsWithRatings = $this->fetchRatingsForConsumable($consumableIds, $products);
+
+            if ($request->ajax()) {
+                return view('shop.partials.product-list', [
+                    'products' => $productsWithRatings,
+                    'mainImages' => $mainImages,
+                ]);
+            }
+
+            return view('shop.consumable', [
+                'products' => $productsWithRatings,
+                'mainImages' => $mainImages,
+            ]);
         } catch (Exception $e) {
             Log::error('Fetching consumables failed: ' . $e->getMessage());
             return response()->json(['error' => 'Fetching consumables failed.'], 500);

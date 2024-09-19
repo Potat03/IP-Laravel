@@ -7,6 +7,15 @@ use App\Models\OrderItem;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\Promotion;
+use App\Models\Category;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Cache;
+use App\Models\PromotionItem;
+use App\Models\Wearable;
+use App\Models\Consumable;
+use App\Models\Collectible;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 
 class OrderController extends Controller
@@ -59,18 +68,14 @@ class OrderController extends Controller
         }
     }
 
-    public function rateOrder(Request $request, $id)
+    public function receiveOrder(Request $request, $id)
     {
-        //Databse security
-        $request->validate([
-            'rating' => 'required|numeric',
-        ]);
+        
         $order = Order::where('order_id',$id)->first();
-        $rating= $request->input('rating');
 
         try {
-            $order->rateOrder($rating);
-            return response()->json(['success' => true,'rating' => $rating,'message' => 'Order state has been updated.']);
+            $order->receiveOrder();
+            return response()->json(['success' => true,'message' => 'Order state has been updated.']);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 400);
         }
@@ -192,4 +197,92 @@ class OrderController extends Controller
             return response()->json(['error' => 'Fetching orders failed.'], 500);
         }
     }
+
+
+
+    public function generateOrderStatusReport()
+    {
+        $orders = Order::select('order_id', 'customer_id', 'created_at', 'delivery_address', 'delivery_method', 'tracking_number', 'updated_at', 'received', 'status')
+        ->orderBy('created_at', 'desc')
+        ->get();
+
+        foreach ($orders as $order) {
+            $updatedAt = Carbon::parse($order->updated_at);
+            $now = Carbon::now();
+    
+            // Calculate the difference in total hours
+            $totalHours = $updatedAt->diffInHours($now);
+    
+            // Calculate the number of full days (24-hour blocks) and remaining hours
+            $days = intdiv($totalHours, 24);  // Full days
+            $hours = $totalHours % 24;        // Remaining hours
+    
+            // Format as "X days Y hours"
+            $order->time_since_update = "{$days} days {$hours} hours";
+        }
+    
+        
+        $xmlContent = $this->generateXMLContent($orders);
+
+        Storage::put('xml/order_status_report.xml', $xmlContent);
+
+        // Load the XSLT stylesheet
+        $xslt = new \DOMDocument();
+        $xslt->load(storage_path('app/xslt/order_status_report.xslt'));
+
+        // Load XML data
+        $xml = new \DOMDocument();
+        $xml->loadXML($xmlContent);
+
+        $proc = new \XSLTProcessor();
+        $proc->importStylesheet($xslt);
+
+        $html = $proc->transformToXML($xml);
+
+        return view('admin.order_status_report', ['html' => $html], ['orders' => $orders]);
+    }
+
+    private function generateXMLContent($orders)
+    {
+        $xml = '<?xml version="1.0" encoding="UTF-8"?>';
+        $xml .= '<orderStatusReport>';
+
+        foreach ($orders as $order) {
+            $xml .= '<order>';
+            $xml .= '<orderID>' . $order->order_id . '</orderID>';
+            $xml .= '<customerID>' . $order->customer_id . '</customerID>';
+            $xml .= '<deliveryAddress>' . $order->delivery_address . '</deliveryAddress>';
+            $xml .= '<deliveryMethod>' . $order->delivery_method . '</deliveryMethod>';
+            $xml .= '<trackingNumber>' . $order->tracking_number . '</trackingNumber>';
+            $xml .= '<received>' . ($order->received == 1 ? 'TRUE' : 'FALSE') . '</received>';
+            $xml .= '<createdAt>' . $order->created_at . '</createdAt>';
+            $xml .= '<updatedAt>' . $order->updated_at . '</updatedAt>';
+            $xml .= '<timeSinceUpdate>' . $order->time_since_update . '</timeSinceUpdate>';
+            $xml .= '<status>' . $order->status . '</status>';
+            $xml .= '</order>';
+        }
+
+        $xml .= '</orderStatusReport>';
+        return $xml;
+    }
+
+    
+    public function getMonthlySales()
+    {
+        // Get monthly sales data, grouped by month, and count the number of orders per month
+        $monthlySales = Order::select(
+                DB::raw('YEAR(created_at) as year'), 
+                DB::raw('MONTH(created_at) as month'), 
+                DB::raw('COUNT(order_id) as total_orders'),
+                DB::raw('SUM(total_discount)  as total_discount'), // Deduct 5 from total sales for each month
+                DB::raw('SUM(total) - 5 as total_sales') // Deduct 5 from total sales for each month
+                )
+            ->groupBy(DB::raw('YEAR(created_at)'), DB::raw('MONTH(created_at)'))
+            ->orderBy('year', 'desc')
+            ->orderBy('month', 'desc')
+            ->get();
+    
+            return response()->json($monthlySales);
+        }
+    
 }

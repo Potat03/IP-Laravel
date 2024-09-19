@@ -23,9 +23,9 @@
 
             @yield('mid')
 
-            @hasSection('bundle')
+            {{-- @hasSection('bundle')
                 @yield('bundle')
-            @endif
+            @endif --}}
 
             @yield('bottom')
         @else
@@ -33,7 +33,6 @@
         @endif
     </main>
 
-    <!-- Scripts -->
     @stack('scripts')
 </body>
 

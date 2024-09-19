@@ -18,15 +18,16 @@ class ChatAuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-        Gate::define('sendMessages', [ChatPolicy::class, 'sendMessages']);
-
-        Gate::define('end', [ChatPolicy::class, 'end']);
-
-        Gate::define('getMessages', [ChatPolicy::class, 'getMessages']);
-
         Gate::define('viewChat', [ChatPolicy::class, 'viewChat']);
 
-        Gate::define('viewAny', [ChatPolicy::class, 'viewAny']);
+        Gate::define('getChatList', [ChatPolicy::class, 'getChatList']);
+
+        Gate::define('sendMessages', [ChatPolicy::class, 'sendMessages']);
+
+        Gate::define('createChat', [ChatPolicy::class, 'createChat']);
         
+        Gate::define('acceptChat', [ChatPolicy::class, 'acceptChat']);
+       
+        Gate::define('endChat', [ChatPolicy::class, 'endChat']);
     }
 }

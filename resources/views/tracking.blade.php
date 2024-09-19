@@ -107,9 +107,10 @@
                         <th style="width:8%;text-align:left!important">ORDER ID</th>
                         <th style="width:20%;text-align:left!important;">DELIVERY ADDRESS</th>
                         <th style="width:15%;text-align:left!important;">TOTAL</th>
-                        <th style="width:15%;text-align:left!important;">CREATED AT</th>
+                        <th style="width:12%;text-align:left!important;">CREATED AT</th>
+                        <th style="width:12%;text-align:left!important;">UPDATED AT</th>
                         <th style="width:15%;text-align:left!important;">TRACKING NUMBER</th>
-                        <th style="width:17%;text-align:left!important;">RATING</th>
+                        <th style="width:12%;text-align:left!important;">RECEIVED</th>
                         <th style="width:15%;text-align:right!important;">STATUS</th>
                     </tr>
 
@@ -124,10 +125,12 @@
                             <td style="text-align:left!important;">{{ $order->delivery_address }}</td>
                             <td style="text-align:left!important;">RM {{ $order->total }}</td>
                             <td style="text-align:left!important;">{{ \Carbon\Carbon::parse($order->created_at)->format('d-m-Y h:iA') }}</td>
+                            <td style="text-align:left!important;">{{ \Carbon\Carbon::parse($order->updated_at)->format('d-m-Y h:iA') }}</td>
                             <td style="text-align:left!important;">-</td>
-                            <td style="text-align:left!important;">-</td>
-
-                            <td style="text-align:right!important;"><button type="button" class="btn btn-secondary">PREPARE</button></td>
+                            <td style="text-align:left!important;">
+                                <button disabled type="button" class="btn btn-primary">RECEIVE</button>
+                            </td>
+                            <td style="text-align:right!important;"><button disabled type="button" class="btn btn-primary">PREPARE</button></td>
                         </tr>
                     @elseif($order->status =="delivery")
                         <tr class="animate-row delivery" style="animation-delay: 0.05s * {{ $x }};">
@@ -135,9 +138,13 @@
                             <td style="text-align:left!important;">{{ $order->delivery_address }}</td>
                             <td style="text-align:left!important;">RM {{ $order->total }}</td>
                             <td style="text-align:left!important;">{{ \Carbon\Carbon::parse($order->created_at)->format('d-m-Y h:iA') }}</td>
+                            <td style="text-align:left!important;">{{ \Carbon\Carbon::parse($order->updated_at)->format('d-m-Y h:iA') }}</td>
+
                             <td style="text-align:left!important;">{{ $order->tracking_number }}</td>
-                            <td style="text-align:left!important;">-</td>
-                            <td style="text-align:right!important;"><button type="button" class="btn btn-secondary">DELIVERY</button></td>
+                            <td style="text-align:left!important;">
+                                <button disabled type="button" class="btn btn-primary">RECEIVE</button>
+                            </td>
+                            <td style="text-align:right!important;"><button disabled type="button" class="btn btn-primary">DELIVERY</button></td>
                         </tr>
                     @elseif($order->status =="delivered")
                         <tr class="animate-row delivered" style="animation-delay: 0.05s * {{ $x }};">
@@ -145,48 +152,14 @@
                             <td style="text-align:left!important;">{{ $order->delivery_address }}</td>
                             <td style="text-align:left!important;">RM {{ $order->total }}</td>
                             <td style="text-align:left!important;">{{ \Carbon\Carbon::parse($order->created_at)->format('d-m-Y h:iA') }}</td>
+                            <td style="text-align:left!important;">{{ \Carbon\Carbon::parse($order->updated_at)->format('d-m-Y h:iA') }}</td>
+
                             <td style="text-align:left!important;">{{ $order->tracking_number }}</td>
                             <td style="text-align:left!important;">
-                                @if($order->rating == 1)
-                                <span id="star1_{{$order->order_id}}"style="font-size:200%;color:yellow;cursor:pointer;" onclick="rateOrder(1,{{$order->order_id}})">&starf;</span>
-                                <span id="star2_{{$order->order_id}}"style="font-size:200%;color:yellow;cursor:pointer;" onclick="rateOrder(2,{{$order->order_id}})">&star;</span>
-                                <span id="star3_{{$order->order_id}}"style="font-size:200%;color:yellow;cursor:pointer;" onclick="rateOrder(3,{{$order->order_id}})">&star;</span>
-                                <span id="star4_{{$order->order_id}}"style="font-size:200%;color:yellow;cursor:pointer;" onclick="rateOrder(4,{{$order->order_id}})">&star;</span>
-                                <span id="star5_{{$order->order_id}}"style="font-size:200%;color:yellow;cursor:pointer;" onclick="rateOrder(5,{{$order->order_id}})">&star;</span>
-                              
-                                @elseif($order->rating == 2)
-                                <span id="star1_{{$order->order_id}}"style="font-size:200%;color:yellow;cursor:pointer;" onclick="rateOrder(1,{{$order->order_id}})">&starf;</span>
-                                <span id="star2_{{$order->order_id}}"style="font-size:200%;color:yellow;cursor:pointer;" onclick="rateOrder(2,{{$order->order_id}})">&starf;</span>
-                                <span id="star3_{{$order->order_id}}"style="font-size:200%;color:yellow;cursor:pointer;" onclick="rateOrder(3,{{$order->order_id}})">&star;</span>
-                                <span id="star4_{{$order->order_id}}"style="font-size:200%;color:yellow;cursor:pointer;" onclick="rateOrder(4,{{$order->order_id}})">&star;</span>
-                                <span id="star5_{{$order->order_id}}"style="font-size:200%;color:yellow;cursor:pointer;" onclick="rateOrder(5,{{$order->order_id}})">&star;</span>
-                                @elseif($order->rating == 3)
-                                <span id="star1_{{$order->order_id}}"style="font-size:200%;color:yellow;cursor:pointer;" onclick="rateOrder(1,{{$order->order_id}})">&starf;</span>
-                                <span id="star2_{{$order->order_id}}"style="font-size:200%;color:yellow;cursor:pointer;" onclick="rateOrder(2,{{$order->order_id}})">&starf;</span>
-                                <span id="star3_{{$order->order_id}}"style="font-size:200%;color:yellow;cursor:pointer;" onclick="rateOrder(3,{{$order->order_id}})">&starf;</span>
-                                <span id="star4_{{$order->order_id}}"style="font-size:200%;color:yellow;cursor:pointer;" onclick="rateOrder(4,{{$order->order_id}})">&star;</span>
-                                <span id="star5_{{$order->order_id}}"style="font-size:200%;color:yellow;cursor:pointer;" onclick="rateOrder(5,{{$order->order_id}})">&star;</span>
-                                @elseif($order->rating == 4)
-                                <span id="star1_{{$order->order_id}}"style="font-size:200%;color:yellow;cursor:pointer;" onclick="rateOrder(1,{{$order->order_id}})">&starf;</span>
-                                <span id="star2_{{$order->order_id}}"style="font-size:200%;color:yellow;cursor:pointer;" onclick="rateOrder(2,{{$order->order_id}})">&starf;</span>
-                                <span id="star3_{{$order->order_id}}"style="font-size:200%;color:yellow;cursor:pointer;" onclick="rateOrder(3,{{$order->order_id}})">&starf;</span>
-                                <span id="star4_{{$order->order_id}}"style="font-size:200%;color:yellow;cursor:pointer;" onclick="rateOrder(4,{{$order->order_id}})">&starf;</span>
-                                <span id="star5_{{$order->order_id}}"style="font-size:200%;color:yellow;cursor:pointer;" onclick="rateOrder(5,{{$order->order_id}})">&star;</span>
-                                @elseif($order->rating == 5)
-                                <span id="star1_{{$order->order_id}}"style="font-size:200%;color:yellow;cursor:pointer;" onclick="rateOrder(1,{{$order->order_id}})">&starf;</span>
-                                <span id="star2_{{$order->order_id}}"style="font-size:200%;color:yellow;cursor:pointer;" onclick="rateOrder(2,{{$order->order_id}})">&starf;</span>
-                                <span id="star3_{{$order->order_id}}"style="font-size:200%;color:yellow;cursor:pointer;" onclick="rateOrder(3,{{$order->order_id}})">&starf;</span>
-                                <span id="star4_{{$order->order_id}}"style="font-size:200%;color:yellow;cursor:pointer;" onclick="rateOrder(4,{{$order->order_id}})">&starf;</span>
-                                <span id="star5_{{$order->order_id}}"style="font-size:200%;color:yellow;cursor:pointer;" onclick="rateOrder(5,{{$order->order_id}})">&starf;</span>
-                              @else
-                                    <span id="star1_{{$order->order_id}}" style="font-size:200%;color:yellow;cursor:pointer;" onclick="rateOrder(1,{{$order->order_id}})">&star;</span>
-                                    <span id="star2_{{$order->order_id}}" style="font-size:200%;color:yellow;cursor:pointer;" onclick="rateOrder(2,{{$order->order_id}})">&star;</span>
-                                    <span id="star3_{{$order->order_id}}" style="font-size:200%;color:yellow;cursor:pointer;" onclick="rateOrder(3,{{$order->order_id}})">&star;</span>
-                                    <span id="star4_{{$order->order_id}}" style="font-size:200%;color:yellow;cursor:pointer;" onclick="rateOrder(4,{{$order->order_id}})">&star;</span>
-                                    <span id="star5_{{$order->order_id}}" style="font-size:200%;color:yellow;cursor:pointer;" onclick="rateOrder(5,{{$order->order_id}})">&star;</span>
-                                @endif
-                                </td>
-                            <td style="text-align:right!important;"><button type="button" class="btn btn-secondary">DELIVERED</button></td>
+                                <button id="receiveButton_{{$order->order_id}}"type="button" class="btn btn-primary" onclick="receiveOrder({{$order->order_id}})">RECEIVE</button>
+                            </td>
+
+                            <td style="text-align:right!important;"><button disabled type="button" class="btn btn-primary">DELIVERED</button></td>
                         </tr>
                     @endif
                     @endforeach
@@ -223,38 +196,21 @@
           setActive(clickedButton);
         }
 
-        function rateOrder(rating, id) {
-            var star1 = document.getElementById(`star1_${id}`);
-            var star2 = document.getElementById(`star2_${id}`);
-            var star3 = document.getElementById(`star3_${id}`);
-            var star4 = document.getElementById(`star4_${id}`);
-            var star5 = document.getElementById(`star5_${id}`);
-
-            star1.innerHTML = '&star;';
-            star2.innerHTML = '&star;';
-            star3.innerHTML = '&star;';
-            star4.innerHTML = '&star;';
-            star5.innerHTML = '&star;';
-
-               // Fill the stars up to the clicked rating
-        if (rating >= 1) star1.innerHTML = '&starf;';
-        if (rating >= 2) star2.innerHTML = '&starf;';
-        if (rating >= 3) star3.innerHTML = '&starf;';
-        if (rating >= 4) star4.innerHTML = '&starf;';
-        if (rating >= 5) star5.innerHTML = '&starf;';
+        function receiveOrder(id) {
+            var receiveButton = document.getElementById(`receiveButton_${id}`);
+            receiveButton.disabled = true; // Disable the button
+        receiveButton.classList.remove('btn-primary'); // Remove existing class
+        receiveButton.classList.add('btn-success'); // Add new class
+        receiveButton.textContent = 'RECEIVED'; // Optional: Change button text
     
-        fetch(`/api/order/rating/${id}`, {
+        fetch(`/api/order/receive/${id}`, {
                 method: 'POST',
-                body: JSON.stringify({ rating: rating }),
-                headers: {
-                 'Content-Type': 'application/json'
-             }
+               
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
                     console.log('Order updated successfully');
-                    alert("You clicked the star to rate the order!");
                 } else {
                     console.error('Error updating order');
                 }

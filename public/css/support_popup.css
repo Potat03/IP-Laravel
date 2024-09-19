@@ -648,6 +648,25 @@
     border-radius: 5px;
 }
 
+.start_message, .chat_ended_message{
+    font-size: 1.2em;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+    color: var(--red);
+    text-align: center;
+    position: absolute;
+    left: 50%;
+    top: 10%;
+    width: 100%;
+    transform: translateX(-50%);
+    opacity: 0.8;
+    display: block;
+}
+
+.chat_ended_message.hide{
+    display: none;
+}
+
 /* End Popup */
 
 /* General Style */

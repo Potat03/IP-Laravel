@@ -62,14 +62,9 @@
                         <h4 class="card-text fw-bold mb-2 fs-5 fs-xl-3">RM {{ $promotion->original_price }}</h4>
                         <div class="d-flex justify-content align-items-center small text-warning">
                             @for ($i = 0; $i < 5; $i++)
-                                <i class="bi bi-star-fill me-1"></i>
+                                <i class="fa-solid fa-star"></i>
                                 @endfor
                                 <span class="text-dark ms-lg-2">(20)</span>
-                        </div>
-                    </div>
-                    <div class="card-footer p-3 pt-0 border-top-0 bg-transparent">
-                        <div class="text-center text-uppercase">
-                            <a class="btn btn-outline-dark mt-auto w-100 fw-bold" href="#">Add to Cart</a>
                         </div>
                     </div>
                 </div>

@@ -11,14 +11,13 @@
 </head>
 
 <body>
-    @include('header')
-    
     <main class="container text-center mt-5">
         <h1 class="display-1">404</h1>
         <h2 class="display-4">Page Not Found</h2>
         <p class="lead mt-2">Sorry, the page you are looking for does not exist. It might have been moved or deleted.</p>
         <div class="text-center text-uppercase">
-            <a class="btn btn-outline-dark btn-add-to-cart mt-auto fw-bold" href="{{ url('/home') }}">Return to Home</a>
+            <a class="btn btn-outline-dark btn-add-to-cart mt-auto fw-bold" href="{{ url('/home') }}">Return to
+                Home</a>
         </div>
     </main>
 

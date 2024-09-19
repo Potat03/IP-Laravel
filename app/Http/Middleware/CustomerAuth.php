@@ -16,7 +16,7 @@ class CustomerAuth
         }
 
         if ($request->route('user.login') && Auth::guard('customer')->check()) {
-            return redirect()->route('user.profile');
+            return redirect()->route('user.profileSec');
         }
 
         return $next($request);

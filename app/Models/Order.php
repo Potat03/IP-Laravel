@@ -84,9 +84,9 @@ class Order extends Model
         return $this->state->canShowToUser();
     }
 
-    public function rateOrder($rating)
+    public function receiveOrder()
     {
-        return $this->state->rateOrder($rating);
+        return $this->state->receiveOrder();
     }
 
     public function startDelivery()
