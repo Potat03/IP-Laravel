@@ -116,6 +116,10 @@ Route::middleware([AdminAuth::class])->group(function () {
         return view('admin.product');
     });
 
+    Route::get('/admin/chatReport', function () {
+        return view('admin.chat_report');
+    });
+
     Route::get('/product/get/images/{id}', [ProductController::class, 'showProductImagesAdmin']);
 
     Route::get('/admin/product', action: [ProductController::class, 'getAll'])->name('admin.product');

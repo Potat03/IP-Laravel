@@ -10,7 +10,7 @@ class WebPurifyService
 
     public function __construct()
     {
-        $this->apiKey = '1908578d279e0530c81f0014a270088a'; // Your WebPurify API key
+        $this->apiKey = '1908578d279e0530c81f0014a270088a'; // Api key
     }
 
     public function checkProfanity($text)

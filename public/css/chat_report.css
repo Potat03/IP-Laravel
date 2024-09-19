@@ -1,0 +1,120 @@
+@import url('color.css');
+
+.chat_rating {
+    max-height: 350px;
+}
+
+.report_content_wrap{
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 1px 1px 10px 0px rgba(0, 0, 0,0.30);
+    background-color: var(--grey);
+    display: flex;
+    flex-direction: column;
+    height: 60vh;
+}
+
+.report_header_wrap{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.report_header_wrap h6{
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--dark);
+    opacity: 0.8;
+}
+
+#admin_select{
+    width: 200px;
+    height: 40px;
+    border-radius: 5px;
+    border: 2px solid var(--adminmain);
+    background-color: var(--white);
+    color: var(--dark);
+    font-size: 1rem;
+    font-weight: 500;
+    outline: none;
+}
+
+.content_wrap_1{
+    padding: 20px;
+    box-shadow: 1px 1px 10px 0px rgba(0, 0, 0,0.30) inset;
+    border-radius: 10px;
+}
+
+.option_group{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+}
+
+.option_group label{
+    
+}
+
+.report_content_scroll{
+    overflow-y: scroll;
+    padding-right: 10px;
+    flex-grow: 1;
+}
+
+.report_content_scroll::-webkit-scrollbar{
+    width: 5px;
+}
+
+.report_content_scroll::-webkit-scrollbar-thumb{
+    background-color: var(--adminmain);
+    border-radius: 5px;
+}
+
+.report_content_scroll::-webkit-scrollbar-track{
+    background-color: var(--white);
+}
+
+.report_body_content_wrap{
+    display: flex;
+    flex-direction: column;
+    padding-right: 10px;
+    gap: 20px;
+}
+
+.content_wrap_2{
+    display: flex;
+    gap: 20px;
+}
+
+.small_content{
+    padding: 20px;
+    box-shadow: 1px 1px 10px 0px rgba(0, 0, 0,0.30) inset;
+    border-radius: 10px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.small_content h6{
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--dark);
+    opacity: 0.8;
+}
+
+.small_content p{
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--dark);
+    opacity: 0.6;
+}
+
+.small_content span{
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--dark);
+    opacity: 0.8;
+}
