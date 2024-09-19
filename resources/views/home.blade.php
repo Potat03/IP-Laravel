@@ -278,12 +278,11 @@
                                     </div>
                                     <div class="card-img-top" style="height: 300px; width: 100%;">
                                         <!-- Use the main image URL -->
-                                        @if ($mainImage == '')
-                                            <img src="{{ URL('storage/images/products/default.jpg') }}"
-                                                class="d-block w-100" style="height: 100%; object-fit: cover;"
-                                                alt="{{ $product->name }}">
+                                        @if ($mainImage)
+                                            <img src="{{ $mainImage }}" class="d-block w-100"
+                                                style="height: 100%; object-fit: cover;" alt="{{ $product->name }}">
                                         @else
-                                            <img src="{{ URL('storage/images/products/' . $product->product_id . '/' . $mainImage) }}"
+                                            <img src="{{ URL('storage/images/products/default.jpg') }}"
                                                 class="d-block w-100" style="height: 100%; object-fit: cover;"
                                                 alt="{{ $product->name }}">
                                         @endif
