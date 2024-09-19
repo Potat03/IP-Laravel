@@ -4,15 +4,13 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Gate;
 use App\Facades\AuthFacade;
 use Illuminate\Support\Facades\Log;
 use App\Models\Verification;
-use Carbon\Carbon;
 use App\Mail\OtpMail;
 use Illuminate\Support\Facades\Mail;
 use App\Models\Customer;
-use App\Rules\Recaptcha;
+use App\Models\Admin;
 
 
 class AuthController extends Controller
@@ -227,16 +225,29 @@ class AuthController extends Controller
             $request->validate([
                 'email' => 'required|email',
                 'password' => 'required',
+                'remember' => 'required|string|in:true,false',
             ]);
 
             $credentials = request(['email', 'password']);
+            $remember = $request->remember === 'true' ? true : false;
 
-            if (Auth::guard('admin')->attempt($credentials)) {
+            if(Auth::guard('admin')->check()){
+                $this->adminLogoutFucntion($request);
+            }
+
+            if (Auth::guard('admin')->attempt($credentials, $remember)) {
                 $admin = Auth::guard('admin')->user();
 
-                if ($admin->status == 'active') {
-                    Log::info($request->session()->token());
-                    $request->session()->regenerate();
+                if ($admin->status == 'active' && $admin instanceof Admin) {
+                    if ($admin->session_id !== session()->getId()) {
+                        $request->session()->regenerate();
+                        if(!$remember){
+                            $admin->remember_token = null;
+                        }
+                        $admin->session_id = session()->getId();
+                        $admin->save();
+                    }
+
                     return response()->json(['success' => true, 'redirect' => route('admin.main')]);
                 } else {
                     return response()->json(['success' => false, 'message' => 'Sorry, your account is inactive'], 403); // 403 = forbidden (not permited)
@@ -259,20 +270,22 @@ class AuthController extends Controller
         return redirect()->intended('/userlogin');
     }
 
-    public function adminLogout(Request $request)
+    private function adminLogoutFucntion(Request $request)
     {
+        $admin = Auth::guard('admin')->user();
+        if($admin instanceof Admin){
+            $admin->session_id = null;
+            $admin->remember_token = null;
+            $admin->save();
+        }
         Auth::guard('admin')->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-
-        return redirect()->intended('adminLogin');
     }
 
-    public function simpleLogout(Request $request)
+    public function adminLogout(Request $request)
     {
-        Auth::guard('customer')->logout();
-        Auth::guard('admin')->logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+        $this->adminLogoutFucntion($request);
+        return redirect()->route('admin.login');
     }
 }

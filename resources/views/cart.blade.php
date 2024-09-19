@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+    {{-- communication security --}}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
@@ -76,6 +77,7 @@
 @php
 $subtotal=0;
 $deliveryFee = 5;
+$totalDiscount=0;
 @endphp
 
 <body>
@@ -135,71 +137,106 @@ $deliveryFee = 5;
             <tbody>
                 @if(count($cartItems) > 0)
                 @php
-                $x = 0;
+                    $x = 1;
                 @endphp
-                @forEach($cartItems as $cartItem)
-                @php
-                $id = $cartItem->id;
-                $quantity = $cartItem->quantity;
-                $unitPrice = number_format($cartItem->product->price,2);
-                $totalForItem = number_format($cartItem->quantity * $cartItem->product->price, 2);
-                @endphp
-                <tr id="cartItemRow_{{$id}}" class="animate-row" style="animation-delay:'. 0.05 * {{$x}} .'s;">
-                    <td style="width:15%;text-align:left!important">
-                        <img src="' . URL('storage/images/pika.jpg') . '" alt="pokemon" width="135" height="135">
-                    </td>
-                    <td style="width:25%;text-align:left!important">
-                        <p>{{$cartItem->product->name}}</p>
-                    </td>
-                    <td style="width:15%;" id="unitPrice_{{$id}}">RM {{$unitPrice}}</td>
-                    <td style="width:15%;">
-                        <div class="input-group mb-3" style="justify-content: center;margin-bottom:0!important;">
-                            <button id="decrease{{$id}}" class="btn btn-outline-secondary decrease-btn"
-                                onclick="minus({{$id}})" type="button" style="border-right:none;">-</button>
-                            <input id="quantity_{{$id}}" value={{$quantity}}
-                                style="border: #6c757d 1px solid;max-width:60px;text-align:center;" type="text"
-                                class="form-control" aria-describedby="basic-addon1">
-                            <button id="'.$x.'increase" class="btn btn-outline-secondary increase-btn"
-                                onclick="add({{$id}})" type="button" style="border-left:none;">+</button>
-                        </div>
-                    </td>
-                    <td style="width:15%;" id="totalForItem_{{$id}}">RM {{$totalForItem}}</td>
-                    <td style="width:15%;"><button type="button" class="btn btn-danger" onclick="removeRow({{$id}})">DELETE</button></td>
-
-                </tr>
-                @php
-                $subtotal+=$cartItem->quantity * $cartItem->product->price;
-                $x +=1;
-                @endphp
+                @foreach($cartItems as $cartItem)
+                    @if($cartItem->product_id != null)
+                        @php
+                            $id = $cartItem->id;
+                            $quantity = $cartItem->quantity;
+            
+                            // Use raw values for calculation
+                            $unitPrice = $cartItem->product->price; 
+                            $totalForItem = $cartItem->quantity * $unitPrice;
+            
+                            // Format for display after calculation
+                            $formattedUnitPrice = number_format($unitPrice, 2);
+                            $formattedTotalForItem = number_format($totalForItem, 2);
+                        @endphp
+                        <tr id="cartItemRow_{{$id}}" class="animate-row" style="animation-delay:'. 0.05 * {{$x}} .'s;">
+                            <td style="width:15%;text-align:left!important">
+                                <img src="' . URL('storage/images/pika.jpg') . '" alt="pokemon" width="135" height="135">
+                            </td>
+                            <td style="width:25%;text-align:left!important">
+                                <p>{{$cartItem->product->name}}</p>
+                            </td>
+                            <td style="width:15%;" id="oriUnitPrice_{{$id}}">RM {{$formattedUnitPrice}}</td>
+                            <td style="width:15%;">
+                                <div class="input-group mb-3" style="justify-content: center;margin-bottom:0!important;">
+                                    <button id="decrease{{$id}}" class="btn btn-outline-secondary decrease-btn"
+                                        onclick="productMinus({{$id}})" type="button" style="border-right:none;">-</button>
+                                    <input id="quantity_{{$id}}" value={{$quantity}}
+                                        style="border: #6c757d 1px solid;max-width:60px;text-align:center;" type="text"
+                                        class="form-control" aria-describedby="basic-addon1">
+                                    <button id="'.$x.'increase" class="btn btn-outline-secondary increase-btn"
+                                        onclick="productAdd({{$id}})" type="button" style="border-left:none;">+</button>
+                                </div>
+                            </td>
+                            <td style="width:15%;" id="totalForItem_{{$id}}">RM {{$formattedTotalForItem}}</td>
+                            <td style="width:15%;"><button type="button" class="btn btn-danger"  onclick="removeCartItem({{ $id }}, false)">REMOVE</button></td>
+                        </tr>
+                        @php
+                            // Use raw values for subtotal calculation
+                            $subtotal += $cartItem->quantity * $unitPrice;
+                            $x += 1;
+                        @endphp
+                    @else
+                        @php
+                            $id = $cartItem->id;
+                            $quantity = $cartItem->quantity;
+            
+                            // Use raw values for calculation
+                            $oriUnitPrice = $cartItem->promotion->original_price;
+                            $disUnitPrice = $cartItem->promotion->discount_amount;
+                            $totalForItem = $cartItem->quantity * $disUnitPrice;
+            
+                            // Format for display after calculation
+                            $formattedOriUnitPrice = number_format($oriUnitPrice, 2);
+                            $formattedDisUnitPrice = number_format($disUnitPrice, 2);
+                            $formattedTotalForItem = number_format($totalForItem, 2);
+                        @endphp
+                        <tr id="cartItemRow_{{$id}}" class="animate-row" style="animation-delay:'. 0.05 * {{$x}} .'s;">
+                            <td style="width:15%;text-align:left!important">
+                                <img src="' . URL('storage/images/pika.jpg') . '" alt="pokemon" width="135" height="135">
+                            </td>
+                            <td style="width:25%;text-align:left!important">
+                                <p>{{$cartItem->promotion->title}}</p>
+                            </td>
+                            <td style="width:15%;" id="unitPrice_{{$id}}">
+                                <span style="text-decoration: line-through;" id="oriUnitPrice_{{$id}}">RM {{$formattedOriUnitPrice}}</span><br>
+                                <span id="disUnitPrice_{{$id}}">RM {{$formattedDisUnitPrice}}</span>
+                            </td>
+                                                        <td style="width:15%;">
+                                <div class="input-group mb-3" style="justify-content: center;margin-bottom:0!important;">
+                                    <button id="decrease{{$id}}" class="btn btn-outline-secondary decrease-btn"
+                                        onclick="promotionMinus({{$id}})" type="button" style="border-right:none;">-</button>
+                                    <input id="quantity_{{$id}}" value={{$quantity}}
+                                        style="border: #6c757d 1px solid;max-width:60px;text-align:center;" type="text"
+                                        class="form-control" aria-describedby="basic-addon1">
+                                    <button id="'.$x.'increase" class="btn btn-outline-secondary increase-btn"
+                                        onclick="promotionAdd({{$id}})" type="button" style="border-left:none;">+</button>
+                                </div>
+                            </td>
+                            <td style="width:15%;" id="totalForItem_{{$id}}">RM {{$formattedTotalForItem}}</td>
+                            <td style="width:15%;"><button type="button" class="btn btn-danger"  onclick="removeCartItem({{ $id }},true)">REMOVE</button></td>
+                        </tr>
+                        @php
+                            // Use raw values for subtotal calculation
+                            $totalDiscount += ($oriUnitPrice * $quantity) - ($disUnitPrice * $quantity);
+                            $subtotal += $cartItem->quantity * $oriUnitPrice;
+                            $x += 1;
+                        @endphp
+                    @endif
                 @endforeach
-                @else
-                <p>No items</p>
+            @else
+            <tr>
+                <td colspan="6">
+                <p style="width:100%;text-align:center;height:100%; display: flex;justify-content: center;align-items: center;">No Items</p>
+                </td>
+            </tr>
                 @endif
-                <!-- <?php
-for ($x = 0; $x <= 10; $x++) {
-    echo '
-      <tr class="animate-row" style="animation-delay:'. 0.05 * $x .'s;">
-        <td style="width:15%;text-align:left!important">
-          <img src="' . URL('storage/images/pika.jpg') . '" alt="pokemon" width="135" height="135">
-          
-        </td>
-                <td style="width:25%;text-align:left!important">
-
-        <p>Pokemon Card</p>
-        </td>
-        <td style="width:15%;">RM8.00</td>
-        <td style="width:15%;">
-          <div class="input-group mb-3" style="justify-content: center;margin-bottom:0!important;">
-            <button id="'.$x.'decrease" class="btn btn-outline-secondary decrease-btn" onclick=minus("'.$x.'quantity") type="button" style="border-right:none;">-</button>
-            <input id="'.$x.'quantity" value=1 style="border: #6c757d 1px solid;max-width:60px;text-align:center;" type="text" class="form-control" aria-describedby="basic-addon1">
-            <button id="'.$x.'increase" class="btn btn-outline-secondary increase-btn" onclick=add("'.$x.'quantity") type="button" style="border-left:none;">+</button>
-          </div>
-        </td>
-        <td style="width:15%;">RM8.00</td>
-        <td style="width:15%;"><button type="button" class="btn btn-danger">DELETE</button></td>
-      </tr>';
-}
-?> -->
+            
+              
             </tbody>
 
         </table>
@@ -207,32 +244,10 @@ for ($x = 0; $x <= 10; $x++) {
     </div>
 
     <div class="sticky-bottom">
-        <div>
-            <table style="width:100%;margin:0%" class="table discount-detail-table">
-                <tbody>
-                    <tr>
-
-                        <td colspan=2
-                            style="text-align:right!important;padding-top:0.5%!important;padding-bottom:0.5%!important;">
-                            Discount Details<button style="background-color: #ffffff;border:0" onclick=showDiscount()><i
-                                    id="show-discount-icon" style="display:inline">&#9650;</i><i id="hide-discount-icon"
-                                    style="display:none;">&#9660;</i></button></td>
-
-                    </tr>
-                    <?php
-                echo 
-                '<tr class="discount-row" style="display:none">  
-                    <td>description</td>
-                    <td>-RM8.00</td>
-                </tr>';
-                ?>
-
-                </tbody>
-            </table>
-        </div>
+        
         <div class="d-flex justify-content-between align-items-center">
-            <div class="outline-divv">
-                Discount RM0.00
+            <div id="totalDiscount" class="outline-divv">
+                Discount RM {{number_format($totalDiscount,2)}}
             </div>
             <div id="deliveryfee" class="outline-divv">
                 Delivery RM {{number_format($deliveryFee,2)}}
@@ -241,13 +256,13 @@ for ($x = 0; $x <= 10; $x++) {
                 Subtotal RM {{number_format($subtotal,2)}}
             </div>
             @php
-            $total = $deliveryFee + $subtotal;
+            $total = $deliveryFee + $subtotal - $totalDiscount;
             @endphp
-            <div class="outline-divv">
+            <div id="total" class="outline-divv">
                 Total RM {{number_format($total,2)}}
             </div>
             <div class="no-outline-divv">
-                <td style="width:20%;"><button type="button" class="btn btn-success">CHECKOUT</button>
+                <td style="width:20%;"><button type="button" class="btn btn-success" onclick="location.href='{{url('/payment')}}'">CHECKOUT</button>
             </div>
         </div>
     </div>
@@ -257,7 +272,7 @@ for ($x = 0; $x <= 10; $x++) {
 </html>
 
 <script>
-function add(id) {
+function productAdd(id) {
     // Get the quantity input element and update its value
     var quantityInput = document.getElementById(`quantity_${id}`);
     var currentValue = parseInt(quantityInput.value, 10);
@@ -266,7 +281,7 @@ function add(id) {
 
     // Get the total price and unit price elements
     var totalPrice = document.getElementById(`totalForItem_${id}`);
-    var unitPriceElement = document.getElementById(`unitPrice_${id}`);
+    var unitPriceElement = document.getElementById(`oriUnitPrice_${id}`);
 
     // Get the numeric value of the unit price (remove "RM" and commas, then convert to float)
     var unitPriceValue = parseFloat(unitPriceElement.textContent.replace('RM', '').replace(',', ''));
@@ -280,17 +295,83 @@ function add(id) {
     // Update the subtotal
     var subtotalDiv = document.getElementById("subtotal");
     var subtotalValue = parseFloat(subtotalDiv.textContent.replace('Subtotal RM ', '').replace(',', ''));
+    var totalDiv = document.getElementById("total");
+    var totalValue = parseFloat(totalDiv.textContent.replace('Total RM ', '').replace(',', ''));
 
     // Add the unit price to the subtotal
     var newSubtotal = subtotalValue + unitPriceValue;
+    var newTotal = totalValue + unitPriceValue;
 
     // Update the subtotal value, formatted with RM
     subtotalDiv.textContent = `Subtotal RM ${newSubtotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    totalDiv.textContent = `Total RM ${newTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+    updateCartItemQuantity(id, newValue);
+    updateCartItemSubtotal(id, newTotalPrice);
+    updateCartItemTotal(id, newTotalPrice);
+
+    updateCartSubtotal(newSubtotal);
+    updateCartTotal(newTotal);
+
+}
+
+function promotionAdd(id) {
+    // Get the quantity input element and update its value
+    var quantityInput = document.getElementById(`quantity_${id}`);
+    var currentValue = parseInt(quantityInput.value, 10);
+    var newValue = currentValue + 1;
+    quantityInput.value = newValue;
+
+    // Get the total price and unit price elements
+    var totalPrice = document.getElementById(`totalForItem_${id}`);
+    var oriUnitPriceElement = document.getElementById(`oriUnitPrice_${id}`);
+    var disUnitPriceElement = document.getElementById(`disUnitPrice_${id}`);
+
+    // Get the numeric value of the unit price (remove "RM" and commas, then convert to float)
+    var oriUnitPriceValue = parseFloat(oriUnitPriceElement.textContent.replace('RM', '').replace(',', ''));
+    var disUnitPriceValue = parseFloat(disUnitPriceElement.textContent.replace('RM', '').replace(',', ''));
+
+    // Calculate the new total price
+    var newSubtotalPrice = oriUnitPriceValue * newValue;
+    var newTotalPrice = disUnitPriceValue * newValue;
+    var newDiscountValue = newSubtotalPrice - newTotalPrice;
+
+    // Update the total price in the cell, formatted with RM
+    totalPrice.textContent = `RM ${newTotalPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+    // Update the subtotal
+    var totalDiscountDiv = document.getElementById("totalDiscount");
+    var totalDiscountValue = parseFloat(totalDiscountDiv.textContent.replace('Discount RM ', '').replace(',', ''));
+    var subtotalDiv = document.getElementById("subtotal");
+    var subtotalValue = parseFloat(subtotalDiv.textContent.replace('Subtotal RM ', '').replace(',', ''));
+    var totalDiv = document.getElementById("total");
+    var totalValue = parseFloat(totalDiv.textContent.replace('Total RM ', '').replace(',', ''));
+
+    // Add the unit price to the subtotal
+    var newSubtotal = subtotalValue + oriUnitPriceValue;
+    var newTotal = totalValue + disUnitPriceValue;
+    var newTotalDiscount = totalDiscountValue + oriUnitPriceValue - disUnitPriceValue;
+
+    // Update the subtotal value, formatted with RM
+    totalDiscountDiv.textContent = `Discount RM ${newTotalDiscount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    subtotalDiv.textContent = `Subtotal RM ${newSubtotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    totalDiv.textContent = `Total RM ${newTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+    
+    updateCartItemQuantity(id, newValue);
+    updateCartItemDiscount(id, newDiscountValue);
+    updateCartItemSubtotal(id, newSubtotalPrice);
+    updateCartItemTotal(id, newTotalPrice);
+
+    
+    updateCartSubtotal(newSubtotal);
+    updateCartTotal(newTotal);
+    updateCartDiscount(newTotalDiscount);
 }
 
 
 
-function minus(id) {
+function productMinus(id) {
     // Get the quantity input element and update its value
     var quantityInput = document.getElementById(`quantity_${id}`);
     var currentValue = parseInt(quantityInput.value, 10);
@@ -301,7 +382,7 @@ function minus(id) {
 
     // Get the total price and unit price elements
     var totalPrice = document.getElementById(`totalForItem_${id}`);
-    var unitPriceElement = document.getElementById(`unitPrice_${id}`);
+    var unitPriceElement = document.getElementById(`oriUnitPrice_${id}`);
 
     // Get the numeric value of the unit price (remove "RM" and commas, then convert to float)
     var unitPriceValue = parseFloat(unitPriceElement.textContent.replace('RM', '').replace(',', ''));
@@ -312,29 +393,368 @@ function minus(id) {
     // Update the total price in the cell, formatted with RM
     totalPrice.textContent = `RM ${newTotalPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
-    // Update the subtotal
+   // Update the subtotal
     var subtotalDiv = document.getElementById("subtotal");
     var subtotalValue = parseFloat(subtotalDiv.textContent.replace('Subtotal RM ', '').replace(',', ''));
+    var totalDiv = document.getElementById("total");
+    var totalValue = parseFloat(totalDiv.textContent.replace('Total RM ', '').replace(',', ''));
 
-    // Subtract the unit price from the subtotal
-    var newSubtotal = subtotalValue - (unitPriceElement.textContent.replace('RM', '').replace(',', '') * (currentValue - newValue));
+    // Add the unit price to the subtotal
+    var newSubtotal = subtotalValue - unitPriceValue;
+    var newTotal = totalValue - unitPriceValue;
 
     // Update the subtotal value, formatted with RM
     subtotalDiv.textContent = `Subtotal RM ${newSubtotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    totalDiv.textContent = `Total RM ${newTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+    
+    updateCartItemQuantity(id, newValue);
+    updateCartItemSubtotal(id, newTotalPrice);
+    updateCartItemTotal(id, newTotalPrice);
+    updateCartSubtotal(newSubtotal);
+    updateCartTotal(newTotal);
+
 }
 
-function removeRow(id) {
-    // Construct the ID of the row to remove
+function promotionMinus(id) {
+    // Get the quantity input element and update its value
+    var quantityInput = document.getElementById(`quantity_${id}`);
+    var currentValue = parseInt(quantityInput.value, 10);
+
+    // Ensure quantity does not go below 1
+    var newValue = currentValue > 1 ? currentValue - 1 : 1;
+    quantityInput.value = newValue;
+
+    // Get the total price and unit price elements
+    var totalPrice = document.getElementById(`totalForItem_${id}`);
+    var oriUnitPriceElement = document.getElementById(`oriUnitPrice_${id}`);
+    var disUnitPriceElement = document.getElementById(`disUnitPrice_${id}`);
+
+
+    // Get the numeric value of the unit price (remove "RM" and commas, then convert to float)
+    var oriUnitPriceValue = parseFloat(oriUnitPriceElement.textContent.replace('RM', '').replace(',', ''));
+    var disUnitPriceValue = parseFloat(disUnitPriceElement.textContent.replace('RM', '').replace(',', ''));
+
+    // Calculate the new total price
+    var newSubtotalPrice = oriUnitPriceValue * newValue;
+    var newTotalPrice = disUnitPriceValue * newValue;
+    var newDiscountValue = newSubtotalPrice - newTotalPrice;
+
+
+    // Update the total price in the cell, formatted with RM
+    totalPrice.textContent = `RM ${newTotalPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+ // Update the subtotal
+    var totalDiscountDiv = document.getElementById("totalDiscount");
+    var totalDiscountValue = parseFloat(totalDiscountDiv.textContent.replace('Discount RM ', '').replace(',', ''));
+    var subtotalDiv = document.getElementById("subtotal");
+    var subtotalValue = parseFloat(subtotalDiv.textContent.replace('Subtotal RM ', '').replace(',', ''));
+    var totalDiv = document.getElementById("total");
+    var totalValue = parseFloat(totalDiv.textContent.replace('Total RM ', '').replace(',', ''));
+
+    // Add the unit price to the subtotal
+    var newSubtotal = subtotalValue - oriUnitPriceValue;
+    var newTotal = totalValue - disUnitPriceValue;
+    var newTotalDiscount = totalDiscountValue - (oriUnitPriceValue - disUnitPriceValue);
+
+    // Update the subtotal value, formatted with RM
+    totalDiscountDiv.textContent = `Discount RM ${newTotalDiscount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    subtotalDiv.textContent = `Subtotal RM ${newSubtotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    totalDiv.textContent = `Total RM ${newTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+    updateCartItemQuantity(id, newValue);
+    updateCartItemDiscount(id, newDiscountValue);
+    updateCartItemSubtotal(id, newSubtotalPrice);
+    updateCartItemTotal(id, newTotalPrice);
+
+    updateCartSubtotal(newSubtotal);
+    updateCartTotal(newTotal);
+    updateCartDiscount(newTotalDiscount);
+
+}
+
+function updateCartItemQuantity(id, quantity) {
+    fetch(`/api/cartItem/updateQuantity/${id}`, {
+        method: 'POST',
+        body: JSON.stringify({ quantity: quantity }),
+        headers: {
+        'Content-Type': 'application/json'
+    }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log('Cart item updated successfully');
+        } else {
+            console.error('Error updating cart item');
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+function updateCartItemDiscount(id, discount) {
+    fetch(`/api/cartItem/updateDiscount/${id}`, {
+        method: 'POST',
+        body: JSON.stringify({ discount: discount }),
+        headers: {
+        'Content-Type': 'application/json'
+    }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log('Cart item updated successfully');
+        } else {
+            console.error('Error updating cart item');
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+
+function updateCartItemSubtotal(id, subtotal){
+    fetch(`/api/cartItem/updateSubtotal/${id}`, {
+        method: 'POST',
+        body: JSON.stringify({ subtotal: subtotal }),
+        headers: {
+        'Content-Type': 'application/json'
+    }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log('Cart item updated successfully');
+        } else {
+            console.error('Error updating cart item');
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+function updateCartItemTotal(id, total){
+    fetch(`/api/cartItem/updateTotal/${id}`, {
+        method: 'POST',
+        body: JSON.stringify({ total: total }),
+        headers: {
+        'Content-Type': 'application/json'
+    }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log('Cart item updated successfully');
+        } else {
+            console.error('Error updating cart item');
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+
+function updateCartSubtotal(subtotal){
+    fetch(`/api/cart/updateSubtotal`, {
+        method: 'POST',
+        body: JSON.stringify({ subtotal: subtotal }),
+        headers: {
+        'Content-Type': 'application/json'
+    }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log('Cart item updated successfully');
+        } else {
+            console.error('Error updating cart item');
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+function updateCartTotal(total){
+    fetch(`/api/cart/updateTotal`, {
+        method: 'POST',
+        body: JSON.stringify({ total: total }),
+        headers: {
+        'Content-Type': 'application/json'
+    }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log('Cart item updated successfully');
+        } else {
+            console.error('Error updating cart item');
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+function updateCartDiscount(discount){
+    fetch(`/api/cart/updateDiscount`, {
+        method: 'POST',
+        body: JSON.stringify({ discount: discount }),
+        headers: {
+        'Content-Type': 'application/json'
+    }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log('Cart item updated successfully');
+        } else {
+            console.error('Error updating cart item');
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+
+function removeCartItem(id, promotion) {
     var row = document.getElementById(`cartItemRow_${id}`);
 
-    // Check if the row exists
     if (row) {
-        // Remove the row from the table
-        row.remove();
-        
-   
+        if (promotion != true) {
+            console.log("Promotion value:", promotion);
+
+            var quantityInput = document.getElementById(`quantity_${id}`);
+            var currentValue = parseInt(quantityInput.value, 10);
+
+            var totalPriceElement = document.getElementById(`totalForItem_${id}`);
+            var unitPriceElement = document.getElementById(`oriUnitPrice_${id}`);
+
+            var unitPriceValue = parseFloat(unitPriceElement.textContent.replace('RM', '').replace(',', ''));
+            var totalPriceValue = parseFloat(totalPriceElement.textContent.replace('RM', '').replace(',', ''));
+
+            var productTotalPrice = totalPriceValue;
+
+            var totalDiscountDiv = document.getElementById("totalDiscount");
+            var totalDiscountValue = parseFloat(totalDiscountDiv.textContent.replace('Discount RM ', '').replace(',', ''));
+            var subtotalDiv = document.getElementById("subtotal");
+            var subtotalValue = parseFloat(subtotalDiv.textContent.replace('Subtotal RM ', '').replace(',', ''));
+            var totalDiv = document.getElementById("total");
+            var totalValue = parseFloat(totalDiv.textContent.replace('Total RM ', '').replace(',', ''));
+
+            var newSubtotal = subtotalValue - productTotalPrice;
+            var newTotal = totalValue - productTotalPrice;
+            var newTotalDiscount = totalDiscountValue;
+
+            totalDiscountDiv.textContent = `Discount RM ${totalDiscountValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            subtotalDiv.textContent = `Subtotal RM ${newSubtotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            totalDiv.textContent = `Total RM ${newTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+            var payload = {
+                newSubtotal: newSubtotal.toFixed(2),
+                newTotal: newTotal.toFixed(2),
+                newTotalDiscount: newTotalDiscount.toFixed(2)
+            };
+
+            fetch(`/api/cartItem/removeCartItem/${id}`, {
+                method: 'POST',
+                body: JSON.stringify(payload),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log('Cart item updated successfully');
+                    row.remove();
+                    checkIfAnyRowsExist();
+                } else {
+                    console.error('Error updating cart item');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        } else {
+            console.log("Promotion value:", promotion);
+
+            var quantityInput = document.getElementById(`quantity_${id}`);
+            var currentValue = parseInt(quantityInput.value, 10);
+
+            var oriUnitPriceElement = document.getElementById(`oriUnitPrice_${id}`);
+            var disUnitPriceElement = document.getElementById(`disUnitPrice_${id}`);
+
+            var oriUnitPriceValue = parseFloat(oriUnitPriceElement.textContent.replace('RM', '').replace(',', ''));
+            var disUnitPriceValue = parseFloat(disUnitPriceElement.textContent.replace('RM', '').replace(',', ''));
+
+            var newSubtotalPrice = oriUnitPriceValue * currentValue;
+            var totalPriceValue = disUnitPriceValue * currentValue;
+            var newDiscountValue = newSubtotalPrice - totalPriceValue;
+
+            var totalDiscountDiv = document.getElementById("totalDiscount");
+            var totalDiscountValue = parseFloat(totalDiscountDiv.textContent.replace('Discount RM ', '').replace(',', ''));
+            var subtotalDiv = document.getElementById("subtotal");
+            var subtotalValue = parseFloat(subtotalDiv.textContent.replace('Subtotal RM ', '').replace(',', ''));
+            var totalDiv = document.getElementById("total");
+            var totalValue = parseFloat(totalDiv.textContent.replace('Total RM ', '').replace(',', ''));
+
+            var newSubtotal = subtotalValue - newSubtotalPrice;
+            var newTotal = totalValue - totalPriceValue;
+            var newTotalDiscount = totalDiscountValue - newDiscountValue;
+
+            totalDiscountDiv.textContent = `Discount RM ${newTotalDiscount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            subtotalDiv.textContent = `Subtotal RM ${newSubtotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            totalDiv.textContent = `Total RM ${newTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+            var payload = {
+                newSubtotal: newSubtotal.toFixed(2),
+                newTotal: newTotal.toFixed(2),
+                newTotalDiscount: newTotalDiscount.toFixed(2)
+            };
+
+            fetch(`/api/cartItem/removeCartItem/${id}`, {
+                method: 'POST',
+                body: JSON.stringify(payload),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log('Cart item updated successfully');
+                    row.remove();
+                    checkIfAnyRowsExist();
+                } else {
+                    console.error('Error updating cart item');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
     } else {
         console.error('Row not found.');
+    }
+}
+
+// Function to check if any rows with the class 'animate-row' still exist
+function checkIfAnyRowsExist() {
+    var rows = document.querySelectorAll('tr.animate-row');
+    var tableBody = document.querySelector('#cart-items-table tbody');
+
+    if (rows.length === 0) {
+        // Clear the table body
+        tableBody.innerHTML = '';
+
+        // Create and insert the <p> element with the desired style
+        var noItemsMessage = document.createElement('p');
+        noItemsMessage.textContent = 'No Items';
+
+        // Apply the style
+        noItemsMessage.style.width = '100%';
+        noItemsMessage.style.textAlign = 'center';
+        noItemsMessage.style.height = '100%';
+        noItemsMessage.style.display = 'flex';
+        noItemsMessage.style.justifyContent = 'center';
+        noItemsMessage.style.alignItems = 'center';
+
+        // Insert the <p> element into the table body
+        var noItemsRow = document.createElement('tr');
+        var noItemsCell = document.createElement('td');
+        noItemsCell.colSpan = 6;  // Set the colspan to cover the entire table width
+        noItemsCell.appendChild(noItemsMessage);
+        noItemsRow.appendChild(noItemsCell);
+        tableBody.appendChild(noItemsRow);
     }
 }
 
@@ -372,151 +792,4 @@ document.addEventListener('DOMContentLoaded', (event) => {
         row.classList.add('animate-row');
     });
 });
-
-// document.addEventListener('DOMContentLoaded', function() {
-//     const customerID = 1;
-//     fetch(`/api/cartItem/getCartItemByCustomerID/${customerID}`)
-//         .then(response => response.json())
-//         .then(data => {
-//             if (data.cartItems) {
-//                 const cartItems = data.cartItems;
-//                 const products = data.products;
-
-//                 const tbody = document.querySelector('#cart-items-table tbody');
-//                 tbody.innerHTML = '';
-
-//                 for (let i = 0; i < cartItems.length; i++) {
-//                     const cartItem = cartItems[i];
-//                     const product = products[i];
-
-//                     // Calculate delay for animation
-//                     const animationDelay = 0.05 * i;
-
-//                     // Create a new table row
-//                     const row = document.createElement('tr');
-//                     row.classList.add('animate-row');
-//                     row.style.animationDelay = `${animationDelay}s`;
-
-//                     // Create the first cell with an image
-//                     const imgCell = document.createElement('td');
-//                     imgCell.style.width = '15%';
-//                     imgCell.style.textAlign = 'left';
-//                     const img = document.createElement('img');
-//                     img.src = 'storage/images/pika.jpg'; // Assuming all products use this image
-//                     img.alt = product.name;
-//                     img.width = 135;
-//                     img.height = 135;
-//                     imgCell.appendChild(img);
-//                     row.appendChild(imgCell);
-
-//                     // Create the second cell with product name
-//                     const nameCell = document.createElement('td');
-//                     nameCell.style.width = '25%';
-//                     nameCell.style.textAlign = 'left';
-//                     const nameP = document.createElement('p');
-//                     nameP.textContent = product.name;
-//                     nameCell.appendChild(nameP);
-//                     row.appendChild(nameCell);
-
-//                     // Create the third cell with product price
-//                     const priceCell = document.createElement('td');
-//                     priceCell.id = `${i}eachPrice`;
-//                     priceCell.style.width = '15%';
-//                     priceCell.textContent = `RM${parseFloat(product.price).toFixed(2)}`;
-//                     row.appendChild(priceCell);
-
-//                     // Create the fourth cell with quantity input and buttons
-//                     const quantityCell = document.createElement('td');
-//                     quantityCell.style.width = '15%';
-
-//                     const inputGroupDiv = document.createElement('div');
-//                     inputGroupDiv.classList.add('input-group', 'mb-3');
-//                     inputGroupDiv.style.justifyContent = 'center';
-//                     inputGroupDiv.style.marginBottom = '0';
-
-//                     const decreaseBtn = document.createElement('button');
-//                     decreaseBtn.id = `${i}decrease`;
-//                     decreaseBtn.classList.add('btn', 'btn-outline-secondary', 'decrease-btn');
-//                     decreaseBtn.setAttribute('onclick', `minus("${i}quantity",${i})`);
-//                     decreaseBtn.type = 'button';
-//                     decreaseBtn.style.borderRight = 'none';
-//                     decreaseBtn.textContent = '-';
-//                     inputGroupDiv.appendChild(decreaseBtn);
-
-//                     const quantityInput = document.createElement('input');
-//                     quantityInput.id = `${i}quantity`;
-//                     quantityInput.value = cartItem.quantity;
-//                     quantityInput.style.border = '#6c757d 1px solid';
-//                     quantityInput.style.maxWidth = '60px';
-//                     quantityInput.style.textAlign = 'center';
-//                     quantityInput.type = 'text';
-//                     quantityInput.classList.add('form-control');
-//                     inputGroupDiv.appendChild(quantityInput);
-
-//                     const increaseBtn = document.createElement('button');
-//                     increaseBtn.id = `${i}increase`;
-//                     increaseBtn.classList.add('btn', 'btn-outline-secondary', 'increase-btn');
-//                     increaseBtn.setAttribute('onclick', `add("${i}quantity","${i}")`);
-//                     increaseBtn.type = 'button';
-//                     increaseBtn.style.borderLeft = 'none';
-//                     increaseBtn.textContent = '+';
-//                     inputGroupDiv.appendChild(increaseBtn);
-
-//                     quantityCell.appendChild(inputGroupDiv);
-//                     row.appendChild(quantityCell);
-
-//                     // Create the fifth cell with the total price
-//                     const totalCell = document.createElement('td');
-//                     totalCell.style.width = '15%';
-//                     totalCell.id = `${i}totalPrice`;
-//                     totalCell.textContent =
-//                         `RM${(parseFloat(product.price) * cartItem.quantity).toFixed(2)}`;
-//                     row.appendChild(totalCell);
-
-//                     // Create the sixth cell with the delete button
-//                     const deleteCell = document.createElement('td');
-//                     deleteCell.style.width = '15%';
-//                     const deleteButton = document.createElement('button');
-//                     deleteButton.type = 'button';
-//                     deleteButton.classList.add('btn', 'btn-danger');
-//                     deleteButton.textContent = 'DELETE';
-//                     deleteCell.appendChild(deleteButton);
-//                     row.appendChild(deleteCell);
-
-//                     // Append the row to the table body
-//                     tbody.appendChild(row);
-//                 }
-//             } else if (data.error) {
-//                 console.error('Error:', data.error);
-//                 alert(data.error);
-//             } else {
-//                 console.error('Unexpected response format.');
-//                 alert('Unexpected response format.');
-//             }
-//         })
-//         .catch(error => {
-//             console.error('Error:', error);
-//             alert('An error occurred while fetching the cart items.');
-//         });
-// });
-
-// function deleteProd(id) {
-//     fetch(`/api/cartItem/deleteCartItem/`.id)
-//         .then(response => response.json())
-//         .then(data => {
-//             if (data.success) {
-//                 alert('Delete Success');
-//                 //handle success
-//                 //find the row and remove it
-//                 $('#cartItem_'.id).remove();
-//             } else {
-//                 alert('Delete Failed');
-//                 console.log(data.data);
-//             }
-//         })
-//         .catch(error => {
-//             console.error('Error:', error);
-//             alert('An error occurred while deleting the product.');
-//         });
-// }
 </script>

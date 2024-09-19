@@ -188,6 +188,44 @@
             @yield('prodTitle')
         @endif
 
+        @if (request()->is('shop'))
+            <div class="flex-shrink-0 p-3 bg-white d-flex flex-column">
+                <div class="container">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="input-group mb-3">
+                                <input type="text" class="form-control" id="search" name="search"
+                                    placeholder="Search" aria-label="Search" aria-describedby="search-btn">
+                                <button class="btn btn-outline-secondary" type="button" id="search-btn"><i
+                                        class="fa-solid fa-magnifying-glass"></i></button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            @foreach ($categories as $category)
+                                <div class="input-group mb-3">
+                                    <div class="input-group-text">
+                                        <input class="form-check-input mt-0" type="checkbox"
+                                            value="{{ $category->category_name }}"
+                                            aria-label="Checkbox for {{ $category->category_name }}"
+                                            id="category-{{ $category->category_name }}">
+                                    </div>
+                                    <input type="text" class="form-control" aria-label="Text input with checkbox"
+                                        value="{{ $category->category_name }}" disabled>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
+
+        <div class="flex-shrink-0 p-3 bg-white d-flex flex-column">
+            <div class="container">
+                <div class="card">
+                </div>
+            </div>
+        </div>
+
         @yield('content')
     </main>
 
@@ -195,6 +233,36 @@
     <script src="https://code.jquery.com/jquery-migrate-3.3.2.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     @yield('script')
+
+    <script>
+        $(document).ready(function() {
+            $('#search, .form-check-input').on('change keyup', function() {
+                filterProducts();
+            });
+
+            function filterProducts() {
+                let search = $('#search').val();
+                let categories = [];
+                $('.form-check-input:checked').each(function() {
+                    categories.push($(this).val());
+                });
+
+                let url = window.location.pathname;
+
+                $.ajax({
+                    url: url,
+                    method: 'GET',
+                    data: {
+                        search: search,
+                        categories: categories
+                    },
+                    success: function(response) {
+                        $('#product-list').html(response);
+                    }
+                });
+            }
+        });
+    </script>
 
 </body>
 

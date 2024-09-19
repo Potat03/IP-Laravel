@@ -8,7 +8,7 @@
 
     @include('partials.fontawesome')
     <link href="{{ asset('css/admin_nav.css') }}" rel="stylesheet">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     @yield('vite')
     @yield('css')
 </head>
@@ -29,7 +29,8 @@
 
         <div class="top_content">
             <div class="top_left">
-                <img src="{{ asset('images/logo.png') }}" width="40" height="40"><h1>Futatabi</h1>
+                <img src="{{ asset('images/logo.png') }}" width="40" height="40">
+                <h1>Futatabi</h1>
             </div>
             <div class="top_middle">
                 <div class="current_time">
@@ -48,7 +49,11 @@
                                 Profile
                             </a>
                         </li>
-                        <li><a href="{{ route('auth.adminLogout') }}">
+                        <li onclick="logout();">
+                            <form id="logout-form" action="{{ route('auth.adminLogout') }}" method="POST" style="display: none;">
+                                @csrf
+                            </form>
+                            <a href="#">
                                 <div class="li_icon_wrap">
                                     <i class="fa-regular fa-person-from-portal"></i>
                                 </div>
@@ -99,6 +104,7 @@
                             Customer
                         </a>
                     </li>
+                    @if (Auth::guard('admin')->user()->role == 'manager') 
                     <li @stack('report')>
                         <a class="w-100" type="button" data-bs-toggle="collapse" href="#collapseReport" role="button" aria-expanded="false" aria-controls="collapseReport">
                             <i class="fa-regular fa-chart-bar"></i>
@@ -107,18 +113,19 @@
                         <div class="collapse" id="collapseReport">
                             <ul class="py-3 px-1">
                                 <li><a class="text-light" href="">Sales Report</a></li>
-                                <li><a class="text-light" href="">Product Report</a></li>
+                                <li><a class="text-light" href="{{ route('admin.product.report' )}}">Product Report</a></li>
                                 <li><a class="text-light" href="{{ route('admin.promotion.report' )}}">Promotion Report</a></li>
                                 <li><a class="text-light" href="{{ route('admin.customer.report' )}}">Customer Report</a></li>
                             </ul>
                         </div>
                     </li>
+                    @endif
                 </ul>
             </div>
             <div class="right_content">
                 <div class="upper_content">
                     <div class="back_btn">
-                        <a href="#">
+                        <a href="@yield('prev_page')">
                             <i class="fa-solid fa-arrow-left"></i></a>
                     </div>
                     <div class="title">
@@ -177,6 +184,11 @@
                 $('.cur_date').text(strDate);
 
             }
+
+            function logout() {
+                $('#logout-form').submit();
+            }
+
         </script>
 
         @yield('js')

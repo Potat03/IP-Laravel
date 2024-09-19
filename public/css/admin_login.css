@@ -37,7 +37,7 @@ h1, h2, h3, h4, h5, h6, p{
 
 .login_wrap{
     width: 300px;
-    height: 350px;
+    height: 390px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -180,4 +180,25 @@ h1, h2, h3, h4, h5, h6, p{
 
 .login_button button:active{
     transform: scale(0.95);
+}
+
+.remember_me{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+}
+
+.remember_me input{
+    width: 15px;
+    height: 15px;
+}
+
+.remember_me label{
+    color: var(--white);   
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: 500;
+    opacity: 0.8;
+    user-select: none;
 }

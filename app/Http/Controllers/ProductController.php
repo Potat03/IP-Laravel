@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\Wearable;
 use App\Models\Collectible;
 use App\Models\Consumable;
+use App\Models\Category;
 use App\Models\Rating;
 use App\Contexts\ProductContext;
 use App\Strategies\WearableStrategy;
@@ -19,6 +20,9 @@ use Illuminate\Support\Facades\Log;
 use Intervention\Image\ImageManagerStatic as Image;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\Adapters\ProductAdapter;
+use Illuminate\Support\Facades\Response;
+use DOMDocument;
+use XSLTProcessor;
 
 class ProductController extends Controller
 {
@@ -42,7 +46,6 @@ class ProductController extends Controller
                 $isFirstImage = true;
                 $imageCounter = 1;
                 foreach ($images as $index => $image) {
-                    // Check if this is the first image
                     if ($isFirstImage) {
                         $imageName = 'main.' . $image->getClientOriginalExtension();
                         $isFirstImage = false;
@@ -51,7 +54,6 @@ class ProductController extends Controller
                         $imageCounter++;
                     }
 
-                    // Move the image to the folder
                     $image->move(public_path($folderPath), $imageName);
                 }
                 return response()->json(['success' => true, 'data' => 'Images have been successfully uploaded.'], 200);
@@ -59,13 +61,11 @@ class ProductController extends Controller
 
             return response()->json(['success' => false, 'data' => 'No images were uploaded.'], 400);
         } catch (ValidationException $e) {
-            // Log validation errors
             Log::error('Validation failed for request', [
                 'errors' => $e->errors(),
                 'input' => $request->all(),
             ]);
 
-            // Return validation error response
             return response()->json(['errors' => $e->errors()], 422);
         } catch (Exception $e) {
             return response()->json(['success' => false, 'data' => $e->getMessage()], 400);
@@ -89,7 +89,6 @@ class ProductController extends Controller
                 mkdir($folderFullPath, 0777, true);
             }
 
-            // Get list of existing images in the folder
             $existingImages = array_map('basename', glob($folderFullPath . '/*'));
 
             $existingImagesFromRequest = json_decode($request->input('existingImages', '[]'), true);
@@ -103,11 +102,9 @@ class ProductController extends Controller
                 }
             }
 
-            // Remove images that are not in the existing images list
             foreach ($existingImages as $image) {
                 if (!in_array($image, $existingImagesFromRequest)) {
                     if ($mainImageExists && in_array($image, ['main.jpg', 'main.png', 'main.jpeg'])) {
-                        // The main image is being deleted
                         $mainImageExists = false; // Update flag
                         Log::info('Deleted main image: ' . $image);
                     }
@@ -124,7 +121,6 @@ class ProductController extends Controller
                     $extension = $image->getClientOriginalExtension();
                     $imageName = '';
 
-                    // If no main image exists, assign 'main' name to the first uploaded image
                     if (!$mainImageExists) {
                         $imageName = 'main.' . $extension;
                         $newMainImage = $imageName;
@@ -133,21 +129,17 @@ class ProductController extends Controller
                         $imageName = $this->generateUniqueName($existingImages, $extension);
                     }
 
-                    // Move the image to the folder
                     $image->move($folderFullPath, $imageName);
                     Log::info('Uploaded image: ' . $imageName);
 
-                    // Add the new image to the existing images list
                     $existingImages[] = $imageName;
                 }
 
-                // If a new main image was assigned, log the action
                 if ($newMainImage) {
                     Log::info('Assigned new main image: ' . $newMainImage);
                 }
             }
 
-            // If no new images were uploaded and no main image exists, find a new main image
             if (!$images && !$mainImageExists) {
                 $remainingImages = array_diff($existingImages, ['main.jpg', 'main.png', 'main.jpeg']);
                 if (!empty($remainingImages)) {
@@ -163,13 +155,11 @@ class ProductController extends Controller
 
             return response()->json(['success' => true, 'data' => 'Images have been successfully updated.'], 200);
         } catch (ValidationException $e) {
-            // Log validation errors
             Log::error('Validation failed for request', [
                 'errors' => $e->errors(),
                 'input' => $request->all(),
             ]);
 
-            // Return validation error response
             return response()->json(['errors' => $e->errors()], 422);
         } catch (Exception $e) {
             Log::error('Error updating images: ' . $e->getMessage());
@@ -192,7 +182,10 @@ class ProductController extends Controller
 
     public function addProduct()
     {
-        return view('admin.product_add');
+        $categoryController = new CategoryController();
+        $categories = $categoryController->index();
+
+        return view('admin.product_add', ['categories' => $categories]);
     }
 
     // Add product to database
@@ -215,6 +208,7 @@ class ProductController extends Controller
                 'halal' => 'nullable|boolean',
                 'supplier' => 'nullable|string',
                 'user_groups' => 'nullable|string',
+                'categories' => 'required|string',
             ]);
 
             $product = new Product();
@@ -226,7 +220,6 @@ class ProductController extends Controller
             $product->created_at = now()->addHours(8);
             $product->save();
 
-            // Check for specific attributes
             if ($request->has('isWearable')) {
                 $this->createWearable($product, $request);
             }
@@ -239,18 +232,29 @@ class ProductController extends Controller
                 $this->createCollectible($product, $request);
             }
 
-            // Forward request for image upload
+            if ($request->has('categories')) {
+                $categoryNames = json_decode($request->input('categories'), true);
+
+                // Merge the category names and product_id into the request
+                $mergedRequest = $request->merge([
+                    'category_names' => $categoryNames,
+                    'product_id' => $product->product_id
+                ]);
+
+                // Pass the merged request to the attach method
+                $productCatControl = new ProductCategoryController();
+                $productCatControl->attach($mergedRequest, $product);
+            }
+
             ProductController::productImageUpload($request, $product->product_id);
 
             return response()->json(['success' => true, 'message' => 'Product created successfully.'], 200);
         } catch (ValidationException $e) {
-            // Log validation errors
             Log::error('Validation failed for request', [
                 'errors' => $e->errors(),
                 'input' => $request->all(),
             ]);
 
-            // Return validation error response
             return response()->json(['errors' => $e->errors()], 422);
         } catch (Exception $e) {
             Log::error('Adding product failed: ' . $e->getMessage());
@@ -295,30 +299,59 @@ class ProductController extends Controller
     {
         try {
             $query = $request->input('search');
+            $categoryNames = $request->input('categories', []);
 
-            // Get the product IDs based on search query
+            // Initialize the product query
+            $productQuery = Product::query();
+
+            // Apply search filter if provided
             if ($query) {
-                $productIds = Product::where('name', 'LIKE', "%$query%")->pluck('product_id');
-            } else {
-                $productIds = Product::pluck('product_id');
+                $productQuery->where('name', 'LIKE', "%$query%");
             }
 
-            // Fetch the products
-            $products = Product::whereIn('product_id', $productIds)->paginate(20);
+            // Apply category filter if provided
+            if (!empty($categoryNames)) {
+                $productQuery->whereIn('product_id', function ($subQuery) use ($categoryNames) {
+                    $subQuery->select('product_id')
+                        ->from('product_category')
+                        ->whereIn('category_name', $categoryNames)
+                        ->groupBy('product_id')
+                        ->havingRaw('COUNT(DISTINCT category_name) = ?', [count($categoryNames)]);
+                });
+            }
+
+            // Paginate products
+            $products = $productQuery->paginate(20);
+
+            // Extract product IDs from the paginated results
+            $productIds = $products->items(); // Get the items on the current page
+            $productIds = collect($productIds)->pluck('product_id')->toArray(); // Convert to collection and pluck IDs
 
             // Fetch main images using the ProductController's getMainImages method
             $productController = new ProductController();
             $mainImages = $productController->getMainImages($productIds);
 
+            // Fetch ratings for products
             $ratingController = new RatingController();
-
-            // Fetch and append ratings to the product collection
             $productsWithRatings = $ratingController->fetchRatingsForShop($productIds, $products);
 
-            // Pass the products, ratings, and images to the view
+            // Fetch all categories for view
+            $categories = Category::all();
+
+            // Return view based on AJAX request
+            if ($request->ajax()) {
+                return view('shop.partials.product-list', [
+                    'products' => $productsWithRatings,
+                    'mainImages' => $mainImages,
+                    'categories' => $categories,
+                ]);
+            }
+
+            // Return the main view (if not AJAX)
             return view('shop', [
-                'products' => $productsWithRatings,  // The products with ratings included
-                'mainImages' => $mainImages,         // Pass the images to the view
+                'products' => $productsWithRatings,
+                'mainImages' => $mainImages,
+                'categories' => $categories,
             ]);
         } catch (Exception $e) {
             Log::error('Fetching products failed: ' . $e->getMessage());
@@ -331,7 +364,10 @@ class ProductController extends Controller
         try {
             $products = Product::all();
 
-            return view('admin.product', ['products' => $products]);
+            $categoryController = new CategoryController();
+            $categories = $categoryController->index();
+
+            return view('admin.product', ['products' => $products, 'categories' => $categories]);
         } catch (Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
         }
@@ -355,7 +391,7 @@ class ProductController extends Controller
         $images = [];
         $imageFiles = Storage::files('public/images/products/' . $id);
         foreach ($imageFiles as $file) {
-            $images[] = basename($file);
+            $images[] = Storage::url($file);
         }
 
         return response()->json(['success' => true, 'data' => $images], 200);
@@ -366,15 +402,20 @@ class ProductController extends Controller
         $images = [];
         foreach ($ids as $id) {
             $imageFiles = Storage::files('public/images/products/' . $id);
+
             $mainImage = null;
 
             foreach ($imageFiles as $file) {
                 $filename = basename($file);
 
-                if (strpos($filename, 'main') !== false) {
-                    $mainImage = $filename;
+                if (strpos($filename, 'main') !== false && preg_match('/\.(jpg|jpeg|png)$/i', $filename)) {
+                    $mainImage = Storage::url($file);
                     break;
                 }
+            }
+
+            if (!$mainImage) {
+                $mainImage = Storage::url('public/images/products/default.jpg'); // Ensure default image exists
             }
 
             $images[$id] = $mainImage;
@@ -398,7 +439,7 @@ class ProductController extends Controller
 
             $imageFiles = Storage::files('public/images/products/' . $id);
             $images = array_map(function ($file) {
-                return basename($file);
+                return Storage::url($file);
             }, $imageFiles);
 
             $mainImageExtension = $this->getMainImageExtension($id);
@@ -411,7 +452,7 @@ class ProductController extends Controller
                 'mainImageExtension' => $mainImageExtension,
             ]);
         } catch (ModelNotFoundException $e) {
-            return response()->json(['error' => 'Product not found.'], 404);
+            return response()->view('errors.404', [], 404);
         } catch (Exception $e) {
             Log::error('Fetching product failed: ' . $e->getMessage());
             return response()->json(['error' => 'Fetching product failed.'], 500);
@@ -458,12 +499,12 @@ class ProductController extends Controller
 
     public function getMainImageExtension($productId)
     {
-        $folderPath = public_path('storage/images/products/' . $productId);
+        $folderPath = 'public/images/products/' . $productId;
         $extensions = ['jpg', 'jpeg', 'png'];
 
         foreach ($extensions as $extension) {
             $mainImage = 'main.' . $extension;
-            if (file_exists($folderPath . '/' . $mainImage)) {
+            if (Storage::exists($folderPath . '/' . $mainImage)) {
                 return $extension;
             }
         }
@@ -713,5 +754,53 @@ class ProductController extends Controller
             Log::error('Fetching new arrivals failed: ' . $e->getMessage());
             return response()->json(['error' => 'Fetching new arrivals failed.'], 500);
         }
+    }
+
+    public function generateProductReport()
+    {
+        // Fetch all products along with their associated category
+        $products = Product::all();
+
+        // Prepare XML content with the basic product details, including the category
+        $xmlContent = $this->generateXMLContentForBasicProductInfo($products);
+
+        // Save the XML content to a file (optional)
+        Storage::put('xml/product_report.xml', $xmlContent);
+
+        // Load the XSLT file for transforming the XML into HTML
+        $xslt = new \DOMDocument();
+        $xslt->load(storage_path('app/xslt/product_report.xslt'));
+
+        // Load the generated XML content
+        $xml = new \DOMDocument();
+        $xml->loadXML($xmlContent);
+
+        // Apply the XSLT transformation
+        $proc = new \XSLTProcessor();
+        $proc->importStylesheet($xslt);
+
+        // Transform XML to HTML
+        $html = $proc->transformToXML($xml);
+
+        // Return the view with the generated HTML
+        return view('admin.product_report', ['html' => $html, 'products' => $products]);
+    }
+
+    private function generateXMLContentForBasicProductInfo($products)
+    {
+        $xml = new \SimpleXMLElement('<products/>');
+
+        foreach ($products as $product) {
+            $productNode = $xml->addChild('product');
+            $productNode->addChild('id', $product->product_id);
+            $productNode->addChild('name', $product->name);
+            $type = $product->getProductType();
+            $productNode->addChild('type', $type);
+            $productNode->addChild('price', $product->price);
+            $productNode->addChild('stock', $product->stock); // Assuming there's a stock attribute
+            $productNode->addChild('status', $product->status); // Assuming status is a field in your product model
+        }
+
+        return $xml->asXML();
     }
 }

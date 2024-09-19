@@ -13,7 +13,6 @@
                     <li>
                         <hr class="dropdown-divider">
                     </li>
-                    <li><a class="dropdown-item" href="#!">Popular Items</a></li>
                     <li><a class="dropdown-item" href="{{ url('/shop/new-arrivals') }}">New Arrivals</a></li>
                 </ul>
             </li>
@@ -22,7 +21,6 @@
             </li>
         </ul>
 
-        <!-- Cart -->
         <form class="d-flex m-0">
             <button class="btn btn-outline-dark" type="button" onclick="window.location.href=`{{ url('/cart') }}`">
                 <i class="fa-solid fa-cart-shopping"></i>
@@ -32,7 +30,6 @@
         </form>
 
         <ul class="navbar-nav mb-lg-0">
-            <!-- Profile or Sign-in -->
             @auth('customer')
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" id="profileDropdown" href="#" role="button"

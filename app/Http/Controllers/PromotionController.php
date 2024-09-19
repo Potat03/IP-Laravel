@@ -13,6 +13,9 @@ use App\Models\Wearable;
 use App\Models\Consumable;
 use App\Models\Collectible;
 use App\Models\OrderItem;
+use App\Memento\PromotionMemento;
+use App\Memento\PromotionCaretaker;
+use Illuminate\Support\Facades\Auth;
 use Exception;
 
 class PromotionController extends Controller
@@ -98,8 +101,8 @@ class PromotionController extends Controller
     {
         try {
             $promotion = Promotion::find($id);
-
-            Cache::put('promotion_' . $id, $promotion, 86400);
+            $promotionCaretaker = new PromotionCaretaker();
+            $promotionCaretaker->addMemento($promotion->saveToMemento());
 
             $originalPrice = 0;
             $productList = json_decode($request->products);
@@ -143,6 +146,9 @@ class PromotionController extends Controller
     {
         try {
             $promotion = Promotion::find($id);
+            $promotionCaretaker = new PromotionCaretaker();
+            $promotionCaretaker->addMemento($promotion->saveToMemento());
+
             $promotion->status = 'deleted';
             $promotion->save();
             return response()->json(['success' => true, 'data' => $promotion], 200);
@@ -171,8 +177,25 @@ class PromotionController extends Controller
     {
         try {
             $promotion = Promotion::find($id);
-            $promotion->status = 'inactive';
-            $promotion->save();
+            //get the memento object
+            $promotionCaretaker = new PromotionCaretaker();
+            $promotionMemento = $promotionCaretaker->getMemento($id);
+            $promotion->restoreFromMemento($promotionMemento);
+
+            return response()->json(['success' => true, 'data' => $promotion], 200);
+        } catch (Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
+        }
+    }
+
+    public function undoUpdatePromotion($index)
+    {
+        try {
+            $promotionCaretaker = new PromotionCaretaker();
+            $promotionMemento = $promotionCaretaker->getMemento($index);
+            $promotion = Promotion::find($promotionMemento->getPromotion()['promotion_id']);
+            $promotion->restoreFromMemento($promotionMemento);
+
             return response()->json(['success' => true, 'data' => $promotion], 200);
         } catch (Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
@@ -205,7 +228,7 @@ class PromotionController extends Controller
                         $promotion->products_sold_without += count($orders);
                     }
                 }
-                
+
                 if ($promotion->products_sold > 0) {
                     $promotion->average_order_value_with = $promotion->total_revenue / $promotion->products_sold;
                 }
@@ -332,12 +355,6 @@ class PromotionController extends Controller
 
             $promotion->bought_count = 0;
 
-            // if(auth()->check()){
-            //     $promotion->bought_count = Promotion::find($id)->order->where('customer_id', auth()->user()->customer_id)->count();
-            // }else{
-            //     $promotion->bought_count = $promotion->limit;
-            // }
-
             return view('promotionDetails', ['promotion' => $promotion]);
         } catch (Exception $e) {
             return view('errors.404');
@@ -347,11 +364,16 @@ class PromotionController extends Controller
     public function adminList()
     {
         try {
-            $promotions = Promotion::whereNot('status', 'deleted')->paginate(12);
-            foreach ($promotions as $promotion) {
-                $promotion->product_list = Promotion::find($promotion->promotion_id)->product;
+
+            if (Auth::guard('admin')->check()) {
+                $promotions = Promotion::whereNot('status', 'deleted')->paginate(12);
+                foreach ($promotions as $promotion) {
+                    $promotion->product_list = Promotion::find($promotion->promotion_id)->product;
+                }
+                return view('admin.promotion', ['promotions' => $promotions]);
+            }else{
+                return view('errors.404');
             }
-            return view('admin.promotion', ['promotions' => $promotions]);
         } catch (Exception $e) {
             return view('errors.404');
         }
@@ -359,13 +381,34 @@ class PromotionController extends Controller
 
     public function addPromotion()
     {
-        $products = Product::all();
-        return view('admin.promotion_add', ['products' => $products]);
+        try {
+            if (Auth::guard('admin')->check()) {
+                if (Auth::guard('admin')->user()->role != 'admin' && Auth::guard('admin')->user()->role != 'manager') {
+                    return view('errors.404');
+                }
+            } else {
+                return view('errors.404');
+            }
+
+
+            $products = Product::all();
+            return view('admin.promotion_add', ['products' => $products]);
+        } catch (Exception $e) {
+            return view('errors.404');
+        }
     }
 
     public function editPromotion($id)
     {
         try {
+            if (Auth::guard('admin')->check()) {
+                if (Auth::guard('admin')->user()->role != 'admin' && Auth::guard('admin')->user()->role != 'manager') {
+                    return view('errors.404');
+                }
+            } else {
+                return view('errors.404');
+            }
+
             $promotion = Promotion::find($id);
             $promotion->product_list = Promotion::find($id)->product;
             $products = Product::all();
@@ -382,11 +425,47 @@ class PromotionController extends Controller
     public function restorePromotion()
     {
         try {
+            if (Auth::guard('admin')->check()) {
+                if (Auth::guard('admin')->user()->role != 'admin' && Auth::guard('admin')->user()->role != 'manager') {
+                    return view('errors.404');
+                }
+            } else {
+                return view('errors.404');
+            }
+
             $promotions = Promotion::where('status', 'deleted')->get();
             foreach ($promotions as $promotion) {
                 $promotion->product_list = Promotion::find($promotion->promotion_id)->product;
             }
             return view('admin.promotion_restore', ['promotions' => $promotions]);
+        } catch (Exception $e) {
+            return view('errors.404');
+        }
+    }
+
+    public function undoListPromotion()
+    {
+        try {
+            if (Auth::guard('admin')->check()) {
+                if (Auth::guard('admin')->user()->role != 'admin' && Auth::guard('admin')->user()->role != 'manager') {
+                    return view('errors.404');
+                }
+            } else {
+                return view('errors.404');
+            }
+
+            $promotionCaretaker = new PromotionCaretaker();
+            $mementoList = $promotionCaretaker->getMementoList();
+
+            // Extract promotions from mementos
+            $promotions = array_map(function ($memento) {
+                return $memento->getPromotion();
+            }, $mementoList);
+
+            //convert to object
+            $promotions = json_decode(json_encode($promotions));
+
+            return view('admin.promotion_revert', ['promotions' => $promotions]);
         } catch (Exception $e) {
             return view('errors.404');
         }

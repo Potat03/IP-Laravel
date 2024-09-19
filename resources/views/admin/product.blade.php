@@ -14,6 +14,11 @@
     </style>
 @endsection
 
+@section('prev_page', route('admin.main'))
+@section('title', 'Product')
+@section('page_title', 'Product')
+@section('page_gm', 'Product List')
+
 @section('content')
     <div>
         <div class="px-2 py-3">
@@ -23,50 +28,105 @@
     </div>
     <div class="card shadow-sm p-3">
         <div class="card-body">
-            <div class="card-title d-flex px-3">
-                <div class="ms-auto">
-                    <button class="btn btn-primary" onclick="window.location.href='{{ route('admin.product.add') }}'"><i
-                            class="fa-regular fa-square-plus pe-2"></i>Add Product</button>
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link active" id="products-tab" data-bs-toggle="tab" href="#products" role="tab"
+                        aria-controls="products" aria-selected="true">Products</a>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link" id="categories-tab" data-bs-toggle="tab" href="#categories" role="tab"
+                        aria-controls="categories" aria-selected="false">Categories</a>
+                </li>
+            </ul>
+            <div class="tab-content mt-3" id="myTabContent">
+                <div class="tab-pane fade show active" id="products" role="tabpanel" aria-labelledby="products-tab">
+                    <div class="card-title d-flex px-3">
+                        <div class="ms-auto">
+                            <button class="btn btn-primary"
+                                onclick="window.location.href='{{ route('admin.product.add') }}'"><i
+                                    class="fa-regular fa-square-plus pe-2"></i>Add Product</button>
+                        </div>
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Price</th>
+                                <th scope="col">Stock</th>
+                                <th scope="col">Type</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="data-holder">
+                            @foreach ($products as $index => $product)
+                                <tr>
+                                    <th scope="row">{{ $index + 1 }}</th>
+                                    <td>{{ $product->name }}</td>
+                                    <td>{{ $product->price }}</td>
+                                    @if ($product->stock < 50)
+                                        <td class="text-danger fw-bold">{{ $product->stock }}</td>
+                                    @else
+                                        <td class="text-success fw-bold">{{ $product->stock }}</td>
+                                    @endif
+                                    <td>{{ $product->getProductType() }}</td>
+                                    @if ($product->status == 'active')
+                                        <td class="text-success fw-bold">{{ $product->status }}</td>
+                                    @else
+                                        <td class="text-danger fw-bold">{{ $product->status }}</td>
+                                    @endif
+                                    <td>
+                                        <button class="btn btn-warning"
+                                            onclick="window.location.href='{{ route('admin.product.edit', $product->product_id) }}'"><i
+                                                class="fa-regular fa-pen-to-square pe-2"></i>Edit</button>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                <div class="tab-pane fade" id="categories" role="tabpanel" aria-labelledby="categories-tab">
+                    <div class="card-title d-flex px-3">
+                        <div class="ms-auto">
+                            <button class="btn btn-primary"
+                                onclick="window.location.href='{{ route('admin.category.add') }}'"><i
+                                    class="fa-regular fa-square-plus pe-2"></i>Add Category</button>
+                        </div>
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Category Name</th>
+                                <th scope="col">Category Description</th>
+                                <th scope="col">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="data-holder">
+                            @foreach ($categories as $index => $category)
+                                <tr>
+                                    <th scope="row">{{ $index + 1 }}</th>
+                                    <td>{{ $category->category_name }}</td>
+                                    <td>{{ $category->description }}</td>
+                                    <td>
+                                        <button class="btn btn-warning"
+                                            onclick="window.location.href='{{ route('admin.category.edit', $category->id) }}'"><i
+                                                class="fa-regular fa-pen-to-square pe-2"></i>Edit</button>
+                                        <form action="{{ route('admin.category.delete', $category->id) }}" method="POST"
+                                            style="display:inline;" onsubmit="return confirmDeletion();">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-danger"><i
+                                                    class="fa-solid fa-trash-can pe-2"></i>Delete</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
             </div>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Name</th>
-                        <th scope="col">Price</th>
-                        <th scope="col">Stock</th>
-                        <th scope="col">Type</th>
-                        <th scope="col">Status</th>
-                        <th scope="col">Action</th>
-                    </tr>
-                </thead>
-                <tbody id="data-holder">
-                    @foreach ($products as $index => $product)
-                        <tr>
-                            <th scope="row">{{ $index + 1 }}</th>
-                            <td>{{ $product->name }}</td>
-                            <td>{{ $product->price }}</td>
-                            @if ($product->stock < 50)
-                                <td class="text-danger fw-bold">{{ $product->stock }}</td>
-                            @else
-                                <td class="text-success fw-bold">{{ $product->stock }}</td>
-                            @endif
-                            <td>{{ $product->getProductType() }}</td>
-                            @if ($product->status == 'active')
-                                <td class="text-success fw-bold">{{ $product->status }}</td>
-                            @else
-                                <td class="text-danger fw-bold">{{ $product->status }}</td>
-                            @endif
-                            <td>
-                                <button class="btn btn-warning"
-                                    onclick="window.location.href='{{ route('admin.product.edit', $product->product_id) }}'"><i
-                                        class="fa-regular fa-pen-to-square pe-2"></i>Edit</button>
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
         </div>
     </div>
 @endsection
@@ -84,7 +144,7 @@
                         let products = response.data; // Access the 'data' key
                         products.forEach((product, index) => {
                             let tr = document.createElement('tr');
-                            tr.innerHTML = `
+                            tr.innerHTML = ` 
                         <th scope="row">${index + 1}</th>
                         <td>${product.name}</td>
                         <td>${product.price}</td>
@@ -107,4 +167,9 @@
                 });
         });
     </script> --}}
+    <script>
+        function confirmDeletion() {
+            return confirm('Are you sure you want to delete this category? This action cannot be undone.');
+        }
+    </script>
 @endsection
