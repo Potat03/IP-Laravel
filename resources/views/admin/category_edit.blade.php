@@ -17,6 +17,7 @@
     </style>
 @endsection
 
+@section('prev_page', route('admin.product'))
 @section('title', 'Edit Category')
 @section('page_title', 'Edit Category')
 @section('page_gm', 'Edit Category')

@@ -33,7 +33,7 @@ class ProductController extends Controller
     {
         try {
             $request->validate([
-                'images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+                'images.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
                 'filesArray' => 'nullable|string',
             ]);
 
@@ -79,7 +79,7 @@ class ProductController extends Controller
     {
         try {
             $request->validate([
-                'images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+                'images.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
                 'existingImages' => 'nullable|string',
                 'filesArray' => 'nullable|string',
             ]);
@@ -461,7 +461,7 @@ class ProductController extends Controller
         }
     }
 
-    // Show product images
+    //Show product images
     // public function showProductImages($id)
     // {
     //     $product = Product::find($id);
