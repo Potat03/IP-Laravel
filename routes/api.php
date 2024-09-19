@@ -10,6 +10,7 @@
     use App\Http\Controllers\CartController;
     use App\Http\Controllers\CartItemController;
     use App\Http\Controllers\OrderController;
+    use App\Http\Controllers\PaymentController;
 
 
 
@@ -69,7 +70,6 @@
     Route::post('/product/image/upload', [ProductController::class, 'productImageUpload']);
     // Route::get('/product/generateTable', [ProductController::class, 'generateTable']);
 
-    Route::post('/cartItem/upload', [CartController::class, 'addToCart'])->name('cart.add');
 
     //Cart Item
     Route::get('/cartItem/getCartItemByCustomerID/{customerID}', [CartItemController::class, 'getCartItemByCustomerID']);

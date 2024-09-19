@@ -1,5 +1,6 @@
 @extends('layout.promotion')
 
+
 @section('title', "Promotion")
 
 @push('styles')

@@ -3,29 +3,65 @@
     <xsl:output method="html" indent="yes"/>
 
     <xsl:template match="/">
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Title</th>
-                        <th>Total Revenue</th>
-                        <th>Products Sold</th>
-                        <th>Avg. Order Value (With Promotion)</th>
-                        <th>Avg. Order Value (Without Promotion)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <xsl:for-each select="promotionPerformanceReport/promotion">
-                        <tr>
-                            <td><xsl:value-of select="id"/></td>
-                            <td><xsl:value-of select="title"/></td>
-                            <td><xsl:value-of select="totalRevenue"/></td>
-                            <td><xsl:value-of select="productsSold"/></td>
-                            <td><xsl:value-of select="averageOrderValueWithPromotion"/></td>
-                            <td><xsl:value-of select="averageOrderValueWithoutPromotion"/></td>
-                        </tr>
-                    </xsl:for-each>
-                </tbody>
-            </table>
+                <xsl:for-each select="PromotionReports/Promotion">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Field</th>
+                                <th>Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>ID</td>
+                                <td><xsl:value-of select="ID"/></td>
+                            </tr>
+                            <tr>
+                                <td>Title</td>
+                                <td><xsl:value-of select="Title"/></td>
+                            </tr>
+                            <tr>
+                                <td>Start Date</td>
+                                <td><xsl:value-of select="StartDate"/></td>
+                            </tr>
+                            <tr>
+                                <td>End Date</td>
+                                <td><xsl:value-of select="EndDate"/></td>
+                            </tr>
+                            <tr>
+                                <td>Total Revenue</td>
+                                <td><xsl:value-of select="RevenueDetails/TotalRevenue"/></td>
+                            </tr>
+                            <tr>
+                                <td>Products Sold</td>
+                                <td><xsl:value-of select="ProductsSold"/></td>
+                            </tr>
+                            <tr>
+                                <td>Avg. Order Value (With Promotion)</td>
+                                <td><xsl:value-of select="RevenueDetails/AverageOrderValueWith"/></td>
+                            </tr>
+                            <tr>
+                                <td>Avg. Order Value (Without Promotion)</td>
+                                <td><xsl:value-of select="RevenueDetails/AverageOrderValueWithout"/></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Month</th>
+                                <th>Total Revenue</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <xsl:for-each select="MonthlyRevenue/Month">
+                                <tr>
+                                    <td><xsl:value-of select="MonthName"/></td>
+                                    <td><xsl:value-of select="Revenue"/></td>
+                                </tr>
+                            </xsl:for-each>
+                        </tbody>
+                    </table>
+                </xsl:for-each>
     </xsl:template>
 </xsl:stylesheet>

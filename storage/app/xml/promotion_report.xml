@@ -1,1 +1,39 @@
-<?xml version="1.0" encoding="UTF-8"?><promotionPerformanceReport><promotion><id>1</id><title>promotion1</title><totalRevenue>10000</totalRevenue><productsSold>1</productsSold><averageOrderValueWithPromotion>10000</averageOrderValueWithPromotion><averageOrderValueWithoutPromotion>10000</averageOrderValueWithoutPromotion></promotion><promotion><id>2</id><title>promotion2</title><totalRevenue>0</totalRevenue><productsSold>0</productsSold><averageOrderValueWithPromotion>0</averageOrderValueWithPromotion><averageOrderValueWithoutPromotion>10000</averageOrderValueWithoutPromotion></promotion></promotionPerformanceReport>
+<?xml version="1.0" encoding="UTF-8"?>
+<PromotionReports>
+  <Promotion>
+    <ID>1</ID>
+    <Title>Summer Sale</Title>
+    <StartDate>2024-09-19</StartDate>
+    <EndDate>2024-10-19</EndDate>
+    <RevenueDetails>
+      <TotalRevenue>3,150.00</TotalRevenue>
+      <AverageOrderValueWith>1,575.00</AverageOrderValueWith>
+      <AverageOrderValueWithout>0.00</AverageOrderValueWithout>
+    </RevenueDetails>
+    <ProductsSold>3</ProductsSold>
+    <MonthlyRevenue>
+      <Month>
+        <MonthName>2024-09</MonthName>
+        <Revenue>3,150.00</Revenue>
+      </Month>
+    </MonthlyRevenue>
+  </Promotion>
+  <Promotion>
+    <ID>2</ID>
+    <Title>Winter Sale</Title>
+    <StartDate>2024-09-19</StartDate>
+    <EndDate>2024-11-18</EndDate>
+    <RevenueDetails>
+      <TotalRevenue>3,480.00</TotalRevenue>
+      <AverageOrderValueWith>1,740.00</AverageOrderValueWith>
+      <AverageOrderValueWithout>0.00</AverageOrderValueWithout>
+    </RevenueDetails>
+    <ProductsSold>3</ProductsSold>
+    <MonthlyRevenue>
+      <Month>
+        <MonthName>2024-09</MonthName>
+        <Revenue>3,480.00</Revenue>
+      </Month>
+    </MonthlyRevenue>
+  </Promotion>
+</PromotionReports>

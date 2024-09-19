@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-lg sticky-top px-5 navbar-light bg-light">
+<nav class="navbar navbar-expand-lg sticky-top px-5 navbar-light bg-light" style="z-index:999;">
     <a class="navbar-brand fw-bold" href="{{ url('/') }}"><img src="{{ asset('images/logo.png') }}" width="60" height="60">Futatabi</a>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4 gap-3">

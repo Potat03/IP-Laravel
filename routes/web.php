@@ -20,7 +20,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\StripeController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\OrderController;
-use App\Http\Controllers\OrderItemController;
+use Spatie\Analytics\Facades\Analytics;
+use Spatie\Analytics\Period;
 
 
 
@@ -155,51 +156,6 @@ Route::middleware([AdminAuth::class])->group(function () {
 
 
 });
-
-//WK route
-Route::get('/userlogin', ['middleware' => 'guest:customer', function () {
-    return view('userlogin');
-}])->name('user.login');
-
-Route::middleware([CustomerAuth::class])->group(function () {
-
-    Route::get('/profile', function () {
-        return view('userprofile/layout/userProfile');
-    })->name('user.profile');
-});
-
-Route::get('/userverify', function () {
-    return view('userVerification');
-})->name('user.verify');
-
-
-//WK route
-Route::get('/userlogin', ['middleware' => 'guest:customer', function () {
-    return view('userlogin');
-}])->name('user.login');
-
-Route::middleware([CustomerAuth::class])->group(function () {
-
-    Route::get('/profile', function () {
-        return view('userprofile/layout/userProfile');
-    })->name('user.profile');
-
-    //profile content
-    Route::get('/profileSec', [CustomerController::class, 'profileSec'])->name('profile.profileSec');
-    Route::get('/orderHistorySec', [CustomerController::class, 'orderHistorySec'])->name('profile.orderHistorySec');
-    Route::get('/shippingSec', [CustomerController::class, 'shippingSec'])->name('profile.shippingSec');
-    Route::get('/supportChatSec', [CustomerController::class, 'supportChatSec'])->name('profile.supportChatSec');
-    Route::get('/settingSec', [CustomerController::class, 'settingSec'])->name('profile.settingSec');
-});
-
-
-
-
-
-
-
-
-
 
 //TW blade
 Route::get('/wei', function () {
