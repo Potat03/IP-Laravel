@@ -14,6 +14,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Admin;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Date;
 use Illuminate\Database\Seeder;
 
 use function Symfony\Component\String\b;
@@ -91,60 +92,60 @@ class DatabaseSeeder extends Seeder
         ]);
 
         Promotion::create([
-            'title'=>'promotion1',
-            'description'=>'promotion_description',
-            'discount'=>'10',
-            'discount_amount'=> '990',
-            'original_price'=>'1100',
-            'type'=>'test',
-            'limit'=>'10',
-            'status' =>'active',
-            'start_at' => Carbon::now(), 
-            'end_at' => Carbon::now()->addDays(7), 
+            'title' => 'promotion1',
+            'description' => 'promotion_description',
+            'discount' => '10',
+            'discount_amount' => '990',
+            'original_price' => '1100',
+            'type' => 'test',
+            'limit' => '10',
+            'status' => 'active',
+            'start_at' => Carbon::now(),
+            'end_at' => Carbon::now()->addDays(7),
         ]);
         PromotionItem::create([
-            'promotion_id'=>'1',
-            'product_id'=>'1',
-            'quantity'=>'1',
+            'promotion_id' => '1',
+            'product_id' => '1',
+            'quantity' => '1',
         ]);
         PromotionItem::create([
-            'promotion_id'=>'1',
-            'product_id'=>'2',
-            'quantity'=>'1',
+            'promotion_id' => '1',
+            'product_id' => '2',
+            'quantity' => '1',
         ]);
 
         Promotion::create([
-            'title'=>'promotion2',
-            'description'=>'promotion_description',
-            'discount'=>'50',
-            'discount_amount'=> '1000',
-            'original_price'=>'2000',
-            'type'=>'test',
-            'limit'=>'10',
-            'status' =>'active',
-            'start_at' => Carbon::now(), 
-            'end_at' => Carbon::now()->addDays(7), 
+            'title' => 'promotion2',
+            'description' => 'promotion_description',
+            'discount' => '50',
+            'discount_amount' => '1000',
+            'original_price' => '2000',
+            'type' => 'test',
+            'limit' => '10',
+            'status' => 'active',
+            'start_at' => Carbon::now(),
+            'end_at' => Carbon::now()->addDays(7),
         ]);
         PromotionItem::create([
-            'promotion_id'=>'2',
-            'product_id'=>'2',
-            'quantity'=>'1',
+            'promotion_id' => '2',
+            'product_id' => '2',
+            'quantity' => '1',
         ]);
         PromotionItem::create([
-            'promotion_id'=>'2',
-            'product_id'=>'3',
-            'quantity'=>'1',
+            'promotion_id' => '2',
+            'product_id' => '3',
+            'quantity' => '1',
         ]);
-    
-        
+
+
         CartItem::create([
             'customer_id' => '1',
             'product_id' => '1',
-            'promotion_id' =>null,
+            'promotion_id' => null,
             'quantity' => '2',
             'subtotal' => '200',
             'discount' => '0',
-            'total' => '200', 
+            'total' => '200',
         ]);
 
         CartItem::create([
@@ -154,18 +155,18 @@ class DatabaseSeeder extends Seeder
             'quantity' => '2',
             'subtotal' => '2000',
             'discount' => '0',
-            'total' => '2000', 
+            'total' => '2000',
         ]);
 
-        
+
         CartItem::create([
             'customer_id' => '1',
             'product_id' => null,
-            'promotion_id' =>'1',
+            'promotion_id' => '1',
             'quantity' => '2',
             'subtotal' => '2200',
             'discount' => '220',
-            'total' => '1980', 
+            'total' => '1980',
         ]);
 
         CartItem::create([
@@ -175,7 +176,7 @@ class DatabaseSeeder extends Seeder
             'quantity' => '2',
             'subtotal' => '4000',
             'discount' => '2000',
-            'total' => '2000', 
+            'total' => '2000',
         ]);
 
         Order::create([
@@ -187,6 +188,34 @@ class DatabaseSeeder extends Seeder
             'delivery_address' => 'Jl. Raya Bogor',
             'delivery_method' => 'JNE',
             'tracking_number' => '1234567890',
+            'created_at' => date_create('2024-09-19 00:00:00'),
+            'updated_at' => date_create('2024-09-19 00:00:00'),
+        ]);
+
+        Order::create([
+            'customer_id' => '1',
+            'subtotal' => '10000',
+            'total_discount' => '0',
+            'total' => '1000',
+            'status' => 'completed',
+            'delivery_address' => 'Jl. Raya Bogor',
+            'delivery_method' => 'JNE',
+            'tracking_number' => '1234567890',
+            'created_at' => date_create('2024-09-12 00:00:00'),
+            'updated_at' => date_create('2024-09-12 00:00:00'),
+        ]);
+
+        Order::create([
+            'customer_id' => '1',
+            'subtotal' => '5000',
+            'total_discount' => '0',
+            'total' => '10000',
+            'status' => 'cancelled',
+            'delivery_address' => 'Jl. Raya Bogor',
+            'delivery_method' => 'JNE',
+            'tracking_number' => '1234567890',
+            'created_at' => date_create('2024-08-19 00:00:00'),
+            'updated_at' => date_create('2024-08-19 00:00:00'),
         ]);
 
         OrderItem::create([
@@ -197,6 +226,8 @@ class DatabaseSeeder extends Seeder
             'discount' => '0',
             'total' => '10000',
         ]);
+
+
 
         Admin::create([
             'role' => 'manager',
@@ -232,6 +263,5 @@ class DatabaseSeeder extends Seeder
             'password' =>  '$2y$12$SPXDqYIUQGznYrtl7pxsAet5RAxKZhVb6r.9aEgylQlbP2DI89mJO',
             'status' => 'active',
         ]);
-        
     }
 }

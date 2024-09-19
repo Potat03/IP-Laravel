@@ -116,10 +116,10 @@
         ]);
 
         var options = {
-            title: 'Promotion Performance Report',
+            title: 'Revenue Report',
             chartArea: {width: '50%'},
             hAxis: {
-                title: 'Total Sales',
+                title: 'Total Revenue',
                 minValue: 0
             },
             vAxis: {
@@ -139,7 +139,7 @@
         ]);
 
         var options2 = {
-            title: 'Promotion Performance Report',
+            title: 'Products Sold Report',
             chartArea: {width: '50%'},
             hAxis: {
                 title: 'Total Sold',
