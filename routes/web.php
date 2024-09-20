@@ -41,8 +41,7 @@ Route::get('/shop/collectible', [CollectiblesController::class, 'index'])->name(
 Route::get('/shop/new-arrivals', [ProductController::class, 'newArrivals'])->name('shop.newArrivals');
 Route::get('/product/{id}', [ProductController::class, 'show'])->name('product');
 
-Route::get('/product/{id}', [ProductController::class, 'show'])->name('product');
-Route::get('/product/{id}', [ProductController::class, 'showProductImages']);
+// Route::get('/product/{id}', [ProductController::class, 'showProductImages']);
 
 // Route::get('/cart', function () {
 //     return view('cart');
