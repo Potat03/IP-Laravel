@@ -17,6 +17,7 @@ use App\Models\Consumable;
 use App\Models\Category;
 use App\Models\Rating;
 use App\Models\OrderItem;
+use App\Models\APIkey;
 use App\Contexts\ProductContext;
 use App\Strategies\WearableStrategy;
 use App\Strategies\CollectibleStrategy;
@@ -385,27 +386,6 @@ class ProductController extends Controller
             }
 
             return view('admin.product', ['products' => $products, 'categories' => $categories]);
-        } catch (Exception $e) {
-            return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
-        }
-    }
-
-    //python api
-    public function getAllProducts(Request $request)
-    {
-        try {
-            $products = Product::all();
-
-            $categoryController = new CategoryController();
-            $categories = $categoryController->index();
-
-            return response()->json([
-                'success' => true,
-                'data' => [
-                    'products' => $products,
-                    'categories' => $categories
-                ]
-            ], 200);
         } catch (Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
         }
@@ -868,5 +848,32 @@ class ProductController extends Controller
         }
 
         return $xml->asXML();
+    }
+
+    //python api
+    public function getAllProducts(Request $request)
+    {
+        try {
+            $api = APIKEY::where('api_key', $request->api_key)->first();
+
+            if (!$api) {
+                return response()->json(['success' => false, 'message' => 'invalid request'], 400);
+            }
+
+            $products = Product::all();
+
+            $categoryController = new CategoryController();
+            $categories = $categoryController->index();
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'products' => $products,
+                    'categories' => $categories
+                ]
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
+        }
     }
 }

@@ -23,6 +23,7 @@
     use App\Http\Middleware\CustomerAuth;
     use App\Http\Middleware\AdminAuth;
     use App\Http\Controllers\APIkeyController;
+use App\Models\Product;
 
     Route::get('/auth', [AuthController::class, 'showCustomerForm'])->name('auth.showForm');
     Route::group(['middleware' => ['web']], function () {
@@ -56,8 +57,8 @@
     Route::get('/product/generateTable', [ProductController::class, 'generateTable']);
 
     //provide api return json responses
-    Route::get('/products', [ProductController::class, 'getAllProducts'])->name('api.products');
-    Route::get('/products/product/{id}', [ProductController::class, 'getOneProduct'])->name('api.product');
+    // Route::get('/products', [ProductController::class, 'getAllProducts'])->name('api.products');
+    // Route::get('/products/product/{id}', [ProductController::class, 'getOneProduct'])->name('api.product');
 
     Route::post('/category/store', [CategoryController::class, 'store'])->name('admin.category.store');
     Route::post('/category/update/{id}', [CategoryController::class, 'update'])->name('admin.category.update');
@@ -106,4 +107,5 @@
 
     Route::group(['prefix' => 'public'], function () {
         Route::post('/promotions', [PromotionController::class, 'promotionPublic']);
+        Route::post('/products', [ProductController::class, 'getAllProducts']);
     });
