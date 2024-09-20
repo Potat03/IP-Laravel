@@ -38,10 +38,12 @@
                     <a class="nav-link active" id="products-tab" data-bs-toggle="tab" href="#products" role="tab"
                         aria-controls="products" aria-selected="true">Products</a>
                 </li>
+                @if (Auth::guard('admin')->user()->role != 'customer_service') 
                 <li class="nav-item" role="presentation">
                     <a class="nav-link" id="categories-tab" data-bs-toggle="tab" href="#categories" role="tab"
                         aria-controls="categories" aria-selected="false">Categories</a>
                 </li>
+                @endif
             </ul>
             <div class="tab-content mt-3" id="myTabContent">
                 <div class="tab-pane fade show active" id="products" role="tabpanel" aria-labelledby="products-tab">
@@ -51,6 +53,7 @@
                         <button class="btn btn-outline-secondary" type="button" id="search-btn"><i
                                 class="fa-solid fa-magnifying-glass"></i></button>
                     </div>
+                    @if (Auth::guard('admin')->user()->role != 'customer_service') 
                     <div class="card-title d-flex px-3">
                         <div class="ms-auto">
                             <button class="btn btn-primary"
@@ -58,6 +61,7 @@
                                     class="fa-regular fa-square-plus pe-2"></i>Add Product</button>
                         </div>
                     </div>
+                    @endif
                     <table class="table">
                         <thead>
                             <tr>
@@ -88,15 +92,22 @@
                                         <td class="text-danger fw-bold">{{ $product->status }}</td>
                                     @endif
                                     <td>
+                                        @if (Auth::guard('admin')->user()->role != 'customer_service') 
                                         <button class="btn btn-warning"
                                             onclick="window.location.href='{{ route('admin.product.edit', $product->product_id) }}'"><i
                                                 class="fa-regular fa-pen-to-square pe-2"></i>Edit</button>
+                                        @else
+                                        <button class="btn btn-info"
+                                            onclick="window.location.href='{{ route('admin.product.view', $product->product_id) }}'"><i
+                                                class="fa-regular fa-pen-to-square pe-2"></i>View</button>
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach
                         </tbody>
                     </table>
                 </div>
+                @if (Auth::guard('admin')->user()->role != 'customer_service') 
                 <div class="tab-pane fade" id="categories" role="tabpanel" aria-labelledby="categories-tab">
                     <div class="card-title d-flex px-3">
                         <div class="ms-auto">
@@ -121,6 +132,7 @@
                                     <td>{{ $category->category_name }}</td>
                                     <td>{{ $category->description }}</td>
                                     <td>
+                                        
                                         <button class="btn btn-warning"
                                             onclick="window.location.href='{{ route('admin.category.edit', $category->id) }}'"><i
                                                 class="fa-regular fa-pen-to-square pe-2"></i>Edit</button>
@@ -137,6 +149,7 @@
                         </tbody>
                     </table>
                 </div>
+                @endif
             </div>
         </div>
     </div>

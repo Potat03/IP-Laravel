@@ -2,6 +2,10 @@
 
 @section('title', 'Chat Report')
 
+@section('vite')
+    @vite(['resources/css/app.css', 'resources/sass/app.scss', 'resources/js/app.js', 'resources/css/admin-nav.css', 'resources/js/bootstrap.js'])
+@endsection
+
 @section('css')
 <link href="{{ asset('css/chat_report.css') }}" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

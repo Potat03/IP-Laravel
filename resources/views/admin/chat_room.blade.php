@@ -6,7 +6,7 @@
 <link href="{{ asset('css/chat_room.css') }}" rel="stylesheet">
 @endsection
 
-
+@section('prev_page', route('admin.main'))
 @section('page_title', 'Support Chat')
 @section('page_gm', 'Be kind and help our customer')
 
@@ -27,16 +27,6 @@
             <div class="user_info">
                 <div class="user_name chat_hide" id="user_name"></div>
                 <div class="action_bar chat_hide" title="View Their Cart">
-                    <div class="view_order icon_action">
-                        <i class="fa-regular fa-cart-shopping"></i>
-                    </div>
-                    <div class="view_order icon_action">
-                        <i class="fa-regular fa-box"></i>
-                    </div>
-                    <div class="view_pre_chat icon_action" title="View Their Chat History">
-                        <i class="fa-regular fa-comments-question"></i>
-                    </div>
-
                     <div class="main_action">
                         <div class="take_chat">
                             Accept
@@ -84,6 +74,7 @@
     let live_update_interval = null;
     let live_chat_list_interval = null;
     var selected_chat_id = 0;
+    var productRoute = "{{ url('admin/product/view') }}";
     $(document).ready(function() {
 
         getChatList();
@@ -509,9 +500,9 @@
                             }
                         } else if (element['type'] === 'PRODUCT') {
                             if (element['by_customer']) {
-                                html = '<div class="chat_msg admin_msg product_msg"><div class="product_msg_header"><img src="' + element['image'] + '" alt="Product Image"><div class="product_msg_title">' + element['name'] + '(' + element['id'] + ')</div></div><div class="product_msg_link"><hr><a class="product_msg_footer" href="#">Click to View</a></div></div>';
+                                html = '<div class="chat_msg user_msg product_msg"><div class="product_msg_header"><img src="' + element['image'] + '" alt="Product Image"><div class="product_msg_title">' + element['name'] + '(' + element['id'] + ')</div></div><div class="product_msg_link"><hr><a class="product_msg_footer" href="' + productRoute + '/' + element['id'] + '" target="_blank">Click to View</a></div></div>';
                             } else {
-                                html = '<div class="chat_msg user_msg product_msg"><div class="product_msg_header"><img src="' + element['image'] + '" alt="Product Image"><div class="product_msg_title">' + element['name'] + '(' + element['id'] + ')</div></div><div class="product_msg_link"><hr><a class="product_msg_footer" href="#">Click to View</a></div></div>';
+                                html = '<div class="chat_msg admin_msg product_msg"><div class="product_msg_header"><img src="' + element['image'] + '" alt="Product Image"><div class="product_msg_title">' + element['name'] + '(' + element['id'] + ')</div></div><div class="product_msg_link"><hr><a class="product_msg_footer" href="' + productRoute + '/' + element['id'] + '" target="_blank">Click to View</a></div></div>';
                             }
                         }
                         $('.chat_content').append(html);
@@ -582,7 +573,7 @@
 
                             image_load.push(deferred.promise());
                         } else if (element['type'] === 'PRODUCT') {
-                            messageHtml = '<div class="chat_msg ' + (element['by_customer'] ? 'user_msg product_msg' : 'admin_msg product_msg') + ' show"><div class="product_msg_header"><img src="' + element['image'] + '" alt="Product Image"><div class="product_msg_title">' + element['name'] + '(' + element['id'] + ')</div></div><div class="product_msg_link"><hr><a class="product_msg_footer" href="#">Click to View</a></div></div>';
+                            messageHtml = '<div class="chat_msg ' + (element['by_customer'] ? 'user_msg' : 'admin_msg') + ' product_msg show"><div class="product_msg_header"><img src="' + element['image'] + '" alt="Product Image"><div class="product_msg_title">' + element['name'] + '(' + element['id'] + ')</div></div><div class="product_msg_link"><hr><a class="product_msg_footer" href="' + productRoute + '/' + element['id'] + '" target="_blank">Click to View</a></div></div>';
                         }
 
                         $('.chat_content').append(messageHtml);
