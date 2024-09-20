@@ -47,24 +47,6 @@ Route::get('/promotion/{id}', [PromotionController::class, 'viewDetails'])->name
 Route::get('/product/{id}', [ProductController::class, 'showProductImages']);
 
 
-Route::get('/cart', [CartItemController::class, 'getCartItemByCustomerID']);    
-// Route::get('/cart', function () {
-//     return view('cart');
-// });
-
-Route::get('/cart', [CartItemController::class, 'getCartItemByCustomerID']);
-
-Route::get('/payment', function () {
-    return view('payment');
-});
-
-Route::post('/session', [StripeController::class, 'session'])->name('session');
-// Route::get('/success', [StripeController::class, 'success'])->name('success');
-Route::get('/success', [PaymentController::class, 'processCheckout'])->name('success');
-
-Route::get('/tracking', [OrderController::class, 'getOrderByCustomerID']);    
-Route::get('/orders/getMonthlySales', [OrderController::class, 'getMonthlySales']);
-
 //Chat
 Route::post('/sendMsg', [ChatMessageController::class, 'sendMessage'])->name('sendMsg');
 Route::post('/acceptChat', [ChatMessageController::class, 'acceptChat'])->name('acceptChat');
@@ -105,14 +87,42 @@ Route::get('/enterForgetPassword', function () {
 
 //Auth
 Route::middleware([CustomerAuth::class])->group(function () {
-
     Route::get('/profileSec', [CustomerController::class, 'profileSec'])->name('user.profileSec');
     Route::get('/orderHistorySec', [CustomerController::class, 'orderHistorySec'])->name('user.orderHistorySec');
     Route::get('/shippingSec', [CustomerController::class, 'shippingSec'])->name('user.shippingSec');
     Route::get('/supportChatSec', [CustomerController::class, 'supportChatSec'])->name('user.supportChatSec');
     Route::get('/settingSec', [CustomerController::class, 'settingSec'])->name('user.settingSec');
     Route::put('/profile/update', [CustomerController::class, 'updateProfile'])->name('profile.update');
+
+   
 });
+
+//ws
+//communication security 
+Route::middleware([CustomerAuth::class])->group(function () {
+    Route::get('/cart', [CartItemController::class, 'getCartItemByCustomerID']);
+    Route::get('/payment', function () {
+        return view('payment');
+    });  
+    Route::post('/session', [StripeController::class, 'session'])->name('session');
+    Route::get('/success', [PaymentController::class, 'processCheckout'])->name('success');
+    Route::get('/fail',  function () {
+        return view('checkoutFail');
+    })->name('fail');
+
+    Route::get('/tracking', [OrderController::class, 'getOrderByCustomerID']);    
+});
+
+//communication security 
+Route::middleware([AdminAuth::class])->group(function () {
+    Route::get('/admin/orders/prepare', [OrderController::class, 'getPrepareOrders'])->name('admin.orders_prepare');
+    Route::get('/admin/orders/delivery', [OrderController::class, 'getDeliveryOrders'])->name('admin.orders_delivery');
+    Route::get('/admin/orders/delivered', [OrderController::class, 'getDeliveredOrders'])->name('admin.orders_delivered');
+    Route::get('/admin/orders/orderStatusReport', [OrderController::class, 'generateOrderStatusReport'])->name('admin.orders.sales_report');
+});
+
+
+
 
 Route::middleware([AdminAuth::class])->group(function () {
     Route::get('/adminChat', function () {
@@ -147,12 +157,6 @@ Route::middleware([AdminAuth::class])->group(function () {
     Route::get('/admin/promotion/revert', [PromotionController::class, 'undoListPromotion'])->name('admin.promotion.revert');
     Route::get('/admin/promotion/report', [PromotionController::class, 'generatePromotionReport'])->name('admin.promotion.report');
     Route::get('/admin/promotion/report/download', [PromotionController::class, 'downloadXMLReport'])->name('admin.promotion.report.download');
-
-    Route::get('/admin/orders/prepare', [OrderController::class, 'getPrepareOrders'])->name('admin.orders_prepare');
-    Route::get('/admin/orders/delivery', [OrderController::class, 'getDeliveryOrders'])->name('admin.orders_delivery');
-    Route::get('/admin/orders/delivered', [OrderController::class, 'getDeliveredOrders'])->name('admin.orders_delivered');
-    Route::get('/admin/orders/orderStatusReport', [OrderController::class, 'generateOrderStatusReport'])->name('admin.orders.sales_report');
-
 
 });
 

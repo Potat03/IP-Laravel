@@ -18,13 +18,17 @@ use Stripe\Charge;
 
 
 
+
 class PaymentController extends Controller
 {
     
     public function processCheckout(Request $request)
 {
-           $customerID = 1;
-    $request->validate([
+     //comunication security     
+     $user = Auth::guard('customer')->user();
+     $customerID = $user->customer_id;
+     
+     $request->validate([
         'first_name' => 'required|regex:/^[\pL\s]+$/u',
         'last_name' => 'required|regex:/^[\pL\s]+$/u',
         'delivery_address' => 'required|string',
@@ -111,20 +115,27 @@ class PaymentController extends Controller
             $cartItem->delete(); 
 
            }
-         
-        return response()->json([
-            'success' => true,
-            'message' => 'Form submitted successfully',
-            'data' => [
-                'first_name' => $request->input('first_name'),
-                'last_name' => $request->input('last_name'),
-                'delivery_address' => $request->input('delivery_address'),
-                'email' => $request->input('email'),
-                'phone_number' => $request->input('phone_number'),
-            ]
-        ]);
+           return view('checkoutSuccess', [
+            'first_name' => $request->input('first_name'),
+            'last_name' => $request->input('last_name'),
+            'delivery_address' => $request->input('delivery_address'),
+            'email' => $request->input('email'),
+            'phone_number' => $request->input('phone_number'),
+            'order' => $order
+        ]);  
+        // return response()->json([
+        //     'success' => true,
+        //     'message' => 'Form submitted successfully',
+        //     'data' => [
+        //         'first_name' => $request->input('first_name'),
+        //         'last_name' => $request->input('last_name'),
+        //         'delivery_address' => $request->input('delivery_address'),
+        //         'email' => $request->input('email'),
+        //         'phone_number' => $request->input('phone_number'),
+        //     ]
+        // ]);
 
-
+       
 
     
 }

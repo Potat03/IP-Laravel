@@ -3,6 +3,7 @@
     use Illuminate\Http\Request;
     use Illuminate\Support\Facades\Route;
     use App\Http\Controllers\ProductController;
+    use App\Http\Controllers\PaymentController;
     use App\Http\Controllers\CategoryController;
     use App\Http\Controllers\PromotionController;
     use App\Http\Middleware\customAuth;
@@ -36,6 +37,22 @@
 
         Route::post('/admin/login', [AuthController::class, 'adminLogin'])->name('auth.adminLogin');
         Route::post('/admin/logout', [AuthController::class, 'adminLogout'])->name('auth.adminLogout');
+
+
+        Route::post('/cartItem/removeCartItem/{id}', [CartItemController::class, 'removeCartItem']);
+        Route::post('/cart/updateSubtotal', [CartController::class, 'updateSubtotal']);
+        Route::post('/cart/updateTotal', [CartController::class, 'updateTotal']);
+        Route::post('/cart/updateDiscount', [CartController::class, 'updateDiscount']);
+        Route::post('/cartItem/updateQuantity/{id}', [CartItemController::class, 'updateQuantity']);
+        Route::post('/cartItem/updateDiscount/{id}', [CartItemController::class, 'updateDiscount']);
+        Route::post('/cartItem/updateSubtotal/{id}', [CartItemController::class, 'updateSubtotal']);
+        Route::post('/cartItem/updateTotal/{id}', [CartItemController::class, 'updateTotal']);
+
+        Route::post('/order/proceedToNext/{id}', [OrderController::class, 'proceedToNext']);
+        Route::post('/order/receive/{id}', [OrderController::class, 'receiveOrder']);
+
+
+
     });
     Route::post('/resendOtp', [AuthController::class, 'resendOtp'])->name('auth.resendOtp');
 
@@ -68,28 +85,12 @@
     Route::post('/cartItem/upload', [CartController::class, 'addToCart'])->name('cart.add');
 
     //Cart Item
-    Route::get('/cartItem/getCartItemByCustomerID/{customerID}', [CartItemController::class, 'getCartItemByCustomerID']);
-
-
-
-    Route::post('/cartItem/updateQuantity/{id}', [CartItemController::class, 'updateQuantity']);
-    Route::post('/cartItem/updateDiscount/{id}', [CartItemController::class, 'updateDiscount']);
-    Route::post('/cartItem/updateSubtotal/{id}', [CartItemController::class, 'updateSubtotal']);
-    Route::post('/cartItem/updateTotal/{id}', [CartItemController::class, 'updateTotal']);
-    Route::post('/cartItem/removeCartItem/{id}', [CartItemController::class, 'removeCartItem']);
-
-
-    //Cart
-    Route::post('/cart/updateSubtotal', [CartController::class, 'updateSubtotal']);
-    Route::post('/cart/updateTotal', [CartController::class, 'updateTotal']);
-    Route::post('/cart/updateDiscount', [CartController::class, 'updateDiscount']);
+    // Route::get('/cartItem/getCartItemByCustomerID/{customerID}', [CartItemController::class, 'getCartItemByCustomerID']);
 
     //Payment
-    Route::post('/checkout', [PaymentController::class, 'processCheckout']);
+    // Route::post('/checkout', [PaymentController::class, 'processCheckout']);
 
     //Order
-    Route::post('/order/proceedToNext/{id}', [OrderController::class, 'proceedToNext']);
-    Route::post('/order/receive/{id}', [OrderController::class, 'receiveOrder']);
 
 
 

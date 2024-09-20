@@ -7,7 +7,6 @@ use App\Models\CartItem;
 use App\Models\Product;
 use App\Models\Promotion;
 use Illuminate\Support\Facades\Auth;
-
 use function Laravel\Prompts\error;
 use function Pest\Laravel\json;
 use App\Models\Cart;
@@ -81,12 +80,12 @@ class CartController extends Controller
 
         return response()->json(['success' => true, 'message' => 'Item added to cart']);
     }
+
     public function updateSubtotal(Request $request)
     {
-        //$user = Auth::guard('customer')->user();
-        //$customerID = $user->id;
-            
-        $customerID = 1;
+        //comunication security     
+        $user = Auth::guard('customer')->user();
+        $customerID = $user->customer_id;
         
         //Databse security
         $request->validate([
@@ -107,11 +106,10 @@ class CartController extends Controller
 
     public function updateTotal(Request $request)
     {
-              //$user = Auth::guard('customer')->user();
-            //$customerID = $user->id;
-            
-            $customerID = 1;
-            
+        //comunication security     
+            $user = Auth::guard('customer')->user();
+            $customerID = $user->customer_id;
+                        
         //Databse security
         $request->validate([
             'total' => 'required|numeric',
@@ -131,10 +129,10 @@ class CartController extends Controller
 
     public function updateDiscount(Request $request)
     {
-              //$user = Auth::guard('customer')->user();
-            //$customerID = $user->id;
-            
-            $customerID = 1;
+          //comunication security     
+          $user = Auth::guard('customer')->user();
+          $customerID = $user->customer_id;
+      
 
         //Databse security
         $request->validate([

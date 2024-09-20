@@ -2,6 +2,7 @@
 
 @section('vite')
     @vite(['resources/css/app.css', 'resources/sass/app.scss', 'resources/js/app.js', 'resources/css/admin-nav.css', 'resources/js/bootstrap.js'])
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 @endsection
 
 @section('css')
@@ -81,10 +82,16 @@ onclick="location.href='{{url('/admin/orders/delivered')}}'">
 <script>
 function proceedToNext(id) {
     var row = document.getElementById(`row_${id}`);
+    var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
     fetch(`/api/order/proceedToNext/${id}`, {
             method: 'POST',
-
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            },
+            // If you need to send additional data, include it in the body
+            // body: JSON.stringify({ /* data */ })
         })
         .then(response => response.json())
         .then(data => {
