@@ -20,8 +20,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\StripeController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\OrderController;
-use Spatie\Analytics\Facades\Analytics;
-use Spatie\Analytics\Period;
+use App\Http\Controllers\AdminCustomerController;
 
 
 
