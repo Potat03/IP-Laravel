@@ -4,6 +4,7 @@ use App\Http\Middleware\customAuth;
 use App\Http\Middleware\AdminAuth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\AdminCustomerController;
 use App\Http\Controllers\ChatMessageController;
 use App\Http\Controllers\CollectiblesController;
 use App\Http\Controllers\ConsumablesController;
