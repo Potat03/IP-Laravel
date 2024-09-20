@@ -147,11 +147,26 @@ class ChatPolicy
     }
 
     // Check status of user before allowing any access
-    public function checkStatus(UserInterface $user)
+    private function checkStatus(UserInterface $user)
     {
         if ($user->getStatus() === 'active') {
             return true;
         }
+        return false;
+    }
+
+    public function generateReport(UserInterface $user)
+    {
+        // If account is inactive, no access
+        if (!$this->checkStatus($user)) {
+            return false;
+        }
+
+        // Only manager can generate report
+        if ($user->getRole() === 'manager') {
+            return true;
+        }
+
         return false;
     }
 }

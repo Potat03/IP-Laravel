@@ -729,4 +729,26 @@ class ChatMessageController extends Controller
             return false;
         }
     }
+
+    public function generateReport() {
+        try {
+            // Check if got logged in
+            if (!Auth::guard('admin')->check()) {
+                throw new \Exception('Unauthorized');
+            }
+
+            $user = Auth::guard('admin')->user();
+
+            if (Gate::forUser($user)->denies('generateReport')) {
+                throw new \Exception('You are not allowed to generate report.');
+            }
+
+
+
+        } catch (\Exception $e) {
+            return redirect()->route('admin.dashboard');
+        }
+
+    }
+
 }

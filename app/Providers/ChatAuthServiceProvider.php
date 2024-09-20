@@ -29,5 +29,7 @@ class ChatAuthServiceProvider extends ServiceProvider
         Gate::define('acceptChat', [ChatPolicy::class, 'acceptChat']);
        
         Gate::define('endChat', [ChatPolicy::class, 'endChat']);
+
+        Gate::define('generateReport', [ChatPolicy::class, 'generateReport']);
     }
 }

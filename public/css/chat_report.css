@@ -1,7 +1,7 @@
 @import url('color.css');
 
 .chat_rating {
-    max-height: 350px;
+    height: 350px;
 }
 
 .report_content_wrap{

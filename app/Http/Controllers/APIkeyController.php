@@ -20,7 +20,7 @@ class APIkeyController extends Controller
 
         //use guard to check if allowed
         if ($user->role !== 'manager' || $user->status !== 'active') {
-            return redirect()->route('admin.login');
+            return redirect()->route('admin.main');
         }
         $keys = APIKey::all();
 

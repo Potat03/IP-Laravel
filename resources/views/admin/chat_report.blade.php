@@ -50,14 +50,12 @@
             </div>
         </div>
     </div>
-
 </div>
 @endsection
 
 @section('js')
 <script>
-    //create a bar chart using jquery
-    $(document).ready(function() {
+    function generateChart(data) {
         var ctx = document.getElementById('chat_rating_chart').getContext('2d');
         var myChart = new Chart(ctx, {
             type: 'bar',
@@ -65,7 +63,7 @@
                 labels: ['1', '2', '3', '4', '5'],
                 datasets: [{
                     label: 'Total Chat',
-                    data: [12, 19, 3, 5, 2],
+                    data: data,
                     backgroundColor: [
                         'rgba(255, 99, 132, 0.2)', // Rating 1 - Red
                         'rgba(255, 159, 64, 0.2)', // Rating 2 - Orange
@@ -100,7 +98,7 @@
                     x: {
                         title: {
                             display: true,
-                            text: 'Rating', // Label for x-axis
+                            text: 'Rating',
                             font: {
                                 size: 14
                             },
@@ -121,6 +119,6 @@
                 }
             }
         });
-    });
+    }
 </script>
 @endsection
