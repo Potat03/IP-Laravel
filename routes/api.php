@@ -11,6 +11,7 @@
     use App\Http\Controllers\CartItemController;
     use App\Http\Controllers\OrderController;
     use App\Http\Controllers\PaymentController;
+    use App\Http\Controllers\ChatMessageController;
 
 
 
@@ -43,6 +44,7 @@
         Route::middleware([AdminAuth::class])->group(function () {
             Route::post('/admin/apikey/create', [APIkeyController::class, 'createKey'])->name('admin.apikey.create');
             Route::post('/admin/apikey/delete', [APIkeyController::class, 'deleteKey'])->name('admin.apikey.delete');
+            Route::post('/admin/generateReport', [ChatMessageController::class, 'generateReport'])->name('admin.chat_report');
         });
     });
     Route::post('/resendOtp', [AuthController::class, 'resendOtp'])->name('auth.resendOtp');

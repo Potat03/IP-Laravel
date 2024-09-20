@@ -22,6 +22,7 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\OrderController;
 use Spatie\Analytics\Facades\Analytics;
 use Spatie\Analytics\Period;
+use App\Http\Controllers\AdminCustomerController;
 
 
 
@@ -144,9 +145,9 @@ Route::middleware([AdminAuth::class])->group(function () {
         return view('admin.product');
     });
 
-    Route::get('/admin/chatReport', function () {
-        return view('admin.chat_report');
-    });
+    Route::get('/admin/chatReport', [ChatMessageController::class, 'generateReport']);
+    Route::get('/admin/apikey', [APIkeyController::class, 'listKey'])->name('admin.apikey');
+    
 
     Route::get('/product/get/images/{id}', [ProductController::class, 'showProductImagesAdmin']);
 
@@ -165,7 +166,6 @@ Route::middleware([AdminAuth::class])->group(function () {
     Route::get('/admin/promotion/report', [PromotionController::class, 'generatePromotionReport'])->name('admin.promotion.report');
     Route::get('/admin/promotion/report/download', [PromotionController::class, 'downloadXMLReport'])->name('admin.promotion.report.download');
 
-    Route::get('/admin/apikey', [APIkeyController::class, 'listKey'])->name('admin.apikey');
     Route::get('/admin/customer', [AdminCustomerController::class, 'getAll'])->name('admin.customer');
     Route::post('/admin/customer/{id}/update', [AdminCustomerController::class, 'update'])->name('admin.customer.update');
     Route::get('/admin/customer/report', [AdminCustomerController::class, 'showReportPage'])->name('admin.customer.report');
@@ -197,15 +197,6 @@ Route::get('/template', function () {
 Route::get('/adminLogin', [AuthController::class, 'showAdminLoginForm']);
 Route::post('/adminLogin', [AuthController::class, 'adminLogin'])->name('admin.login');
 Route::get('/adminLogout', [AuthController::class, 'adminLogout'])->name('admin.logout');
-
-Route::middleware([AdminAuth::class])->group(function () {
-    Route::get('/adminChat', function () {
-        return view('adminChat');
-    });
-    Route::get('/adminChat2', function () {
-        return view('admin.chat_room');
-    })->name('admin.main');
-});
 
 Route::get('/chat', [ChatController::class, 'index']);
 Route::post('/chat', [ChatController::class, 'store']);
