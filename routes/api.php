@@ -10,6 +10,7 @@
     use App\Http\Controllers\CartController;
     use App\Http\Controllers\CartItemController;
     use App\Http\Controllers\OrderController;
+    use App\Http\Controllers\AdminCustomerController;
     use App\Http\Controllers\PaymentController;
 
 
@@ -60,6 +61,8 @@
     // Route::get('/products', [ProductController::class, 'getAllProducts'])->name('api.products');
     // Route::get('/products/product/{id}', [ProductController::class, 'getOneProduct'])->name('api.product');
 
+    Route::get('/api/customer_report', [AdminCustomerController::class, 'customerReportAPI']);
+    
     Route::post('/category/store', [CategoryController::class, 'store'])->name('admin.category.store');
     Route::post('/category/update/{id}', [CategoryController::class, 'update'])->name('admin.category.update');
     Route::delete('/category/{id}', [CategoryController::class, 'destroy'])->name('admin.category.delete');
@@ -72,8 +75,6 @@
     Route::put('/promotion/edit/status/{id}', [PromotionController::class, 'togglePromotion']);
     Route::post('/promotion/restore/{id}', [PromotionController::class, 'undoDeletePromotion']);
     Route::post('/promotion/revert/{id}', [PromotionController::class, 'undoUpdatePromotion']);
-
-
 
     Route::post('/product/image/upload', [ProductController::class, 'productImageUpload']);
     // Route::get('/product/generateTable', [ProductController::class, 'generateTable']);
@@ -102,7 +103,6 @@
     //Order
     Route::post('/order/proceedToNext/{id}', [OrderController::class, 'proceedToNext']);
     Route::post('/order/receive/{id}', [OrderController::class, 'receiveOrder']);
-
 
 
     Route::group(['prefix' => 'public'], function () {
