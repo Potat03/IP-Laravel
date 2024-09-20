@@ -104,6 +104,6 @@
 
 
 
-
-
-   
+    Route::group(['prefix' => 'public'], function () {
+        Route::post('/promotions', [PromotionController::class, 'promotionPublic']);
+    });
