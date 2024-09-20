@@ -111,6 +111,12 @@
                             API
                         </a>
                     </li>
+                    <li @stack('adminManage')>
+                        <a href="{{ route('admin.staff') }}" style="width: 100%;display: block;">
+                            <i class="fa-regular fa-user"></i>
+                            Staff
+                        </a>
+                    </li>
                     <li @stack('report')>
                         <a class="w-100" type="button" data-bs-toggle="collapse" href="#collapseReport" role="button" aria-expanded="false" aria-controls="collapseReport">
                             <i class="fa-regular fa-chart-bar"></i>
