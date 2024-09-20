@@ -156,9 +156,9 @@
                             }
                         } else if (element['type'] === 'PRODUCT') {
                             if (element['by_customer']) {
-                                $('.popup_box_body_chat').append('<div class="popup_box_body_chat_msg admin product_msg"><div class="product_msg_header"><img src="' + element['image'] + '" alt="Product Image"><div class="product_msg_title">' + element['name'] + '(' + element['id'] + ')</div></div><div class="product_msg_link"><hr><a class="product_msg_footer" href="' + productRoute + '/' + element['id'] + '">Click to View</a></div></div>');
-                            } else {
                                 $('.popup_box_body_chat').append('<div class="popup_box_body_chat_msg user product_msg"><div class="product_msg_header"><img src="' + element['image'] + '" alt="Product Image"><div class="product_msg_title">' + element['name'] + '(' + element['id'] + ')</div></div><div class="product_msg_link"><hr><a class="product_msg_footer" href="' + productRoute + '/' + element['id'] + '">Click to View</a></div></div>');
+                            } else {
+                                $('.popup_box_body_chat').append('<div class="popup_box_body_chat_msg admin product_msg"><div class="product_msg_header"><img src="' + element['image'] + '" alt="Product Image"><div class="product_msg_title">' + element['name'] + '(' + element['id'] + ')</div></div><div class="product_msg_link"><hr><a class="product_msg_footer" href="' + productRoute + '/' + element['id'] + '">Click to View</a></div></div>');
                             }
                         }
                     });
