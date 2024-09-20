@@ -23,7 +23,7 @@
     use App\Http\Middleware\CustomerAuth;
     use App\Http\Middleware\AdminAuth;
     use App\Http\Controllers\APIkeyController;
-use App\Models\Product;
+    use App\Models\Product;
 
     Route::get('/auth', [AuthController::class, 'showCustomerForm'])->name('auth.showForm');
     Route::group(['middleware' => ['web']], function () {
@@ -108,4 +108,5 @@ use App\Models\Product;
     Route::group(['prefix' => 'public'], function () {
         Route::post('/promotions', [PromotionController::class, 'promotionPublic']);
         Route::post('/products', [ProductController::class, 'getAllProducts']);
+        Route::post('/products/report', [ProductController::class, 'monthlyProductReport']);
     });

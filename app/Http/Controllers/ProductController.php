@@ -876,4 +876,58 @@ class ProductController extends Controller
             return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
         }
     }
+
+    public function monthlyProductReport(Request $request)
+    {
+        try {
+            $products = Product::all();
+
+            $totalValue = Product::sum(DB::raw('price * stock'));
+
+            $cogs = OrderItem::select(DB::raw('SUM(order_items.quantity * product.price) as total'))
+                ->join('product', 'order_items.product_id', '=', 'product.product_id')
+                ->whereMonth('order_items.created_at', '=', date('m'))
+                ->value('total');
+
+            $averageInventory = Product::avg('stock');
+            $inventoryTurnoverRate = $averageInventory ? $cogs / $averageInventory : 0;
+
+            $monthlySales = OrderItem::select('product_id', DB::raw('SUM(quantity) as total_sold'))
+                ->whereMonth('created_at', '=', date('m'))
+                ->groupBy('product_id')
+                ->pluck('total_sold', 'product_id');
+
+            $averageMonthlySales = OrderItem::select('product_id', DB::raw('AVG(quantity) as average_sold'))
+                ->groupBy('product_id')
+                ->pluck('average_sold', 'product_id');
+
+            $reorderRecommendations = [];
+            $leadTimeMonths = 3;
+
+            foreach ($products as $product) {
+                $averageSold = $averageMonthlySales[$product->product_id] ?? 0;
+                $currentStock = $product->stock;
+
+                if ($averageSold > 0) {
+                    $recommendedQuantity = ($averageSold * $leadTimeMonths) - $currentStock;
+                    if ($recommendedQuantity > 0) {
+                        $reorderRecommendations[$product->product_id] = $recommendedQuantity;
+                    }
+                }
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'products' => $products,
+                    'totalValue' => $totalValue,
+                    'inventoryTurnoverRate' => $inventoryTurnoverRate,
+                    'reorderRecommendations' => $reorderRecommendations,
+                    'monthlySales' => $monthlySales
+                ]
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
+        }
+    }
 }
