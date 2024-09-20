@@ -45,6 +45,12 @@
             </ul>
             <div class="tab-content mt-3" id="myTabContent">
                 <div class="tab-pane fade show active" id="products" role="tabpanel" aria-labelledby="products-tab">
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" id="search" name="search" placeholder="Search" aria-label="Search"
+                            aria-describedby="search-btn">
+                        <button class="btn btn-outline-secondary" type="button" id="search-btn"><i
+                                class="fa-solid fa-magnifying-glass"></i></button>
+                    </div>
                     <div class="card-title d-flex px-3">
                         <div class="ms-auto">
                             <button class="btn btn-primary"
@@ -176,5 +182,32 @@
         function confirmDeletion() {
             return confirm('Are you sure you want to delete this category? This action cannot be undone.');
         }
+
+        $(document).ready(function() {
+            $('#search, .form-check-input').on('change keyup', function() {
+                filterProducts();
+            });
+
+            function filterProducts() {
+                let search = $('#search').val();
+                let categories = [];
+                $('.form-check-input:checked').each(function() {
+                    categories.push($(this).val());
+                });
+
+                let url = window.location.pathname;
+
+                $.ajax({
+                    url: url,
+                    method: 'GET',
+                    data: {
+                        search: search,
+                    },
+                    success: function(response) {
+                        $('#data-holder').html(response);
+                    }
+                });
+            }
+        });
     </script>
 @endsection

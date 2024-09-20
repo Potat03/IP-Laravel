@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * Author: Lim Weng Ni
@@ -16,6 +17,7 @@ use App\Models\Consumable;
 use App\Models\Category;
 use App\Models\Rating;
 use App\Models\OrderItem;
+use App\Models\APIkey;
 use App\Contexts\ProductContext;
 use App\Strategies\WearableStrategy;
 use App\Strategies\CollectibleStrategy;
@@ -302,21 +304,19 @@ class ProductController extends Controller
         }
     }
 
+    //for customer side
     public function index(Request $request)
     {
         try {
             $query = $request->input('search');
             $categoryNames = $request->input('categories', []);
 
-            // Initialize the product query
             $productQuery = Product::query();
 
-            // Apply search filter if provided
             if ($query) {
                 $productQuery->where('name', 'LIKE', "%$query%");
             }
 
-            // Apply category filter if provided
             if (!empty($categoryNames)) {
                 $productQuery->whereIn('product_id', function ($subQuery) use ($categoryNames) {
                     $subQuery->select('product_id')
@@ -327,25 +327,20 @@ class ProductController extends Controller
                 });
             }
 
-            // Paginate products
             $products = $productQuery->paginate(20);
 
-            // Extract product IDs from the paginated results
-            $productIds = $products->items(); // Get the items on the current page
-            $productIds = collect($productIds)->pluck('product_id')->toArray(); // Convert to collection and pluck IDs
+            $productIds = $products->items();
+            $productIds = collect($productIds)->pluck('product_id')->toArray();
 
-            // Fetch main images using the ProductController's getMainImages method
             $productController = new ProductController();
             $mainImages = $productController->getMainImages($productIds);
 
-            // Fetch ratings for products
             $ratingController = new RatingController();
             $productsWithRatings = $ratingController->fetchRatingsForShop($productIds, $products);
 
-            // Fetch all categories for view
             $categories = Category::all();
 
-            // Return view based on AJAX request
+            // use AJAX request return for searching
             if ($request->ajax()) {
                 return view('shop.partials.product-list', [
                     'products' => $productsWithRatings,
@@ -354,7 +349,7 @@ class ProductController extends Controller
                 ]);
             }
 
-            // Return the main view (if not AJAX)
+            // return the main view (if not AJAX)
             return view('shop', [
                 'products' => $productsWithRatings,
                 'mainImages' => $mainImages,
@@ -366,35 +361,31 @@ class ProductController extends Controller
         }
     }
 
+    //admin side
     public function getAll(Request $request)
     {
         try {
-            $products = Product::all();
+            $productQuery = Product::query();
+
+            $query = $request->input('search');
+
+            if ($query) {
+                $productQuery->where('name', 'LIKE', "%$query%");
+            }
+
+            $products = $productQuery->get();
 
             $categoryController = new CategoryController();
             $categories = $categoryController->index();
+
+            // use AJAX request return for searching
+            if ($request->ajax()) {
+                return view('admin.partials.data-holder', [
+                    'products' => $products,
+                ]);
+            }
 
             return view('admin.product', ['products' => $products, 'categories' => $categories]);
-        } catch (Exception $e) {
-            return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
-        }
-    }
-
-    public function getAllProducts(Request $request)
-    {
-        try {
-            $products = Product::all();
-
-            $categoryController = new CategoryController();
-            $categories = $categoryController->index();
-
-            return response()->json([
-                'success' => true,
-                'data' => [
-                    'products' => $products,
-                    'categories' => $categories
-                ]
-            ], 200);
         } catch (Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
         }
@@ -857,5 +848,86 @@ class ProductController extends Controller
         }
 
         return $xml->asXML();
+    }
+
+    //python api
+    public function getAllProducts(Request $request)
+    {
+        try {
+            $api = APIKEY::where('api_key', $request->api_key)->first();
+
+            if (!$api) {
+                return response()->json(['success' => false, 'message' => 'invalid request'], 400);
+            }
+
+            $products = Product::all();
+
+            $categoryController = new CategoryController();
+            $categories = $categoryController->index();
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'products' => $products,
+                    'categories' => $categories
+                ]
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
+        }
+    }
+
+    public function monthlyProductReport(Request $request)
+    {
+        try {
+            $products = Product::all();
+
+            $totalValue = Product::sum(DB::raw('price * stock'));
+
+            $cogs = OrderItem::select(DB::raw('SUM(order_items.quantity * product.price) as total'))
+                ->join('product', 'order_items.product_id', '=', 'product.product_id')
+                ->whereMonth('order_items.created_at', '=', date('m'))
+                ->value('total');
+
+            $averageInventory = Product::avg('stock');
+            $inventoryTurnoverRate = $averageInventory ? $cogs / $averageInventory : 0;
+
+            $monthlySales = OrderItem::select('product_id', DB::raw('SUM(quantity) as total_sold'))
+                ->whereMonth('created_at', '=', date('m'))
+                ->groupBy('product_id')
+                ->pluck('total_sold', 'product_id');
+
+            $averageMonthlySales = OrderItem::select('product_id', DB::raw('AVG(quantity) as average_sold'))
+                ->groupBy('product_id')
+                ->pluck('average_sold', 'product_id');
+
+            $reorderRecommendations = [];
+            $leadTimeMonths = 3;
+
+            foreach ($products as $product) {
+                $averageSold = $averageMonthlySales[$product->product_id] ?? 0;
+                $currentStock = $product->stock;
+
+                if ($averageSold > 0) {
+                    $recommendedQuantity = ($averageSold * $leadTimeMonths) - $currentStock;
+                    if ($recommendedQuantity > 0) {
+                        $reorderRecommendations[$product->product_id] = $recommendedQuantity;
+                    }
+                }
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'products' => $products,
+                    'totalValue' => $totalValue,
+                    'inventoryTurnoverRate' => $inventoryTurnoverRate,
+                    'reorderRecommendations' => $reorderRecommendations,
+                    'monthlySales' => $monthlySales
+                ]
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
+        }
     }
 }

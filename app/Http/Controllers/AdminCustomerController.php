@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Customer;
 use Illuminate\Http\Request;
+use App\Models\APIkey;
+use Exception;
 
 class AdminCustomerController extends Controller
 {
@@ -109,5 +111,25 @@ class AdminCustomerController extends Controller
         $html = $proc->transformToXML($xml);
 
         return response($html)->header('Content-Type', 'text/html');
+    }
+
+    public function customerReportAPI(Request $request)
+    {
+        try {
+            $api = APIKEY::where('api_key', $request->api_key)->first();
+            if (!$api) {
+                return response()->json(['success' => false, 'message' => 'Invalid Request'], 400);
+            }
+
+            $customers = Customer::withSum('Order', 'subtotal')->get();
+
+            foreach ($customers as $customer) {
+                $customer->orders = $customer->orders;
+            }
+
+            return response()->json(['success' => true, 'data' => $customers], 200);
+        } catch (Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
+        }
     }
 }

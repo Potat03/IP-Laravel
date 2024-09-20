@@ -228,6 +228,7 @@ class DatabaseSeeder extends Seeder
 
         // Seed Admins
         Admin::create([
+            'name' => 'Manager',
             'role' => 'manager',
             'email' => 'manager@gmail.com',
             'password' => bcrypt('managerpassword'),
@@ -235,6 +236,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         Admin::create([
+            'name' => 'Admin 1',
             'role' => 'admin',
             'email' => 'admin1@gmail.com',
             'password' => bcrypt('adminpassword'),
@@ -242,6 +244,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         Admin::create([
+            'name' => 'Admin 2',
             'role' => 'admin',
             'email' => 'admin2@gmail.com',
             'password' => bcrypt('adminpassword'),
@@ -249,6 +252,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         Admin::create([
+            'name' => 'Customer Service 1',
             'role' => 'customer_service',
             'email' => 'cs1@gmail.com',
             'password' => bcrypt('customerpassword'),
@@ -256,6 +260,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         Admin::create([
+            'name' => 'Customer Service 2',
             'role' => 'customer_service',
             'email' => 'cs2@gmail.com',
             'password' => bcrypt('customerpassword'),

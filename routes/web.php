@@ -4,6 +4,7 @@ use App\Http\Middleware\customAuth;
 use App\Http\Middleware\AdminAuth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\AdminCustomerController;
 use App\Http\Controllers\ChatMessageController;
 use App\Http\Controllers\CollectiblesController;
 use App\Http\Controllers\ConsumablesController;
@@ -22,7 +23,6 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\OrderController;
 use Spatie\Analytics\Facades\Analytics;
 use Spatie\Analytics\Period;
-use App\Http\Controllers\AdminCustomerController;
 
 
 
@@ -41,8 +41,7 @@ Route::get('/shop/collectible', [CollectiblesController::class, 'index'])->name(
 Route::get('/shop/new-arrivals', [ProductController::class, 'newArrivals'])->name('shop.newArrivals');
 Route::get('/product/{id}', [ProductController::class, 'show'])->name('product');
 
-Route::get('/product/{id}', [ProductController::class, 'show'])->name('product');
-Route::get('/product/{id}', [ProductController::class, 'showProductImages']);
+// Route::get('/product/{id}', [ProductController::class, 'showProductImages']);
 
 // Route::get('/cart', function () {
 //     return view('cart');
@@ -55,7 +54,7 @@ Route::get('/promotion/{id}', [PromotionController::class, 'viewDetails'])->name
 // Route::get('/product/{id}', [ProductController::class, 'showProductImages']);
 
 
-Route::get('/cart', [CartItemController::class, 'getCartItemByCustomerID']);    
+Route::get('/cart', [CartItemController::class, 'getCartItemByCustomerID']);
 // Route::get('/cart', function () {
 //     return view('cart');
 // });
@@ -70,7 +69,7 @@ Route::post('/session', [StripeController::class, 'session'])->name('session');
 // Route::get('/success', [StripeController::class, 'success'])->name('success');
 Route::get('/success', [PaymentController::class, 'processCheckout'])->name('success');
 
-Route::get('/tracking', [OrderController::class, 'getOrderByCustomerID']);    
+Route::get('/tracking', [OrderController::class, 'getOrderByCustomerID']);
 Route::get('/orders/getMonthlySales', [OrderController::class, 'getMonthlySales']);
 
 //Chat
@@ -215,13 +214,14 @@ Route::get('/getChatMessage', [ChatMessageController::class, 'adminGetMessage'])
 Route::get('/getNewMessages', [ChatMessageController::class, 'fetchLatestMessages'])->name('getNewMessages');
 
 use App\Http\Controllers\AdminController;
+
 Route::post('/admin', [AdminController::class, 'create'])->name('admin.create');
 Route::get('login2', [AuthController::class, 'showLoginForm'])->name('login2');
 Route::middleware([AdminAuth::class])->group(function () {
     Route::get('/testchat', function () {
         return view('chatConnectionTest');
-    }); 
-    
+    });
+
     Route::post('login2', [AuthController::class, 'login']);
     Route::post('logout2', [AuthController::class, 'logout'])->name('logout2');
     Route::post('/send-message', [ChatMessageController::class, 'sendMessage'])->name('send.message');
@@ -231,4 +231,3 @@ Route::middleware([AdminAuth::class])->group(function () {
 Route::get('/testmsgcust', function () {
     return view('customer_popup_chat');
 });
-

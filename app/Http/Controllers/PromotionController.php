@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\APIKEY;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Cache;
@@ -336,8 +337,6 @@ class PromotionController extends Controller
         // Return the view with chart and HTML content
         return view('admin.promotion_report', ['html' => $html], compact('chart'));
     }
-    
-    
 
     protected function generateXMLContent($revenueByPromotion)
     {
@@ -399,14 +398,11 @@ class PromotionController extends Controller
     
         return $xml->saveXML();
     }
-    
-    
 
     public function downloadXMLReport()
     {
         return Storage::download('xml/promotion_report.xml');
     }
-
 
     public function showPromotionList($ids)
     {
@@ -591,6 +587,25 @@ class PromotionController extends Controller
             return view('admin.promotion_revert', ['promotions' => $promotions]);
         } catch (Exception $e) {
             return view('errors.404');
+        }
+    }
+
+    public function promotionPublic(Request $request)
+    {
+        try {
+            $api = APIKEY::where('api_key', $request->api_key)->first();
+
+            if(!$api){
+                return response()->json(['success' => false, 'message' => 'Invalid Request'], 400);
+            }
+
+            $promotions = Promotion::where('status', 'active')->get();
+            foreach ($promotions as $promotion) {
+                $promotion->product_list = Promotion::find($promotion->promotion_id)->product;
+            }
+            return response()->json(['success' => true, 'data' => $promotions], 200);
+        } catch (Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
         }
     }
 }
