@@ -304,6 +304,17 @@ class ProductController extends Controller
         }
     }
 
+    public function viewProduct($id)
+    {
+        try {
+            $product = Product::findOrFail($id);
+
+            return view('admin.product_view', ['product' => $product]);
+        } catch (Exception $e) {
+            return view('errors.404');
+        }
+    }
+
     //for customer side
     public function index(Request $request)
     {

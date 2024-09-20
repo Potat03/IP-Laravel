@@ -172,7 +172,7 @@ Route::middleware([AdminAuth::class])->group(function () {
         return view('admin.product');
     });
 
-    Route::get('/admin/chatReport', [ChatMessageController::class, 'generateReport']);
+    Route::get('/admin/chatReport', [ChatMessageController::class, 'generateReport'])->name('admin.chat_report');
     Route::get('/admin/apikey', [APIkeyController::class, 'listKey'])->name('admin.apikey');
 
 
@@ -181,6 +181,7 @@ Route::middleware([AdminAuth::class])->group(function () {
     Route::get('/admin/product', action: [ProductController::class, 'getAll'])->name('admin.product');
     Route::get('/admin/product/add', action: [ProductController::class, 'addProduct'])->name('admin.product.add');
     Route::get('/admin/product/edit/{id}', [ProductController::class, 'editProduct'])->name('admin.product.edit');
+    Route::get('/admin/product/view/{id}', [ProductController::class, 'viewProduct'])->name('admin.product.view');
     Route::get('/admin/product/report', [ProductController::class, 'generateProductReport'])->name('admin.product.report');
     Route::get('/admin/category/add', action: [CategoryController::class, 'addCategory'])->name('admin.category.add');
     Route::get('/admin/category/edit/{id}', action: [CategoryController::class, 'editCategory'])->name('admin.category.edit');
@@ -211,6 +212,7 @@ Route::middleware([AdminAuth::class])->group(function () {
     Route::post('/admin/staff/set-password', [AdminController::class, 'setPassword'])->name('admin.setPassword');
 });
 
+<<<<<<< HEAD
 Route::get('admin/verify-otp', [AdminController::class, 'showVerifyOtpForm'])->name('admin.showVerifyOtpForm');
 Route::post('admin/verify-otp', [AdminController::class, 'verifyOtp'])->name('admin.verifyOtp');
 Route::post('/admin/set-password', [AdminController::class, 'setPassword'])->name('admin.setPassword');
@@ -229,6 +231,8 @@ Route::get('/cc2', function () {
     return view('adminChat');
 });
 
+=======
+>>>>>>> 76ba2ba2fba12f57756b9e55af9b2dafdf32ea26
 Route::get('/template', function () {
     return view('admin.error');
 });
@@ -253,7 +257,11 @@ Route::get('/getAdmChatList', [ChatMessageController::class, 'initAdminChatList'
 Route::get('/getChatMessage', [ChatMessageController::class, 'adminGetMessage'])->name('getChatMessage');
 Route::get('/getNewMessages', [ChatMessageController::class, 'fetchLatestMessages'])->name('getNewMessages');
 
+<<<<<<< HEAD
 Route::get('login2', [AuthController::class, 'showLoginForm'])->name('login2');
+=======
+
+>>>>>>> 76ba2ba2fba12f57756b9e55af9b2dafdf32ea26
 Route::middleware([AdminAuth::class])->group(function () {
     Route::get('/testchat', function () {
         return view('chatConnectionTest');

@@ -79,6 +79,7 @@
     <script>
         var last_msg_id = 0;
         let intervalId = null;
+        var productRoute = "{{ url('product') }}";
         $(document).ready(function() {
             //init chat
             $.ajax({
@@ -102,9 +103,9 @@
                                 }
                             } else if (element['type'] === 'PRODUCT') {
                                 if (element['by_customer']) {
-                                    $('.popup_box_body_chat').append('<div class="popup_box_body_chat_msg admin product_msg"><div class="product_msg_header"><img src="' + element['image'] + '" alt="Product Image"><div class="product_msg_title">' + element['name'] + '(' + element['id'] + ')</div></div><div class="product_msg_link"><hr><a class="product_msg_footer" href="#">Click to View</a></div></div>');
+                                    $('.popup_box_body_chat').append('<div class="popup_box_body_chat_msg user product_msg"><div class="product_msg_header"><img src="' + element['image'] + '" alt="Product Image"><div class="product_msg_title">' + element['name'] + '(' + element['id'] + ')</div></div><div class="product_msg_link"><hr><a class="product_msg_footer" href="' + productRoute + '/' + element['id'] + '">Click to View</a></div></div>');
                                 } else {
-                                    $('.popup_box_body_chat').append('<div class="popup_box_body_chat_msg user product_msg"><div class="product_msg_header"><img src="' + element['image'] + '" alt="Product Image"><div class="product_msg_title">' + element['name'] + '(' + element['id'] + ')</div></div><div class="product_msg_link"><hr><a class="product_msg_footer" href="#">Click to View</a></div></div>');
+                                    $('.popup_box_body_chat').append('<div class="popup_box_body_chat_msg admin product_msg"><div class="product_msg_header"><img src="' + element['image'] + '" alt="Product Image"><div class="product_msg_title">' + element['name'] + '(' + element['id'] + ')</div></div><div class="product_msg_link"><hr><a class="product_msg_footer" href="' + productRoute + '/' + element['id'] + '#">Click to View</a></div></div>');
                                 }
                             }
                         });
@@ -360,6 +361,8 @@
                 });
             });
 
+            
+
         });
 
         function createChat() {
@@ -506,7 +509,7 @@
 
                                 image_load.push(deferred.promise());
                             } else if (element['type'] === 'PRODUCT') {
-                                messageHtml = '<div class="popup_box_body_chat_msg ' + (element['by_customer'] ? 'admin product_msg' : 'user product_msg') + ' show"><div class="product_msg_header"><img src="' + element['image'] + '" alt="Product Image"><div class="product_msg_title">' + element['name'] + '(' + element['id'] + ')</div></div><div class="product_msg_link"><hr><a class="product_msg_footer" href="#">Click to View</a></div></div>';
+                                messageHtml = '<div class="popup_box_body_chat_msg ' + (element['by_customer'] ? 'admin product_msg' : 'user product_msg') + ' show"><div class="product_msg_header"><img src="' + element['image'] + '" alt="Product Image"><div class="product_msg_title">' + element['name'] + '(' + element['id'] + ')</div></div><div class="product_msg_link"><hr><a class="product_msg_footer" href="' + productRoute + '/' + element['id'] + '">Click to View</a></div></div>';
                             }
 
                             $('.popup_box_body_chat').append(messageHtml);
@@ -519,7 +522,7 @@
                         })
                         last_msg_id = response['last_msg_id'];
 
-                    } else if (response.info === 'Chat is ended'){
+                    } else if (response.info === 'Chat is ended') {
                         $('.start_message').hide();
                         $('.popup_box_body_chat_msg').remove();
                         $('.chat_ended_message').removeClass('hide');
@@ -536,8 +539,6 @@
                 }
             });
         }
-        
-
     </script>
 
 </body>
