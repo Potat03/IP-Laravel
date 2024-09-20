@@ -930,4 +930,26 @@ class ProductController extends Controller
             return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
         }
     }
+
+    public function restock(Request $request)
+    {
+        $request->validate([
+            'productId' => 'required|integer|exists:product,product_id',
+            'quantity' => 'required|integer|min:1',
+        ]);
+
+        $productId = $request->input('productId');
+        $quantity = $request->input('quantity');
+
+        $product = Product::find($productId);
+
+        if ($product) {
+            $product->stock += $quantity;
+            $product->save();
+
+            return response()->json(['success' => true]);
+        }
+
+        return response()->json(['success' => true, 'message' => 'Product restocked successfully.']);
+    }
 }
