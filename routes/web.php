@@ -21,8 +21,6 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\StripeController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\OrderController;
-use App\Http\Controllers\AdminCustomerController;
-
 
 
 //Default
