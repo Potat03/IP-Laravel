@@ -15,6 +15,7 @@ use DOMDocument;
 use Illuminate\Support\Facades\Log;
 use App\Models\APIkey;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class ChatMessageController extends Controller
 {
@@ -789,7 +790,7 @@ class ChatMessageController extends Controller
     {
         try {
             // Check key is api key is provided and valid
-            $api_key = $request->header('api-key');
+            $api_key = $request->header('api_key');
 
             if (!$api_key) {
                 return response()->json([
@@ -813,34 +814,45 @@ class ChatMessageController extends Controller
                 $type = $request->input('type', 'total');
                 $admin_list = Admin::where('role', 'customer_service')->get();
 
-                $rank_list = [];
+                $data = [];
                 foreach ($admin_list as $admin) {
 
-                    $data = [];
-                    $data['admin_id'] = $admin->admin_id;
-                    $data['email'] = $admin->email;
-                    $data['name'] = $admin->name;
+                    $admin_data = [];
+                    $admin_data['admin_id'] = $admin->admin_id;
+                    $admin_data['email'] = $admin->email;
+                    $admin_data['name'] = $admin->name;
 
                     switch ($type) {
-                        case 'total':
-                            $data['chat_handled'] = Chat::where('admin_id', $admin->admin_id)->count();
+                        case 'totalchat':
+                            $admin_data['info'] = Chat::where('admin_id', $admin->admin_id)->count();
                             break;
                         case 'rating':
-                            Chat::where('admin_id', $admin->admin_id)->avg('rating');
+                            $admin_data['info'] = Chat::where('admin_id', $admin->admin_id)->avg('rating');
                             break;
                         case 'duration':
-                            $data['total_chat_duration'] = Chat::where('admin_id', $admin->admin_id)->sum('ended_at') - Chat::where('admin_id', $admin->admin_id)->sum('created_at');
+                            $admin_data['info'] = round(Chat::where('admin_id', $admin->admin_id)
+                                ->get()
+                                ->sum(function ($chat) {
+                                    $createdAt = strtotime($chat->created_at);
+                                    $endedAt = strtotime($chat->ended_at);
+                                    return ($endedAt - $createdAt) / 60;
+                                }), 0);
                             break;
+                        default:
+                            return response()->json([
+                                'success' => false,
+                                'info' => 'Invalid argument passed'
+                            ], 403);
                     }
 
-                    $rank_list[] = $data;
+                    $data[] = $admin_data;
                 }
 
-                $rank_list = collect($rank_list)->sortByDesc('chat_handled')->values()->all();
+                $data = collect($data)->sortByDesc('info')->values()->all();
 
                 return response()->json([
                     'success' => true,
-                    'rank_list' => $rank_list
+                    'data' => $data
                 ], 200);
             } else {
                 $admin_id = $request->input('admin_id');
@@ -853,7 +865,7 @@ class ChatMessageController extends Controller
                     ], 404);
                 }
 
-                if($admin->getRole() !== 'customer_service') {
+                if ($admin->getRole() !== 'customer_service') {
                     return response()->json([
                         'success' => false,
                         'info' => 'Admin is not customer service'
@@ -866,16 +878,60 @@ class ChatMessageController extends Controller
                 $data['name'] = $admin->name;
                 $data['chat_handled'] = Chat::where('admin_id', $admin->admin_id)->count();
                 $data['avg_rating'] = Chat::where('admin_id', $admin->admin_id)->avg('rating');
-                $data['total_chat_duration'] = Chat::where('admin_id', $admin->admin_id)->sum('ended_at') - Chat::where('admin_id', $admin->admin_id)->sum('created_at');
-                $data['total_chat_for_each_rating'] = Chat::where('admin_id', $admin->admin_id)->select('rating', DB::raw('count(*) as total'))->groupBy('rating')->get();
-                $data['avg_duration'] = Chat::where('admin_id', $admin->admin_id)->get()
+
+                $totalDuration = Chat::where('admin_id', $admin->admin_id)
+                    ->get()
+                    ->sum(function ($chat) {
+                        $createdAt = Carbon::createFromFormat('Y-m-d H:i:s', $chat->created_at);
+                        $endedAt = Carbon::createFromFormat('Y-m-d H:i:s', $chat->ended_at);
+
+                        if ($endedAt >= $createdAt) {
+                            return $createdAt->diffInMinutes($endedAt);
+                        }
+                        return 0;
+                    });
+
+                //round to integer
+                $data['total_chat_duration'] =  round($totalDuration, 0);
+                $data['total_chat_for_each_rating'] = Chat::where('admin_id', $admin->admin_id)
+                    ->select('rating', DB::raw('count(*) as total'))
+                    ->groupBy('rating')
+                    ->get();
+                $data['avg_duration'] = round(Chat::where('admin_id', $admin->admin_id)
+                    ->get()
                     ->map(function ($chat) {
-                        return strtotime($chat->ended_at) - strtotime($chat->created_at);
+                        $createdAt = Carbon::createFromFormat('Y-m-d H:i:s', $chat->created_at);
+                        $endedAt = Carbon::createFromFormat('Y-m-d H:i:s', $chat->ended_at);
+                        if ($endedAt >= $createdAt) {
+                            return $createdAt->diffInMinutes($endedAt);
+                        }
+                        return 0;
                     })
-                    ->avg();
-                $data['min_chat_duration'] = Chat::where('admin_id', $admin->admin_id)->min('ended_at') - Chat::where('admin_id', $admin->admin_id)->min('created_at');
-                $data['max_chat_duration'] = Chat::where('admin_id', $admin->admin_id)->max('ended_at') - Chat::where('admin_id', $admin->admin_id)->max('created_at');
-            
+                    ->avg(), 2);
+
+                $durations = Chat::where('admin_id', $admin->admin_id)
+                    ->get()
+                    ->map(function ($chat) {
+                        $createdAt = Carbon::createFromFormat('Y-m-d H:i:s', $chat->created_at);
+                        $endedAt = Carbon::createFromFormat('Y-m-d H:i:s', $chat->ended_at);
+
+                        if ($endedAt >= $createdAt) {
+                            return $createdAt->diffInMinutes($endedAt);
+                        }
+                        return null;
+                    })
+                    ->filter()
+                    ->values();
+
+                $data['min_chat_duration'] =    round($durations->min(), 0);
+                $data['max_chat_duration'] = round($durations->max(), 0);
+
+                $data['rating_1'] = Chat::where('admin_id', $admin->admin_id)->where('rating', 1)->count();
+                $data['rating_2'] = Chat::where('admin_id', $admin->admin_id)->where('rating', 2)->count();
+                $data['rating_3'] = Chat::where('admin_id', $admin->admin_id)->where('rating', 3)->count();
+                $data['rating_4'] = Chat::where('admin_id', $admin->admin_id)->where('rating', 4)->count();
+                $data['rating_5'] = Chat::where('admin_id', $admin->admin_id)->where('rating', 5)->count();
+
                 return response()->json([
                     'success' => true,
                     'data' => $data

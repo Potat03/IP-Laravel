@@ -851,7 +851,33 @@ class ProductController extends Controller
     }
 
     //python api
-    public function getAllProducts(Request $request)
+    // public function getAllProducts(Request $request)
+    // {
+    //     try {
+    //         $api = APIKEY::where('api_key', $request->api_key)->first();
+
+    //         if (!$api) {
+    //             return response()->json(['success' => false, 'message' => 'invalid request'], 400);
+    //         }
+
+    //         $products = Product::all();
+
+    //         $categoryController = new CategoryController();
+    //         $categories = $categoryController->index();
+
+    //         return response()->json([
+    //             'success' => true,
+    //             'data' => [
+    //                 'products' => $products,
+    //                 'categories' => $categories
+    //             ]
+    //         ], 200);
+    //     } catch (Exception $e) {
+    //         return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
+    //     }
+    // }
+
+    public function monthlyProductReport(Request $request)
     {
         try {
             $api = APIKEY::where('api_key', $request->api_key)->first();
@@ -860,26 +886,6 @@ class ProductController extends Controller
                 return response()->json(['success' => false, 'message' => 'invalid request'], 400);
             }
 
-            $products = Product::all();
-
-            $categoryController = new CategoryController();
-            $categories = $categoryController->index();
-
-            return response()->json([
-                'success' => true,
-                'data' => [
-                    'products' => $products,
-                    'categories' => $categories
-                ]
-            ], 200);
-        } catch (Exception $e) {
-            return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
-        }
-    }
-
-    public function monthlyProductReport(Request $request)
-    {
-        try {
             $products = Product::all();
 
             $totalValue = Product::sum(DB::raw('price * stock'));
@@ -933,23 +939,38 @@ class ProductController extends Controller
 
     public function restock(Request $request)
     {
-        $request->validate([
-            'productId' => 'required|integer|exists:product,product_id',
-            'quantity' => 'required|integer|min:1',
-        ]);
+        try {
+            $apiKey = $request->header('Authorization');
 
-        $productId = $request->input('productId');
-        $quantity = $request->input('quantity');
+            if (strpos($apiKey, 'Bearer ') === 0) {
+                $apiKey = substr($apiKey, 7);
+            }
 
-        $product = Product::find($productId);
+            $api = APIKEY::where('api_key', $apiKey)->first();
 
-        if ($product) {
-            $product->stock += $quantity;
-            $product->save();
+            if (!$api) {
+                return response()->json(['success' => false, 'message' => 'Invalid API key'], 400);
+            }
 
-            return response()->json(['success' => true]);
+            $request->validate([
+                'productId' => 'required|integer|exists:product,product_id',
+                'quantity' => 'required|integer|min:1',
+            ]);
+
+            $productId = $request->input('productId');
+            $quantity = $request->input('quantity');
+            $product = Product::find($productId);
+
+            if ($product) {
+                $product->stock += $quantity;
+                $product->save();
+
+                return response()->json(['success' => true, 'message' => 'Product restocked successfully.']);
+            }
+
+            return response()->json(['success' => false, 'message' => 'Product not found'], 404);
+        } catch (Exception $e) {
+            return response()->json(['success' => false, 'message' => 'An error occurred: ' . $e->getMessage()], 500);
         }
-
-        return response()->json(['success' => true, 'message' => 'Product restocked successfully.']);
     }
 }
