@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Product;
+use App\Models\Admin;
 
 class CheckLowStockAndReorder extends Command
 {
@@ -26,10 +27,14 @@ class CheckLowStockAndReorder extends Command
 
     public function handle()
     {
-        // Fetch low stock products
         $lowStockProducts = Product::where('stock', '<', 50)->get();
 
-        // Aggregate product details into an HTML-formatted string
+        //manager(s) are under to
+        $to = Admin::where('role', 'manager')->pluck('email')->toArray();
+
+        //admins are under cc
+        $cc = Admin::where('role', 'admin')->pluck('email')->toArray();
+
         $message = "<h2>Here are the products that are low in stock:</h2>";
         $message .= "<table border='1' cellpadding='10' cellspacing='0' style='border-collapse: collapse;'>";
         $message .= "<thead>";
@@ -43,8 +48,6 @@ class CheckLowStockAndReorder extends Command
         $message .= "<tbody>";
 
         foreach ($lowStockProducts as $product) {
-            // Update the image URL to use the dev tunnel URL
-           
             $message .= "<tr>";
             $message .= "<td>{$product->product_id}</td>";
             $message .= "<td>{$product->name}</td>";
@@ -57,9 +60,10 @@ class CheckLowStockAndReorder extends Command
         $message .= "</table>";
         $message .= "<p>Please restock these items.</p>";
 
-        // Send aggregated HTML message to Zapier
         Http::post('https://hooks.zapier.com/hooks/catch/20148429/2hvgf6e/', [
-            'message' => $message
+            'to' => $to,
+            'cc' => $cc,
+            'message' => $message,
         ]);
 
         Log::info('Low stock data has been sent to Zapier.');
