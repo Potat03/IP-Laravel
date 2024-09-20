@@ -112,5 +112,6 @@
         Route::post('/promotions', [PromotionController::class, 'promotionPublic']);
         Route::post('/orders/getMonthlySales', [OrderController::class, 'getMonthlySales']);
         Route::post('/products/report', [ProductController::class, 'monthlyProductReport']);
+        Route::get('/getPerformance/customerService', [ChatMessageController::class, 'getCustomerServicePerfomance']);
         Route::post('/products/restock', [ProductController::class, 'restock']);
     });
