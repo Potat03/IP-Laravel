@@ -80,18 +80,23 @@
                         </a>
 
                     </li>
+                    @if (Auth::guard('admin')->user()->role != 'customer_service') 
                     <li @stack('promotion')>
                         <a href="{{ route('admin.promotion') }}" style="width: 100%;display: block;">
                             <i class="fa-regular fa-megaphone"></i>
                             Promotion
                         </a>
                     </li>
+                    @endif
+                    @if (Auth::guard('admin')->user()->role == 'customer_service') 
                     <li @stack('chat')>
                         <a href="{{ url('adminChat2') }}" style="width: 100%;display: block;">
                             <i class="fa-brands fa-rocketchat"></i>
                             Support Chat
                         </a>
                     </li>
+                    @endif
+                    @if (Auth::guard('admin')->user()->role != 'customer_service') 
                     <li @stack('order')>
                         <a href="#" style="width: 100%;display: block;">
                             <i class="fa-regular fa-box"></i>
@@ -104,24 +109,26 @@
                             Customer
                         </a>
                     </li>
+                    @endif
                     @if (Auth::guard('admin')->user()->role == 'manager') 
                     <li @stack('api')>
                         <a href="{{ route('admin.apikey') }}" style="width: 100%;display: block;">
-                            <i class="fa-regular fa-user"></i>
+                            <i class="fa-solid fa-webhook"></i>
                             API
                         </a>
                     </li>
                     <li @stack('report')>
-                        <a class="w-100" type="button" data-bs-toggle="collapse" href="#collapseReport" role="button" aria-expanded="false" aria-controls="collapseReport">
+                        <a class="w-100" type="button" data-bs-toggle="collapse" href="#collapseReport" role="button" aria-expanded="false" aria-controls="collapseReport" style="width: 100%;display: block;">
                             <i class="fa-regular fa-chart-bar"></i>
                             Report
                         </a>
-                        <div class="collapse" id="collapseReport">
-                            <ul class="py-3 px-1">
-                                <li><a class="text-light" href="">Sales Report</a></li>
-                                <li><a class="text-light" href="{{ route('admin.product.report' )}}">Product Report</a></li>
-                                <li><a class="text-light" href="{{ route('admin.promotion.report' )}}">Promotion Report</a></li>
-                                <li><a class="text-light" href="{{ route('admin.customer.report' )}}">Customer Report</a></li>
+                        <div class="collapse" id="collapseReport" style="padding-top: 10px; padding-left: 10px;">
+                            <ul style="display:flex; flex-direction:column;">
+                                <li><a class="text-light" style="width: 100%;display: block;" href="">Sales Report</a></li>
+                                <li><a class="text-light" style="width: 100%;display: block;" href="{{ route('admin.product.report' )}}">Product Report</a></li>
+                                <li><a class="text-light" style="width: 100%;display: block;" href="{{ route('admin.promotion.report' )}}">Promotion Report</a></li>
+                                <li><a class="text-light" style="width: 100%;display: block;" href="{{ route('admin.customer.report' )}}">Customer Report</a></li>
+                                <li><a class="text-light" style="width: 100%;display: block;" href="{{ route('admin.chat_report' )}}">Chat Report</a></li>
                             </ul>
                         </div>
                     </li>
@@ -146,28 +153,7 @@
         </div>
 
         <script>
-            $(document).ready(function() {
-                fixHeight();
 
-                $('.top_right').on('click', function() {
-                    $('.top_right_drop_down_menu').toggleClass('show');
-                });
-
-                $('.admin_content').on('click', function(event) {
-                    if (!$(event.target).closest('.top_right').length) {
-                        $('.top_right_drop_down_menu').removeClass('show');
-                    }
-                });
-                updateTime();
-            });
-
-            $(window).resize(function() {
-                fixHeight();
-            });
-
-            function fixHeight() {
-                $('.lower_content').css('max-height', $('.admin_content').height() - 200);
-            }
 
             function updateTime() {
                 var date = new Date();

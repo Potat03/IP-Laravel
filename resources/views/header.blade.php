@@ -132,6 +132,7 @@
 <script>
     var last_msg_id = 0;
     let intervalId = null;
+    var productRoute = "{{ url('product') }}";
     $(document).ready(function() {
         //init chat
         $.ajax({
@@ -155,9 +156,9 @@
                             }
                         } else if (element['type'] === 'PRODUCT') {
                             if (element['by_customer']) {
-                                $('.popup_box_body_chat').append('<div class="popup_box_body_chat_msg admin product_msg"><div class="product_msg_header"><img src="' + element['image'] + '" alt="Product Image"><div class="product_msg_title">' + element['name'] + '(' + element['id'] + ')</div></div><div class="product_msg_link"><hr><a class="product_msg_footer" href="#">Click to View</a></div></div>');
+                                $('.popup_box_body_chat').append('<div class="popup_box_body_chat_msg admin product_msg"><div class="product_msg_header"><img src="' + element['image'] + '" alt="Product Image"><div class="product_msg_title">' + element['name'] + '(' + element['id'] + ')</div></div><div class="product_msg_link"><hr><a class="product_msg_footer" href="' + productRoute + '/' + element['id'] + '">Click to View</a></div></div>');
                             } else {
-                                $('.popup_box_body_chat').append('<div class="popup_box_body_chat_msg user product_msg"><div class="product_msg_header"><img src="' + element['image'] + '" alt="Product Image"><div class="product_msg_title">' + element['name'] + '(' + element['id'] + ')</div></div><div class="product_msg_link"><hr><a class="product_msg_footer" href="#">Click to View</a></div></div>');
+                                $('.popup_box_body_chat').append('<div class="popup_box_body_chat_msg user product_msg"><div class="product_msg_header"><img src="' + element['image'] + '" alt="Product Image"><div class="product_msg_title">' + element['name'] + '(' + element['id'] + ')</div></div><div class="product_msg_link"><hr><a class="product_msg_footer" href="' + productRoute + '/' + element['id'] + '">Click to View</a></div></div>');
                             }
                         }
                     });
@@ -377,7 +378,7 @@
                     }
                 });
             }
-            intervalId = setInterval(fetchNewMessages, 2000);
+
         });
 
 
@@ -411,6 +412,53 @@
                     showErrorMsg(response.info);
                 }
             });
+        });
+
+        $('#btn-send-to-chat').on('click',async function() {
+            //send msg ajax
+            var product_id = $(this).attr('data-product-id');
+            console.log(product_id);
+            if (product_id == null || product_id == 0) {
+                return;
+            }
+
+            var chat_id = $('.popup_box_body_chat').attr('chat-id');
+
+            if (!chat_id) {
+                chat_id = await createChat()
+            };
+
+
+            if (!chat_id) {
+                showErrorMsg('Failed to create chat');
+                return;
+            };
+            console.log(chat_id);
+
+            clearInterval(intervalId);
+            $.ajax({
+                method: 'POST',
+                url: "{{ route('sendMsg') }}",
+                data: {
+                    chat_id: chat_id,
+                    message_type: "product",
+                    message_content: product_id,
+                    by_customer: 1,
+                    _token: "{{ csrf_token() }}"
+                },
+                success: function(response) {
+                    if (response.success == true) {
+                        fetchNewMessages();
+                    } else {
+                        showErrorMsg(response.info);
+                    }
+                },
+                error: function(xhr) {
+                    const response = JSON.parse(xhr.responseText);
+                    showErrorMsg(response.info);
+                }
+            });
+
         });
 
     });
@@ -559,7 +607,7 @@
 
                             image_load.push(deferred.promise());
                         } else if (element['type'] === 'PRODUCT') {
-                            messageHtml = '<div class="popup_box_body_chat_msg ' + (element['by_customer'] ? 'admin product_msg' : 'user product_msg') + ' show"><div class="product_msg_header"><img src="' + element['image'] + '" alt="Product Image"><div class="product_msg_title">' + element['name'] + '(' + element['id'] + ')</div></div><div class="product_msg_link"><hr><a class="product_msg_footer" href="#">Click to View</a></div></div>';
+                            messageHtml = '<div class="popup_box_body_chat_msg ' + (element['by_customer'] ? 'user' : 'admin') + ' product_msg show"><div class="product_msg_header"><img src="' + element['image'] + '" alt="Product Image"><div class="product_msg_title">' + element['name'] + '(' + element['id'] + ')</div></div><div class="product_msg_link"><hr><a class="product_msg_footer" href="' + productRoute + '/' + element['id'] + '">Click to View</a></div></div>';
                         }
 
                         $('.popup_box_body_chat').append(messageHtml);
@@ -571,6 +619,10 @@
 
                     })
                     last_msg_id = response['last_msg_id'];
+
+                    if (intervalId === null) {
+                        intervalId = setInterval(fetchNewMessages, 2000);
+                    }
 
                 } else if (response.info === 'Chat is ended') {
                     $('.start_message').hide();
