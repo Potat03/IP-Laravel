@@ -50,7 +50,7 @@
                                 @break
                                 @endif
                                 <div class="{{count($promotion->product_list) == 1 ? 'col-12' : 'col-6'}} p-0">
-                                    <img src="{{ asset('storage/images/products/' . $product->product_id . '/main.png') }}"
+                                    <img src="{{ asset('storage/images/products/' . $product->product_id . '/main.jpg') }}"
                                         class="d-block img-thumbnail border-0" alt="product image">
                                 </div>
                                 @endforeach

@@ -168,8 +168,8 @@ class DatabaseSeeder extends Seeder
             'delivery_address' => 'Jl. Raya Bogor',
             'delivery_method' => 'JNE',
             'tracking_number' => '1234567890',
-            'created_at' => Carbon::now()->subDays(10),
-            'updated_at' => Carbon::now()->subDays(10),
+            'created_at' => Carbon::now()->subDays(35),
+            'updated_at' => Carbon::now()->subDays(35),
         ]);
 
         Order::create([
@@ -194,6 +194,8 @@ class DatabaseSeeder extends Seeder
             'subtotal' => '2000',
             'discount' => '200',
             'total' => '1800',
+            'created_at' => Carbon::now()->subDays(35),
+            'updated_at' => Carbon::now()->subDays(35),
         ]);
 
         OrderItem::create([
@@ -204,6 +206,8 @@ class DatabaseSeeder extends Seeder
             'subtotal' => '4000',
             'discount' => '800',
             'total' => '3200',
+            'created_at' => Carbon::now()->subDays(35),
+            'updated_at' => Carbon::now()->subDays(35),
         ]);
 
         OrderItem::create([

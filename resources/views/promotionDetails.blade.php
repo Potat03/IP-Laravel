@@ -180,7 +180,7 @@
                 @break
                 @endif
                 <div class="{{count($promotion->product_list) == 1 ? 'col-12' : 'col-6'}}  p-0">
-                    <img src="{{ asset('storage/images/products/' . $product->product_id . '/main.png') }}"
+                    <img src="{{ asset('storage/images/products/' . $product->product_id . '/main.jpg') }}"
                         class="d-block img-thumbnail border-0" alt="product image">
                 </div>
                 @endforeach
@@ -256,7 +256,7 @@
                                 <div class="card mb-3 col-12">
                                     <div class="row g-0">
                                         <div class="col-md-2 border-end">
-                                            <img src="{{ asset('storage/images/products/' . $product->product_id . '/main.png') }}"
+                                            <img src="{{ asset('storage/images/products/' . $product->product_id . '/main.jpg') }}"
                                                 class="img-fluid p-5" alt="product image">
                                         </div>
                                         <div class="col-md-10">
@@ -311,7 +311,7 @@
         @foreach ($promotion->product_list as $product)
         <div class="row py-3 {{ $loop->last ? '' : ' border-bottom' }}">
             <div class="col-2">
-                <img src="{{ asset('storage/images/products/' . $product->product_id . '/main.png') }}" class="bundle-image" alt="product image">
+                <img src="{{ asset('storage/images/products/' . $product->product_id . '/main.jpg') }}" class="bundle-image" alt="product image">
             </div>
             <div class="col">
                 <div class="container">
