@@ -54,7 +54,6 @@ class AdminCustomerController extends Controller
 
         foreach ($customers as $customer) {
             $customerNode = $xml->createElement('customer');
-
             $id = $xml->createElement('id', $customer->customer_id);
             $customerNode->appendChild($id);
 
@@ -70,7 +69,7 @@ class AdminCustomerController extends Controller
             $status = $xml->createElement('status', $customer->status);
             $customerNode->appendChild($status);
 
-            $totalSpent = $xml->createElement('total_spent', $customer->orders_sum_subtotal); // Add total spent
+            $totalSpent = $xml->createElement('total_spent', $customer->orders_sum_subtotal);
             $customerNode->appendChild($totalSpent);
 
             $root->appendChild($customerNode);
@@ -84,8 +83,13 @@ class AdminCustomerController extends Controller
         $filePath = $xmlDirectory . '/customer_report.xml';
         $xml->save($filePath);
 
+        if (request()->is('api/*')) {
+            return response()->file($filePath)->header('Content-Type', 'application/xml');
+        }
+
         return response()->download($filePath);
     }
+
 
 
     public function generateXSLTReport()
@@ -94,7 +98,11 @@ class AdminCustomerController extends Controller
         $xsltFile = storage_path('app/xslt/customer_report.xslt');
 
         if (!file_exists($xmlFile) || !file_exists($xsltFile)) {
-            return response()->json(['error' => 'XML or XSLT file not found.'], 404);
+            if (request()->is('api/*')) {
+                return response()->json(['error' => 'XML or XSLT file not found.'], 404);
+            } else {
+                return response()->view('errors.404', ['message' => 'XML or XSLT file not found.'], 404);
+            }
         }
 
         $xml = new \DOMDocument();

@@ -10,6 +10,7 @@
     use App\Http\Controllers\CartController;
     use App\Http\Controllers\CartItemController;
     use App\Http\Controllers\OrderController;
+    use App\Http\Controllers\AdminCustomerController;
 
 
 
@@ -64,6 +65,10 @@
     Route::post('/promotion/restore/{id}', [PromotionController::class, 'undoDeletePromotion']);
     Route::post('/promotion/revert/{id}', [PromotionController::class, 'undoUpdatePromotion']);
 
+    Route::middleware(['auth:api', 'admin'])->group(function () {
+        Route::get('/api/customer_report/xml', [AdminCustomerController::class, 'generateXMLReport']);
+        Route::get('/api/customer_report/xslt', [AdminCustomerController::class, 'generateXSLTReport']);
+    });
 
 
     Route::post('/product/image/upload', [ProductController::class, 'productImageUpload']);
@@ -94,9 +99,3 @@
     //Order
     Route::post('/order/proceedToNext/{id}', [OrderController::class, 'proceedToNext']);
     Route::post('/order/receive/{id}', [OrderController::class, 'receiveOrder']);
-
-
-
-
-
-   
