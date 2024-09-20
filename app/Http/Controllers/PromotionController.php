@@ -205,19 +205,14 @@ class PromotionController extends Controller
 
     public function generatePromotionReport()
     {
-        // Initialize an empty array to store revenue and metrics by promotion
         $revenueByPromotion = [];
     
-        // Retrieve all promotions
         $promotions = Promotion::all();
     
-        // Calculate total revenue and metrics for each promotion
         foreach ($promotions as $promotion) {
-            // Fetch orders with and without the promotion
             $promotionOrders = OrderItem::where('promotion_id', $promotion->promotion_id)->get();
             $ordersWithoutPromotion = OrderItem::whereNull('promotion_id')->get();
     
-            // Initialize metrics
             $totalRevenue = 0;
             $totalSold = 0;
             $totalOrderValueWithPromotion = 0;
@@ -225,7 +220,6 @@ class PromotionController extends Controller
             $orderCountWithPromotion = 0;
             $orderCountWithoutPromotion = 0;
     
-            // Calculate metrics for orders with the promotion
             foreach ($promotionOrders as $order) {
                 $totalRevenue += $order->total;
                 $totalSold += $order->quantity;
@@ -233,20 +227,17 @@ class PromotionController extends Controller
                 $orderCountWithPromotion++;
             }
     
-            // Calculate metrics for orders without the promotion
             foreach ($ordersWithoutPromotion as $order) {
                 $totalOrderValueWithoutPromotion += $order->total;
                 $orderCountWithoutPromotion++;
             }
     
-            // Compute average order values
             $averageOrderValueWithPromotion = $orderCountWithPromotion > 0 ? $totalOrderValueWithPromotion / $orderCountWithPromotion : 0;
             $averageOrderValueWithoutPromotion = $orderCountWithoutPromotion > 0 ? $totalOrderValueWithoutPromotion / $orderCountWithoutPromotion : 0;
     
-            // Store metrics and details
             $revenueByPromotion[$promotion->promotion_id] = [
                 'title' => $promotion->title,
-                'start_at' => $promotion->start_at, // Assuming these fields exist
+                'start_at' => $promotion->start_at,
                 'end_at' => $promotion->end_at,
                 'totalRevenue' => $totalRevenue,
                 'productsSold' => $totalSold,
@@ -256,12 +247,10 @@ class PromotionController extends Controller
             ];
         }
     
-        // Prepare data for the chart
         $chartData = [];
         $allMonths = [];
     
         foreach ($revenueByPromotion as $promotionId => $data) {
-            // Prepare chart data
             $months = [];
             $revenue = [];
     
@@ -281,14 +270,11 @@ class PromotionController extends Controller
                 'revenue' => array_values($revenue),
             ];
     
-            // Collect all unique months for chart x-axis
             $allMonths = array_unique(array_merge($allMonths, $months));
         }
     
-        // Create a new Chart instance
         $chart = new Chart;
     
-        // Set chart options (height, responsiveness)
         $chart->options([
             'responsive' => true,
             'maintainAspectRatio' => false,
@@ -304,37 +290,26 @@ class PromotionController extends Controller
             ],
         ]);
     
-        // Add datasets for each promotion
-        foreach ($chartData as $promotionTitle => $data) {
-            $chart->dataset($promotionTitle, 'line', $data['revenue'])
-                ->options([
-                    'backgroundColor' => 'rgba(255, 87, 51, 0.2)', // Change color as needed
-                    'borderColor' => '#FF5733', // Change color as needed
-                    'borderWidth' => 2,
-                ]);
+        foreach ($chartData as $title => $data) {
+            $chart->labels($data['months']);
+            $chart->dataset($title, 'line', $data['revenue']);
         }
     
-        // Generate XML content
         $xmlContent = $this->generateXMLContent($revenueByPromotion);
     
-        // Store XML content
         Storage::put('xml/promotion_report.xml', $xmlContent);
     
-        // Load the XSLT stylesheet
         $xslt = new \DOMDocument();
         $xslt->load(storage_path('app/xslt/promotion_report.xslt'));
     
-        // Load XML data
         $xml = new \DOMDocument();
         $xml->loadXML($xmlContent);
     
-        // Transform XML to HTML using XSLT
         $proc = new \XSLTProcessor();
         $proc->importStylesheet($xslt);
     
         $html = $proc->transformToXML($xml);
     
-        // Return the view with chart and HTML content
         return view('admin.promotion_report', ['html' => $html], compact('chart'));
     }
 

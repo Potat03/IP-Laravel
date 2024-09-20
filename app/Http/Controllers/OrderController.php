@@ -17,6 +17,8 @@ use App\Models\Collectible;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Support\Facades\Auth;
+
 
 use function Pest\Laravel\json;
 
@@ -25,10 +27,9 @@ class OrderController extends Controller
     public function getOrderByCustomerID()
     {
         try {
-            // Replace with authenticated user in production
-            //$user = Auth::guard('customer')->user();
-            //$customerID = $user->id;
-            $customerID = 1;
+              //comunication security     
+       $user = Auth::guard('customer')->user();
+       $customerID = $user->customer_id;
     
             // Fetch orders based on customer ID
             $orders = Order::where('customer_id', $customerID)->get();
@@ -92,7 +93,7 @@ class OrderController extends Controller
             $orders = Order::all();
     
             if ($orders->isEmpty()) {
-                Log::warning('No orders found for Customer ID: ' . $customerID);
+                $orders = null;
             } else {
                 // Attach order items to each order
                 foreach ($orders as $order) {
@@ -271,20 +272,24 @@ class OrderController extends Controller
     
     public function getMonthlySales()
     {
+        $api = APIKEY::where('api_key', $request->api_key)->first();
+
+            if(!$api){
+                return response()->json(['success' => false, 'message' => 'Invalid Request'], 400);
+            }
         // Get monthly sales data, grouped by month, and count the number of orders per month
         $monthlySales = Order::select(
                 DB::raw('YEAR(created_at) as year'), 
                 DB::raw('MONTH(created_at) as month'), 
                 DB::raw('COUNT(order_id) as total_orders'),
-                DB::raw('SUM(total_discount)  as total_discount'), // Deduct 5 from total sales for each month
-                DB::raw('SUM(total) - 5 as total_sales') // Deduct 5 from total sales for each month
+                DB::raw('SUM(subtotal)  as subtotal'), 
+                DB::raw('SUM(total_discount)  as total_discount'), 
+                DB::raw('SUM(total) - 5 as total_sales') 
                 )
             ->groupBy(DB::raw('YEAR(created_at)'), DB::raw('MONTH(created_at)'))
             ->orderBy('year', 'desc')
             ->orderBy('month', 'desc')
             ->get();
-
-            
 
             
             return response()->json($monthlySales);

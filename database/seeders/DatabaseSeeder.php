@@ -164,12 +164,12 @@ class DatabaseSeeder extends Seeder
             'subtotal' => '5000',
             'total_discount' => '1000',
             'total' => '4000',
-            'status' => 'completed',
+            'status' => 'delivered',
             'delivery_address' => 'Jl. Raya Bogor',
             'delivery_method' => 'JNE',
             'tracking_number' => '1234567890',
-            'created_at' => Carbon::now()->subDays(10),
-            'updated_at' => Carbon::now()->subDays(10),
+            'created_at' => Carbon::now()->subDays(35),
+            'updated_at' => Carbon::now()->subDays(35),
         ]);
 
         Order::create([
@@ -177,7 +177,7 @@ class DatabaseSeeder extends Seeder
             'subtotal' => '3000',
             'total_discount' => '500',
             'total' => '2500',
-            'status' => 'pending',
+            'status' => 'delivery',
             'delivery_address' => 'Jl. Raya Jakarta',
             'delivery_method' => 'JNE',
             'tracking_number' => '0987654321',
@@ -194,6 +194,8 @@ class DatabaseSeeder extends Seeder
             'subtotal' => '2000',
             'discount' => '200',
             'total' => '1800',
+            'created_at' => Carbon::now()->subDays(35),
+            'updated_at' => Carbon::now()->subDays(35),
         ]);
 
         OrderItem::create([
@@ -204,6 +206,8 @@ class DatabaseSeeder extends Seeder
             'subtotal' => '4000',
             'discount' => '800',
             'total' => '3200',
+            'created_at' => Carbon::now()->subDays(35),
+            'updated_at' => Carbon::now()->subDays(35),
         ]);
 
         OrderItem::create([
@@ -265,6 +269,27 @@ class DatabaseSeeder extends Seeder
             'email' => 'cs2@gmail.com',
             'password' => bcrypt('customerpassword'),
             'status' => 'active',
+        ]);
+
+        CartItem::create([
+            'customer_id'=>1,
+            'product_id'=>1,
+            'promotion_id'=>null,
+            'quantity'=>2,
+            'details'=>'black',
+            'subtotal'=>200.00,
+            'discount'=>0,
+            'total'=>200,
+        ]);
+        CartItem::create([
+            'customer_id'=>1,
+            'product_id'=>null,
+            'promotion_id'=>2,
+            'quantity'=>2,
+            'details'=>'black',
+            'subtotal'=>3000.00,
+            'discount'=>600,
+            'total'=>2400,
         ]);
     }
 }

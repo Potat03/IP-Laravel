@@ -17,6 +17,7 @@ class CartItem extends Model
         'product_id',
         'promotion_id',
         'quantity',
+        'details',
         'subtotal',
         'discount',
         'total',

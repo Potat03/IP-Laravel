@@ -851,7 +851,33 @@ class ProductController extends Controller
     }
 
     //python api
-    public function getAllProducts(Request $request)
+    // public function getAllProducts(Request $request)
+    // {
+    //     try {
+    //         $api = APIKEY::where('api_key', $request->api_key)->first();
+
+    //         if (!$api) {
+    //             return response()->json(['success' => false, 'message' => 'invalid request'], 400);
+    //         }
+
+    //         $products = Product::all();
+
+    //         $categoryController = new CategoryController();
+    //         $categories = $categoryController->index();
+
+    //         return response()->json([
+    //             'success' => true,
+    //             'data' => [
+    //                 'products' => $products,
+    //                 'categories' => $categories
+    //             ]
+    //         ], 200);
+    //     } catch (Exception $e) {
+    //         return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
+    //     }
+    // }
+
+    public function monthlyProductReport(Request $request)
     {
         try {
             $api = APIKEY::where('api_key', $request->api_key)->first();
@@ -862,18 +888,89 @@ class ProductController extends Controller
 
             $products = Product::all();
 
-            $categoryController = new CategoryController();
-            $categories = $categoryController->index();
+            $totalValue = Product::sum(DB::raw('price * stock'));
+
+            $cogs = OrderItem::select(DB::raw('SUM(order_items.quantity * product.price) as total'))
+                ->join('product', 'order_items.product_id', '=', 'product.product_id')
+                ->whereMonth('order_items.created_at', '=', date('m'))
+                ->value('total');
+
+            $averageInventory = Product::avg('stock');
+            $inventoryTurnoverRate = $averageInventory ? $cogs / $averageInventory : 0;
+
+            $monthlySales = OrderItem::select('product_id', DB::raw('SUM(quantity) as total_sold'))
+                ->whereMonth('created_at', '=', date('m'))
+                ->groupBy('product_id')
+                ->pluck('total_sold', 'product_id');
+
+            $averageMonthlySales = OrderItem::select('product_id', DB::raw('AVG(quantity) as average_sold'))
+                ->groupBy('product_id')
+                ->pluck('average_sold', 'product_id');
+
+            $reorderRecommendations = [];
+            $leadTimeMonths = 3;
+
+            foreach ($products as $product) {
+                $averageSold = $averageMonthlySales[$product->product_id] ?? 0;
+                $currentStock = $product->stock;
+
+                if ($averageSold > 0) {
+                    $recommendedQuantity = ($averageSold * $leadTimeMonths) - $currentStock;
+                    if ($recommendedQuantity > 0) {
+                        $reorderRecommendations[$product->product_id] = $recommendedQuantity;
+                    }
+                }
+            }
 
             return response()->json([
                 'success' => true,
                 'data' => [
                     'products' => $products,
-                    'categories' => $categories
+                    'totalValue' => $totalValue,
+                    'inventoryTurnoverRate' => $inventoryTurnoverRate,
+                    'reorderRecommendations' => $reorderRecommendations,
+                    'monthlySales' => $monthlySales
                 ]
             ], 200);
         } catch (Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
+        }
+    }
+
+    public function restock(Request $request)
+    {
+        try {
+            $apiKey = $request->header('Authorization');
+
+            if (strpos($apiKey, 'Bearer ') === 0) {
+                $apiKey = substr($apiKey, 7);
+            }
+
+            $api = APIKEY::where('api_key', $apiKey)->first();
+
+            if (!$api) {
+                return response()->json(['success' => false, 'message' => 'Invalid API key'], 400);
+            }
+
+            $request->validate([
+                'productId' => 'required|integer|exists:product,product_id',
+                'quantity' => 'required|integer|min:1',
+            ]);
+
+            $productId = $request->input('productId');
+            $quantity = $request->input('quantity');
+            $product = Product::find($productId);
+
+            if ($product) {
+                $product->stock += $quantity;
+                $product->save();
+
+                return response()->json(['success' => true, 'message' => 'Product restocked successfully.']);
+            }
+
+            return response()->json(['success' => false, 'message' => 'Product not found'], 404);
+        } catch (Exception $e) {
+            return response()->json(['success' => false, 'message' => 'An error occurred: ' . $e->getMessage()], 500);
         }
     }
 }
