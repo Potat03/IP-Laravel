@@ -16,6 +16,15 @@
     .table td {
         vertical-align: middle;
     }
+
+    .alert-fixed {
+        position: fixed;
+        top: 10%;
+        left: 25%;
+        width: 50%;
+        z-index: 9999;
+        border-radius: 25px;
+    }
 </style>
 @endsection
 
@@ -24,6 +33,7 @@
 @section('page_gm', 'Add a promotion')
 
 @section('content')
+<div id="liveAlertPlaceholder"></div>
 <div class="card shadow-sm p-3 mb-5 w-100 position-static">
     <div class="overflow-auto">
         <div class="card-body">
@@ -31,15 +41,15 @@
                 @csrf
                 <div class="mb-3">
                     <label for="name" class="form-label">Promotion Title</label>
-                    <input type="text" class="form-control" id="title" name="title" value="1" required>
+                    <input type="text" class="form-control" id="title" name="title"required>
                 </div>
                 <div class="mb-3">
                     <label for="description" class="form-label">Description</label>
-                    <textarea class="form-control" id="description" name="description" value="1" required></textarea>
+                    <textarea class="form-control" id="description" name="description" required></textarea>
                 </div>
                 <div class="mb-3">
                     <label for="discount" class="form-label">Discount (%)</label>
-                    <input type="number" class="form-control" id="discount" name="discount" value="1" required>
+                    <input type="number" class="form-control" id="discount" name="discount" required>
                 </div>
                 <div class="mb-3">
                     <label for="product_id" class="form-label">Type</label>
@@ -50,7 +60,7 @@
                 </div>
                 <div class="mb-3">
                     <label for="limit" class="form-label">Limit</label>
-                    <input type="number" class="form-control" id="limit" name="limit" value="1" required>
+                    <input type="number" class="form-control" id="limit" name="limit" required>
                 </div>
                 <div class="mb-3">
                     <div class="row">
@@ -77,7 +87,6 @@
                     <div class="container mx-0">
 
                         <div class="row" id="product_list">
-                            <!-- Product List -->
                         </div>
                     </div>
 
@@ -147,6 +156,26 @@
     }
 
     document.addEventListener('DOMContentLoaded', function() {
+
+        let suggestion = "";
+        fetch("{{ route('suggestion.weather')}}", {
+                method: 'GET',
+            })
+            .then(response => response.json())
+            .then(data => {
+                suggestion = data.message;
+
+                $('#title').on('click', function() {
+                    if (suggestion != "" && $('#liveAlertPlaceholder').html() == "") {
+                        $('#liveAlertPlaceholder').html(`<div class="alert alert-info alert-dismissible fade show alert-fixed" role="alert">
+                            ${suggestion}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>`);
+                    }
+                });
+            });
+
+
         let productLimit = document.getElementById('limit').value == "single" ? 1 : 0;
 
         $('#start_date').on('change', function() {
@@ -156,8 +185,6 @@
         $('#end_date').on('change', function() {
             $('#start_date').attr('max', this.value);
         });
-
-
         document.getElementById('type').addEventListener('change', function() {
             let type = this.value;
             if (type == "single") {

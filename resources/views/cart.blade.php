@@ -1,78 +1,76 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('layout.shop')
 
-<head>
-    {{-- communication security --}}
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    @vite(['resources/sass/app.scss','resources/js/app.js','resources/css/general.css'])
+@section('title', 'Cart')
 
-    <style>
-    @keyframes slideIn {
-        from {
-            opacity: 0;
-            transform: translateX(100%);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateX(0);
-        }
-
-
+@push('styles')
+<meta name="csrf-token" content="{{ csrf_token() }}">
+@vite(['resources/css/general.css'])
+<style>
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
     }
-
-    .animate-row {
-        animation: slideIn 0.5s ease-out;
+    to {
+        opacity: 1;
+        transform: translateX(0);
     }
+}
 
-    .outline-divv {
-        text-align: center;
-        border: 1px solid #d3d3d3fa;
-        margin-top: 0.5%;
-        margin-bottom: 0.5%;
-        margin-left: 3.5%;
-        margin-right: 3.5%;
-        padding-left: 0.5%;
-        padding-right: 0.5%;
-        padding-top: 0.5%;
-        padding-bottom: 0.5%;
-        border-radius: 10px;
-        flex: 1;
-    }
+.animate-row {
+    animation: slideIn 0.5s ease-out;
+}
 
-    .no-outline-divv {
-        text-align: center;
-        margin-top: 0.5%;
-        margin-bottom: 0.5%;
-        margin-left: 3.5%;
-        margin-right: 3.5%;
-        padding-left: 0.5%;
-        padding-right: 0.5%;
-        padding-top: 0.5%;
-        padding-bottom: 0.5%;
-        flex: 1;
+.outline-divv {
+    text-align: center;
+    border: 1px solid #d3d3d3fa;
+    margin-top: 0.5%;
+    margin-bottom: 0.5%;
+    margin-left: 3.5%;
+    margin-right: 3.5%;
+    padding-left: 0.5%;
+    padding-right: 0.5%;
+    padding-top: 0.5%;
+    padding-bottom: 0.5%;
+    border-radius: 10px;
+    flex: 1;
+}
 
-    }
+.no-outline-divv {
+    text-align: center;
+    margin-top: 0.5%;
+    margin-bottom: 0.5%;
+    margin-left: 3.5%;
+    margin-right: 3.5%;
+    padding-left: 0.5%;
+    padding-right: 0.5%;
+    padding-top: 0.5%;
+    padding-bottom: 0.5%;
+    flex: 1;
+
+}
 
 
 
-    #cart-items-table td:nth-child(1),
-    #cart-items-table td:nth-child(2) {
-        text-align: left !important;
-    }
+#cart-items-table td:nth-child(1),
+#cart-items-table td:nth-child(2) {
+    text-align: left !important;
+}
 
-    /* Ensure the body and the main container fill the viewport height */
-    body,
-    html {
-        height: 100%;
-        margin: 0;
-        display: flex;
-        flex-direction: column;
-    }
-    </style>
-</head>
+body,
+html {
+    /* height: 100%; */
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+</style>
+@endpush
+
+@section('content')
+ 
+   
+
 
 @php
 $subtotal=0;
@@ -80,46 +78,9 @@ $deliveryFee = 5;
 $totalDiscount=0;
 @endphp
 
-<body>
-    <nav class="navbar navbar-expand-lg nav-bar justify-content-between">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">
-                <img src="/docs/4.0/assets/brand/bootstrap-solid.svg" width="30" height="30" alt=""
-                    class="d-inline-block align-text-top">
-                <h2 class="text-white d-inline-block" style="vertical-align: middle;margin-left:3%;">Futatabi</h2>
-            </a>
-            <div class="d-flex navbar">
-                <form>
-                    <div class="input-group mb-3" style="margin:0px!important;">
-                        <input type="text" class="form-control" placeholder="Product Name"
-                            aria-label="Recipient's username" aria-describedby="button-addon2">
-                        <button class="btn" type="button" id="button-addon2" style="background-color:white">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                                class="bi bi-search" viewBox="0 0 16 16">
-                                <path
-                                    d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0">
-                                </path>
-                            </svg>
-                        </button>
-                    </div>
-                </form>
-
-                <div class="navbar-nav">
-                    <a class="nav-link active text-white" aria-current="page" href="#">Home</a>
-                    <a class="nav-link text-white" href="#">Product</a>
-                    <a class="nav-link text-white" href="{{ url('/cart') }}">Cart</a>
-                    <a class="nav-link disabled text-white" aria-disabled="true">Profile</a>
-                </div>
-            </div>
-
-
-    </nav>
-
-
-    
-
-    <div class="container-xl content-div">
-        <div class="sticky-top">
+   
+<div class="container-xl content-div" style="margin-bottom:6%;height:fit-content;">
+    <div class="sticky-top">
             <table class="table" style="margin-bottom: 0%;">
                 <thead>
                     <tr>
@@ -155,7 +116,12 @@ $totalDiscount=0;
                         @endphp
                         <tr id="cartItemRow_{{$id}}" class="animate-row" style="animation-delay:'. 0.05 * {{$x}} .'s;">
                             <td style="width:15%;text-align:left!important">
-                                <img src="' . URL('storage/images/pika.jpg') . '" alt="pokemon" width="135" height="135">
+                                <div class="card-img-top">
+                                   
+<img src="{{ asset('storage/images/products/' . $cartItem->product->product_id . '/main.png') }}"
+class="d-block img-thumbnail border-0" alt="product image">
+                                   
+                                </div>                            
                             </td>
                             <td style="width:25%;text-align:left!important">
                                 <p>{{$cartItem->product->name}}</p>
@@ -188,23 +154,38 @@ $totalDiscount=0;
                             // Use raw values for calculation
                             $oriUnitPrice = $cartItem->promotion->original_price;
                             $disUnitPrice = $cartItem->promotion->discount_amount;
+                            $unitPriceAfterDis =  $oriUnitPrice- $disUnitPrice;
                             $totalForItem = $cartItem->quantity * $disUnitPrice;
             
                             // Format for display after calculation
                             $formattedOriUnitPrice = number_format($oriUnitPrice, 2);
-                            $formattedDisUnitPrice = number_format($disUnitPrice, 2);
+                            $formattedunitPriceAfterDis = number_format($unitPriceAfterDis, 2);
                             $formattedTotalForItem = number_format($totalForItem, 2);
                         @endphp
                         <tr id="cartItemRow_{{$id}}" class="animate-row" style="animation-delay:'. 0.05 * {{$x}} .'s;">
                             <td style="width:15%;text-align:left!important">
-                                <img src="' . URL('storage/images/pika.jpg') . '" alt="pokemon" width="135" height="135">
-                            </td>
+                                <div class="card-img-top">
+                                    <div class="container">
+                                        <div class="row pt-3 p-2" style="min-height:250px;">
+                                            @foreach ($cartItem->promotion->products as $product)
+                                            @if ($loop->index >= 4)
+                                            @break
+                                            @endif
+                                            <div class="{{count($cartItem->promotion->products) == 1 ? 'col-12' : 'col-6'}} p-0">
+                                                <img src="{{ asset('storage/images/products/' . $product->product_id . '/main.png') }}"
+                                                    class="d-block img-thumbnail border-0" alt="product image">
+                                            </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                </div>                       
+                                </td>
                             <td style="width:25%;text-align:left!important">
                                 <p>{{$cartItem->promotion->title}}</p>
                             </td>
                             <td style="width:15%;" id="unitPrice_{{$id}}">
                                 <span style="text-decoration: line-through;" id="oriUnitPrice_{{$id}}">RM {{$formattedOriUnitPrice}}</span><br>
-                                <span id="disUnitPrice_{{$id}}">RM {{$formattedDisUnitPrice}}</span>
+                                <span id="disUnitPrice_{{$id}}">RM {{$formattedunitPriceAfterDis}}</span>
                             </td>
                                                         <td style="width:15%;">
                                 <div class="input-group mb-3" style="justify-content: center;margin-bottom:0!important;">
@@ -222,7 +203,7 @@ $totalDiscount=0;
                         </tr>
                         @php
                             // Use raw values for subtotal calculation
-                            $totalDiscount += ($oriUnitPrice * $quantity) - ($disUnitPrice * $quantity);
+                            $totalDiscount += $disUnitPrice * $quantity;
                             $subtotal += $cartItem->quantity * $oriUnitPrice;
                             $x += 1;
                         @endphp
@@ -243,7 +224,7 @@ $totalDiscount=0;
 
     </div>
 
-    <div class="sticky-bottom">
+    <div class="fixed-bottom" style="border-top: solid #d3d3d3fa 1px;background-color: white; ">
         
         <div class="d-flex justify-content-between align-items-center">
             <div id="totalDiscount" class="outline-divv">
@@ -267,9 +248,8 @@ $totalDiscount=0;
         </div>
     </div>
 
-</body>
 
-</html>
+@endsection
 
 <script>
 function productAdd(id) {
@@ -478,7 +458,8 @@ function updateCartItemQuantity(id, quantity) {
         method: 'POST',
         body: JSON.stringify({ quantity: quantity }),
         headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
     }
     })
     .then(response => response.json())
@@ -497,7 +478,8 @@ function updateCartItemDiscount(id, discount) {
         method: 'POST',
         body: JSON.stringify({ discount: discount }),
         headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
     }
     })
     .then(response => response.json())
@@ -517,7 +499,8 @@ function updateCartItemSubtotal(id, subtotal){
         method: 'POST',
         body: JSON.stringify({ subtotal: subtotal }),
         headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
     }
     })
     .then(response => response.json())
@@ -536,7 +519,8 @@ function updateCartItemTotal(id, total){
         method: 'POST',
         body: JSON.stringify({ total: total }),
         headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
     }
     })
     .then(response => response.json())
@@ -556,7 +540,8 @@ function updateCartSubtotal(subtotal){
         method: 'POST',
         body: JSON.stringify({ subtotal: subtotal }),
         headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
     }
     })
     .then(response => response.json())
@@ -575,7 +560,8 @@ function updateCartTotal(total){
         method: 'POST',
         body: JSON.stringify({ total: total }),
         headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
     }
     })
     .then(response => response.json())
@@ -594,7 +580,8 @@ function updateCartDiscount(discount){
         method: 'POST',
         body: JSON.stringify({ discount: discount }),
         headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
     }
     })
     .then(response => response.json())
@@ -614,7 +601,7 @@ function removeCartItem(id, promotion) {
 
     if (row) {
         if (promotion != true) {
-            console.log("Promotion value:", promotion);
+            console.log("1Promotion value:", promotion);
 
             var quantityInput = document.getElementById(`quantity_${id}`);
             var currentValue = parseInt(quantityInput.value, 10);
@@ -648,11 +635,12 @@ function removeCartItem(id, promotion) {
                 newTotalDiscount: newTotalDiscount.toFixed(2)
             };
 
-            fetch(`/api/cartItem/removeCartItem/${id}`, {
+            fetch(`http://127.0.0.1:8000/api/cartItem/removeCartItem/${id}`, {
                 method: 'POST',
                 body: JSON.stringify(payload),
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                 }
             })
             .then(response => response.json())
@@ -667,7 +655,7 @@ function removeCartItem(id, promotion) {
             })
             .catch(error => console.error('Error:', error));
         } else {
-            console.log("Promotion value:", promotion);
+            console.log("2Promotion value:", promotion);
 
             var quantityInput = document.getElementById(`quantity_${id}`);
             var currentValue = parseInt(quantityInput.value, 10);
@@ -703,12 +691,14 @@ function removeCartItem(id, promotion) {
                 newTotalDiscount: newTotalDiscount.toFixed(2)
             };
 
-            fetch(`/api/cartItem/removeCartItem/${id}`, {
+            fetch(`http://127.0.0.1:8000/api/cartItem/removeCartItem/${id}`, {
                 method: 'POST',
                 body: JSON.stringify(payload),
                 headers: {
-                    'Content-Type': 'application/json'
-                }
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                
             })
             .then(response => response.json())
             .then(data => {
@@ -792,4 +782,22 @@ document.addEventListener('DOMContentLoaded', (event) => {
         row.classList.add('animate-row');
     });
 });
+
+document.addEventListener('DOMContentLoaded', function() {
+        var popupButtons = document.querySelectorAll('.popup_btn');
+        var popupImages = document.querySelectorAll('.popup_image_big_preview');
+        var popupBoxes = document.querySelectorAll('.popup_box');
+
+        popupButtons.forEach(function(button) {
+            button.remove();
+        });
+
+        popupImages.forEach(function(image) {
+            image.remove();
+        });
+
+        popupBoxes.forEach(function(box) {
+            box.remove();
+        });
+    });
 </script>

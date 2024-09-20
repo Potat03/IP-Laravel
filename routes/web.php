@@ -21,8 +21,6 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\StripeController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\OrderController;
-use Spatie\Analytics\Facades\Analytics;
-use Spatie\Analytics\Period;
 
 
 
@@ -54,7 +52,7 @@ Route::get('/promotion/{id}', [PromotionController::class, 'viewDetails'])->name
 // Route::get('/product/{id}', [ProductController::class, 'showProductImages']);
 
 
-Route::get('/cart', [CartItemController::class, 'getCartItemByCustomerID']);
+Route::get('/cart', [CartItemController::class, 'getCartItemByCustomerID']);    
 // Route::get('/cart', function () {
 //     return view('cart');
 // });
@@ -69,7 +67,7 @@ Route::post('/session', [StripeController::class, 'session'])->name('session');
 // Route::get('/success', [StripeController::class, 'success'])->name('success');
 Route::get('/success', [PaymentController::class, 'processCheckout'])->name('success');
 
-Route::get('/tracking', [OrderController::class, 'getOrderByCustomerID']);
+Route::get('/tracking', [OrderController::class, 'getOrderByCustomerID']);    
 Route::get('/orders/getMonthlySales', [OrderController::class, 'getMonthlySales']);
 
 //Chat
@@ -113,7 +111,6 @@ Route::get('/enterForgetPassword', function () {
 
 //Auth
 Route::middleware([CustomerAuth::class])->group(function () {
-
     Route::get('/profileSec', [CustomerController::class, 'profileSec'])->name('user.profileSec');
     Route::get('/orderHistorySec', [CustomerController::class, 'orderHistorySec'])->name('user.orderHistorySec');
     Route::get('/shippingSec', [CustomerController::class, 'shippingSec'])->name('user.shippingSec');
@@ -126,6 +123,36 @@ Route::middleware([CustomerAuth::class])->group(function () {
     Route::post('/profile/verifyOtp', [CustomerController::class, 'verifyOtp'])->name('profile.verifyOtp');
     Route::put('/profile/change-password', [CustomerController::class, 'changePassword'])->name('profile.changePassword');
 });
+
+   
+
+
+//ws
+//communication security 
+Route::middleware([CustomerAuth::class])->group(function () {
+    Route::get('/cart', [CartItemController::class, 'getCartItemByCustomerID']);
+    Route::get('/payment', function () {
+        return view('payment');
+    });  
+    Route::post('/session', [StripeController::class, 'session'])->name('session');
+    Route::get('/success', [PaymentController::class, 'processCheckout'])->name('success');
+    Route::get('/fail',  function () {
+        return view('checkoutFail');
+    })->name('fail');
+
+    Route::get('/tracking', [OrderController::class, 'getOrderByCustomerID']);    
+});
+
+//communication security 
+Route::middleware([AdminAuth::class])->group(function () {
+    Route::get('/admin/orders/prepare', [OrderController::class, 'getPrepareOrders'])->name('admin.orders_prepare');
+    Route::get('/admin/orders/delivery', [OrderController::class, 'getDeliveryOrders'])->name('admin.orders_delivery');
+    Route::get('/admin/orders/delivered', [OrderController::class, 'getDeliveredOrders'])->name('admin.orders_delivered');
+    Route::get('/admin/orders/orderStatusReport', [OrderController::class, 'generateOrderStatusReport'])->name('admin.orders.sales_report');
+});
+
+
+
 
 Route::middleware([AdminAuth::class])->group(function () {
     Route::get('/adminChat', function () {

@@ -1,98 +1,64 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('layout.shop')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    @vite(['resources/sass/app.scss','resources/js/app.js','resources/css/general.css'])
-    <style>
-        .input-layout {
-            margin-bottom: 1.5%;
+@section('title', 'Cart')
+
+@push('styles')
+@vite(['resources/css/general.css'])
+<meta name="csrf-token" content="{{ csrf_token() }}">
+<style>
+    .input-layout {
+        margin-bottom: 1.5%;
+    }
+
+    .flex-container {
+        display: flex;
+        align-items: stretch;
+    }
+
+    .tracking-page-btn {
+        flex-grow: 1;
+        background-color: transparent;
+        color: black;
+        border: none;
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s, color 0.3s;
+    }
+
+    .tracking-page-btn:hover {
+        background-color: #b90f0f;
+        color: white;
+    }
+
+    .tracking-page-btn-active {
+        border-bottom: #b90f0f 5px solid;
+    }
+
+    p {
+        margin-bottom: 0;
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateX(100%);
         }
 
-        .flex-container {
-            display: flex;
-            align-items: stretch;
+        to {
+            opacity: 1;
+            transform: translateX(0);
         }
+    }
 
-        .tracking-page-btn {
-            flex-grow: 1;
-            background-color: transparent;
-            color: black;
-            border: none;
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.3s, color 0.3s;
-        }
+    .animate-row {
+        animation: slideIn 0.5s ease-out;
+    }
+</style>
+@endpush
 
-        .tracking-page-btn:hover {
-            background-color: #b90f0f;
-            color: white;
-        }
-
-        .tracking-page-btn-active {
-            border-bottom: #b90f0f 5px solid;
-        }
-
-        p {
-            margin-bottom: 0;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateX(100%);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        .animate-row {
-            animation: slideIn 0.5s ease-out;
-        }
-    </style>
-</head>
-
-<body>
-    <nav class="navbar navbar-expand-lg nav-bar justify-content-between">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">
-                <img src="/docs/4.0/assets/brand/bootstrap-solid.svg" width="30" height="30" alt=""
-                    class="d-inline-block align-text-top">
-                <h2 class="text-white d-inline-block" style="vertical-align: middle;margin-left:3%;">Futatabi</h2>
-            </a>
-            <div class="d-flex navbar">
-                <form>
-                    <div class="input-group mb-3" style="margin:0px!important;">
-                        <input type="text" class="form-control" placeholder="Product Name"
-                            aria-label="Recipient's username" aria-describedby="button-addon2">
-                        <button class="btn" type="button" id="button-addon2" style="background-color:white">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                                class="bi bi-search" viewBox="0 0 16 16">
-                                <path
-                                    d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0">
-                                </path>
-                            </svg>
-                        </button>
-                    </div>
-                </form>
-
-                <div class="navbar-nav">
-                    <a class="nav-link active text-white" aria-current="page" href="#">Home</a>
-                    <a class="nav-link text-white" href="#">Product</a>
-                    <a class="nav-link text-white" href="{{ url('/cart') }}">Cart</a>
-                    <a class="nav-link disabled text-white" aria-disabled="true">Profile</a>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <div class="container-xl content-div">
+@section('content')
+    <div class="container-xl content-div" style="margin-bottom: 2%;height:fit-content;">
         <div class="d-flex justify-content-between" style="margin-bottom:0.5%">
             <button type="button" class="btn tracking-page-btn tracking-page-btn-active" id="allBtn"
                 onclick="filterRows('all',this)">All</button>
@@ -104,17 +70,16 @@
             <table class="table">
                 <tbody>
                     <tr class="th">
-                        <th style="width:8%;text-align:left!important">ORDER ID</th>
-                        <th style="width:20%;text-align:left!important;">DELIVERY ADDRESS</th>
-                        <th style="width:15%;text-align:left!important;">TOTAL</th>
+                        <th style="width:10%;text-align:left!important">ORDER ID</th>
+                        <th style="width:18%;text-align:left!important;">DELIVERY ADDRESS</th>
+                        <th style="width:12%;text-align:left!important;">TOTAL</th>
                         <th style="width:12%;text-align:left!important;">CREATED AT</th>
                         <th style="width:12%;text-align:left!important;">UPDATED AT</th>
-                        <th style="width:15%;text-align:left!important;">TRACKING NUMBER</th>
+                        <th style="width:18%;text-align:left!important;">TRACKING NUMBER</th>
                         <th style="width:12%;text-align:left!important;">RECEIVED</th>
-                        <th style="width:15%;text-align:right!important;">STATUS</th>
+                        <th style="width:15%;text-align:left!important;">STATUS</th>
                     </tr>
-
-                    @if(count($orders) > 0)
+                    @if(count($orders) > 1)
                     @php
                     $x = 1;
                     @endphp
@@ -142,7 +107,11 @@
 
                             <td style="text-align:left!important;">{{ $order->tracking_number }}</td>
                             <td style="text-align:left!important;">
+                                @if($order->received)
+                                <button id="receiveButton_2" type="button" class="btn btn-success" onclick="receiveOrder(2)" disabled="">RECEIVED</button>
+                                @else
                                 <button disabled type="button" class="btn btn-primary">RECEIVE</button>
+                                @endif
                             </td>
                             <td style="text-align:right!important;"><button disabled type="button" class="btn btn-primary">DELIVERY</button></td>
                         </tr>
@@ -156,69 +125,85 @@
 
                             <td style="text-align:left!important;">{{ $order->tracking_number }}</td>
                             <td style="text-align:left!important;">
+                                @if($order->received)
+                                <button id="receiveButton_2" type="button" class="btn btn-success" onclick="receiveOrder(2)" disabled="">RECEIVED</button>
+                                @else
                                 <button id="receiveButton_{{$order->order_id}}"type="button" class="btn btn-primary" onclick="receiveOrder({{$order->order_id}})">RECEIVE</button>
+                                @endif 
                             </td>
-
                             <td style="text-align:right!important;"><button disabled type="button" class="btn btn-primary">DELIVERED</button></td>
                         </tr>
                     @endif
                     @endforeach
+                    @else
+                    <tr>
+                        <td colspan="8">
+                        <p style="width:100%;text-align:center;height:100%; display: flex;justify-content: center;align-items: center;">No Orders</p>
+                        </td>
+                    </tr>
                     @endif
                 </tbody>
             </table>
         </div>
     </div>
 
-    <script>
-        function setActive(clickedButton) {
-            const buttons = document.querySelectorAll('.btn.tracking-page-btn');
-            buttons.forEach(button => button.classList.remove('tracking-page-btn-active'));
+@endsection
 
-            clickedButton.classList.add('tracking-page-btn-active');
-        }
+<script>
+    function setActive(clickedButton) {
+        const buttons = document.querySelectorAll('.btn.tracking-page-btn');
+        buttons.forEach(button => button.classList.remove('tracking-page-btn-active'));
 
-        function filterRows(status,clickedButton) {
-            const rows = document.querySelectorAll('tr');
-
-            rows.forEach(row => {
-                if (status === 'all') {
-                    row.style.display = '';
-                } else if (row.classList.contains(status)) {
-                    row.style.display = '';
-                }else if (row.classList.contains("th")) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
-            });
-
-            // Update active button
-          setActive(clickedButton);
-        }
-
-        function receiveOrder(id) {
-            var receiveButton = document.getElementById(`receiveButton_${id}`);
-            receiveButton.disabled = true; // Disable the button
-        receiveButton.classList.remove('btn-primary'); // Remove existing class
-        receiveButton.classList.add('btn-success'); // Add new class
-        receiveButton.textContent = 'RECEIVED'; // Optional: Change button text
-    
-        fetch(`/api/order/receive/${id}`, {
-                method: 'POST',
-               
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    console.log('Order updated successfully');
-                } else {
-                    console.error('Error updating order');
-                }
-            })
-            .catch(error => console.error('Error:', error));
-       
+        clickedButton.classList.add('tracking-page-btn-active');
     }
-    </script>
-</body>
 
-</html>
+    function filterRows(status,clickedButton) {
+        const rows = document.querySelectorAll('tr');
+
+        rows.forEach(row => {
+            if (status === 'all') {
+                row.style.display = '';
+            } else if (row.classList.contains(status)) {
+                row.style.display = '';
+            }else if (row.classList.contains("th")) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        // Update active button
+      setActive(clickedButton);
+    }
+
+    function receiveOrder(id) {
+        var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+        var receiveButton = document.getElementById(`receiveButton_${id}`);
+        receiveButton.disabled = true; // Disable the button
+    receiveButton.classList.remove('btn-primary'); // Remove existing class
+    receiveButton.classList.add('btn-success'); // Add new class
+    receiveButton.textContent = 'RECEIVED'; // Optional: Change button text
+
+    fetch(`/api/order/receive/${id}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            },
+            // If you need to send additional data, include it in the body
+            // body: JSON.stringify({ /* data */ })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log('Order updated successfully');
+            } else {
+                console.error('Error updating order');
+            }
+        })
+        .catch(error => console.error('Error:', error));
+   
+}
+</script>
+
