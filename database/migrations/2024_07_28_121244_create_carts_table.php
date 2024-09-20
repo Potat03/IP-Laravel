@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('customer_id')->references('customer_id')->on('customer')->unique();
             $table->decimal('subtotal', 8, 2);
+            $table->decimal('delivery_fee',8,2);
             $table->decimal('total_discount', 8, 2);
             $table->decimal('total', 8, 2);
             $table->timestamps();

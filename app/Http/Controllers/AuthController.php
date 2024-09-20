@@ -27,7 +27,7 @@ class AuthController extends Controller
 
     function verifyCaptcha($captcha_response)
     {
-        $captcha_secret = env('RECAPTCHA_SECRET_KEY'); // Replace with your actual secret key in .env
+        $captcha_secret = env('RECAPTCHA_SECRET_KEY');
         $captcha_verify_url = "https://www.google.com/recaptcha/api/siteverify";
         $captcha_data = [
             'secret'   => $captcha_secret,
@@ -96,7 +96,7 @@ class AuthController extends Controller
             'username' => 'required|string|max:50',
             'email' => 'required|email|unique:customer,email',
             'phone' => 'required|regex:/^(\+?6?01)[0-46-9]-*[0-9]{7,8}$/',
-            'password' => 'required|min:8|confirmed', //^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[!$#%]).*$
+            'password' => 'required|min:8|confirmed|regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[!$#%]).*$/',
         ]);
 
         Log::info('Recaptcha URL', ['url' => 'https://www.google.com/recaptcha/api/siteverify']);
@@ -155,24 +155,28 @@ class AuthController extends Controller
 
         if ($response['success']) {
             $customer = Customer::find($customer_id);
+
+            if (!$customer) {
+                return redirect()->back()->withErrors($response['message']);
+            }
+
             if ($customer->status !== 'active') {
                 $customer->status = 'active';
                 $customer->save();
             }
 
-            if (!$customer) {
-                return redirect()->back()->withErrors($response['message']);
+            if ($context === 'forget_password') {
+                return redirect()->route('user.enterForget')->with('message', 'Please enter your new password');
             } else {
-                if ($context === 'forget_password') {
-                    return redirect()->route('user.enterForget')->with('message', 'Please enter your new password');
-                } else {
-                    return redirect()->route('user.login')->with('message', 'Verification complete, please proceed with login');
-                }
+                AuthFacade::createCart();
+
+                return redirect()->route('user.login')->with('message', 'Verification complete, please proceed with login');
             }
         } else {
             return back()->withErrors(['otp' => $response['message']]);
         }
     }
+
 
     public function updatePassword(Request $request)
     {
@@ -231,7 +235,7 @@ class AuthController extends Controller
             $credentials = request(['email', 'password']);
             $remember = $request->remember === 'true' ? true : false;
 
-            if(Auth::guard('admin')->check()){
+            if (Auth::guard('admin')->check()) {
                 $this->adminLogoutFucntion($request);
             }
 
@@ -241,7 +245,7 @@ class AuthController extends Controller
                 if ($admin->status == 'active' && $admin instanceof Admin) {
                     if ($admin->session_id !== session()->getId()) {
                         $request->session()->regenerate();
-                        if(!$remember){
+                        if (!$remember) {
                             $admin->remember_token = null;
                         }
                         $admin->session_id = session()->getId();
@@ -273,7 +277,7 @@ class AuthController extends Controller
     private function adminLogoutFucntion(Request $request)
     {
         $admin = Auth::guard('admin')->user();
-        if($admin instanceof Admin){
+        if ($admin instanceof Admin) {
             $admin->session_id = null;
             $admin->remember_token = null;
             $admin->save();

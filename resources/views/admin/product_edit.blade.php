@@ -1,3 +1,8 @@
+{{-- 
+    Author: Lim Weng Ni
+    Date: 20/09/2024
+--}}
+
 @extends('admin.layout.main')
 
 @section('vite')
@@ -49,6 +54,7 @@
     </style>
 @endsection
 
+@section('prev_page', route('admin.product'))
 @section('title', 'Product')
 @section('page_title', 'Product')
 @section('page_gm', 'Edit Product')

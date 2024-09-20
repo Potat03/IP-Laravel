@@ -1,3 +1,8 @@
+{{-- 
+    Author: Lim Weng Ni
+    Date: 20/09/2024
+--}}
+
 @extends('layout.shop')
 
 @section('title', 'Shop')
@@ -50,16 +55,13 @@
 
                                 <div class="card-img-top" style="height: 300px; width: 100%;">
                                     @php
-                                        $mainImage = $mainImages[$product->product_id] ?? 'default.jpg';
+                                        $mainImage =
+                                            $mainImages[$product->product_id] ??
+                                            Storage::url('public/images/products/default.jpg');
                                     @endphp
-                                    @if ($mainImage == 'default.jpg')
-                                        <img src="{{ URL('storage/images/products/default.jpg') }}" class="d-block w-100"
-                                            style="height: 100%; object-fit: cover;" alt="{{ $product->name }}">
-                                    @else
-                                        <img src="{{ URL('storage/images/products/' . $product->product_id . '/' . $mainImage) }}"
-                                            class="d-block w-100" style="height: 100%; object-fit: cover;"
-                                            alt="{{ $product->name }}">
-                                    @endif
+
+                                    <img src="{{ $mainImage }}" class="d-block w-100"
+                                        style="height: 100%; object-fit: cover;" alt="{{ $product->name }}">
                                 </div>
                                 <div class="card-body">
                                     <p class="card-text mb-1 fs-5 fs-lg-5 fs-xl-3">{{ $product->name }}</p>

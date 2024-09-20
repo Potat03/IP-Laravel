@@ -19,6 +19,7 @@
 </style>
 @endsection
 
+@section('prev_page', route('admin.promotion'))
 @section('title', 'Promotion')
 @section('page_title', 'Promotion')
 @section('page_gm', 'Restore promotion')
@@ -59,7 +60,7 @@
                 <tr id="promotion_{{$promotion->promotion_id}}">
                             <th scope="row">{{$index++}}</th>
                             <td>{{$promotion->title}}</td>
-                            <td><i class="fa-solid {{$promotion->status == " bundle" ? "fa-cubes" :"fa-cube"}}"></i><span class="ps-2">{{$promotion->type}}</span></td>
+                            <td><i class="fa-solid {{$promotion->type == " bundle" ? "fa-cubes" :"fa-cube"}}"></i><span class="ps-2">{{$promotion->type}}</span></td>
                             <td>{{count($promotion->product_list)}} product(s)
                                 <a class="text-decoration-none text-secondary ps-1" data-bs-toggle="modal" data-bs-target="#viewProducts" onclick="displayProducts({{ json_encode($promotion->product_list) }})"><i class="fa-solid fa-eye"></i></a>
                             </td>
@@ -105,20 +106,20 @@
     </div>
 </div>
 
-<div class="modal fade" id="deletePromotion" tabindex="-1" aria-labelledby="deletePromotionLabel" aria-hidden="true">
+<div class="modal fade" id="restorePromotion" tabindex="-1" aria-labelledby="restorePromotionLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <input type="hidden" id="promotion_id">
             <div class="modal-header">
-                <h1 class="modal-title fs-5" id="deletePromotionLabel">Delete Promotion</h1>
+                <h1 class="modal-title fs-5" id="restorePromotionLabel">restore Promotion</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                Are you sure you want to delete this promotion?
+                Are you sure you want to restore this promotion?
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
-                <button type="button" class="btn btn-danger" id="confirm-delete">Yes</button>
+                <button type="button" class="btn btn-danger" id="confirm-restore">Yes</button>
             </div>
         </div>
     </div>
@@ -146,10 +147,10 @@
 
     function confirmation(promotion_id) {
         $('#promotion_id').val(promotion_id);
-        $('#deletePromotion').modal('show');
+        $('#restorePromotion').modal('show');
     }
 
-    document.querySelector('#confirm-delete').addEventListener('click', function() {
+    document.querySelector('#confirm-restore').addEventListener('click', function() {
         let promotion_id = document.querySelector('#promotion_id').value;
         fetch('/api/promotion/restore/' + promotion_id, {
                 method: 'POST',
@@ -158,7 +159,7 @@
             .then(data => {
                 if (data.success) {
                     $('#promotion_' + promotion_id).remove();
-                    $('#deletePromotion').modal('hide');
+                    $('#restorePromotion').modal('hide');
                 }
             });
     });

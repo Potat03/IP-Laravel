@@ -23,7 +23,7 @@
                 <div class="col-lg-8 col-md-10">
                     <div class="cont">
                         <div class="form sign-in">
-                            <h1>Logo</h1>
+                            <h2><img src="{{ asset('images/logo.png') }}" width="50" height="50"></h2>
                             <h2>Welcome to Futatabi</h2>
                             <form id="loginForm" action="{{ route('auth.userLogin') }}" method="POST">
                                 @csrf

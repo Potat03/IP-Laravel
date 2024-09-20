@@ -14,14 +14,18 @@ return new class extends Migration
         Schema::create('cart_item', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('customer_id')->references('customer_id')->on('cart');
-            $table->unsignedBigInteger('product_id')->references('product_id')->on('product')->nullable();
-            $table->unsignedBigInteger('promotion_id')->references('promotion_id')->on('promotion')->nullable();
+            $table->unsignedBigInteger('product_id')->nullable()->default(null)->references('product_id')->on('product');
+            $table->unsignedBigInteger('promotion_id')->nullable()->default(null)->references('promotion_id')->on('promotion');    
             $table->integer('quantity');
             $table->string('details');
             $table->decimal('subtotal', 8, 2);
             $table->decimal('discount', 8, 2);
             $table->decimal('total', 8, 2);
             $table->timestamps();
+
+            $table->foreign('customer_id')->references('customer_id')->on('cart');
+            $table->foreign('product_id')->references('product_id')->on('product');
+            $table->foreign('promotion_id')->references('promotion_id')->on('promotion');
         });
     }
 

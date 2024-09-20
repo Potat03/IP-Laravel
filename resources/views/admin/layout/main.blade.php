@@ -99,11 +99,12 @@
                         </a>
                     </li>
                     <li @stack('customer')>
-                        <a href="#" style="width: 100%;display: block;">
+                        <a href="{{ route('admin.customer') }}" style="width: 100%;display: block;">
                             <i class="fa-regular fa-user"></i>
                             Customer
                         </a>
                     </li>
+                    @if (Auth::guard('admin')->user()->role == 'manager') 
                     <li @stack('report')>
                         <a class="w-100" type="button" data-bs-toggle="collapse" href="#collapseReport" role="button" aria-expanded="false" aria-controls="collapseReport">
                             <i class="fa-regular fa-chart-bar"></i>
@@ -112,18 +113,19 @@
                         <div class="collapse" id="collapseReport">
                             <ul class="py-3 px-1">
                                 <li><a class="text-light" href="">Sales Report</a></li>
-                                <li><a class="text-light" href="">Product Report</a></li>
+                                <li><a class="text-light" href="{{ route('admin.product.report' )}}">Product Report</a></li>
                                 <li><a class="text-light" href="{{ route('admin.promotion.report' )}}">Promotion Report</a></li>
-                                <li><a class="text-light" href="">Customer Report</a></li>
+                                <li><a class="text-light" href="{{ route('admin.customer.report' )}}">Customer Report</a></li>
                             </ul>
                         </div>
                     </li>
+                    @endif
                 </ul>
             </div>
             <div class="right_content">
                 <div class="upper_content">
                     <div class="back_btn">
-                        <a href="#">
+                        <a href="@yield('prev_page')">
                             <i class="fa-solid fa-arrow-left"></i></a>
                     </div>
                     <div class="title">
