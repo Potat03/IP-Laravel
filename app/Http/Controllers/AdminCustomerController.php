@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Customer;
 use Illuminate\Http\Request;
+use App\Models\APIkey;
+use Exception;
 
 class AdminCustomerController extends Controller
 {
@@ -54,6 +56,7 @@ class AdminCustomerController extends Controller
 
         foreach ($customers as $customer) {
             $customerNode = $xml->createElement('customer');
+
             $id = $xml->createElement('id', $customer->customer_id);
             $customerNode->appendChild($id);
 
@@ -69,7 +72,7 @@ class AdminCustomerController extends Controller
             $status = $xml->createElement('status', $customer->status);
             $customerNode->appendChild($status);
 
-            $totalSpent = $xml->createElement('total_spent', $customer->orders_sum_subtotal);
+            $totalSpent = $xml->createElement('total_spent', $customer->orders_sum_subtotal); // Add total spent
             $customerNode->appendChild($totalSpent);
 
             $root->appendChild($customerNode);
@@ -83,13 +86,8 @@ class AdminCustomerController extends Controller
         $filePath = $xmlDirectory . '/customer_report.xml';
         $xml->save($filePath);
 
-        if (request()->is('api/*')) {
-            return response()->file($filePath)->header('Content-Type', 'application/xml');
-        }
-
         return response()->download($filePath);
     }
-
 
 
     public function generateXSLTReport()
@@ -98,11 +96,7 @@ class AdminCustomerController extends Controller
         $xsltFile = storage_path('app/xslt/customer_report.xslt');
 
         if (!file_exists($xmlFile) || !file_exists($xsltFile)) {
-            if (request()->is('api/*')) {
-                return response()->json(['error' => 'XML or XSLT file not found.'], 404);
-            } else {
-                return response()->view('errors.404', ['message' => 'XML or XSLT file not found.'], 404);
-            }
+            return response()->json(['error' => 'XML or XSLT file not found.'], 404);
         }
 
         $xml = new \DOMDocument();
@@ -117,5 +111,25 @@ class AdminCustomerController extends Controller
         $html = $proc->transformToXML($xml);
 
         return response($html)->header('Content-Type', 'text/html');
+    }
+
+    public function customerReportAPI(Request $request)
+    {
+        try {
+            $api = APIKEY::where('api_key', $request->api_key)->first();
+            if (!$api) {
+                return response()->json(['success' => false, 'message' => 'Invalid Request'], 400);
+            }
+
+            $customers = Customer::withSum('Order', 'subtotal')->get();
+
+            foreach ($customers as $customer) {
+                $customer->orders = $customer->orders;
+            }
+
+            return response()->json(['success' => true, 'data' => $customers], 200);
+        } catch (Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
+        }
     }
 }

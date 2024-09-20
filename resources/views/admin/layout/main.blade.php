@@ -105,6 +105,12 @@
                         </a>
                     </li>
                     @if (Auth::guard('admin')->user()->role == 'manager') 
+                    <li @stack('api')>
+                        <a href="{{ route('admin.apikey') }}" style="width: 100%;display: block;">
+                            <i class="fa-regular fa-user"></i>
+                            API
+                        </a>
+                    </li>
                     <li @stack('report')>
                         <a class="w-100" type="button" data-bs-toggle="collapse" href="#collapseReport" role="button" aria-expanded="false" aria-controls="collapseReport">
                             <i class="fa-regular fa-chart-bar"></i>

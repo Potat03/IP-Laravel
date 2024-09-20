@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\APIKEY;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Cache;
@@ -13,9 +14,9 @@ use App\Models\Wearable;
 use App\Models\Consumable;
 use App\Models\Collectible;
 use App\Models\OrderItem;
-use App\Memento\PromotionMemento;
 use App\Memento\PromotionCaretaker;
 use Illuminate\Support\Facades\Auth;
+use ConsoleTVs\Charts\Classes\Chartjs\Chart;
 use Exception;
 
 class PromotionController extends Controller
@@ -204,86 +205,204 @@ class PromotionController extends Controller
 
     public function generatePromotionReport()
     {
+        // Initialize an empty array to store revenue and metrics by promotion
+        $revenueByPromotion = [];
+    
+        // Retrieve all promotions
         $promotions = Promotion::all();
-
-        //calculate total revenue
+    
+        // Calculate total revenue and metrics for each promotion
         foreach ($promotions as $promotion) {
-            $promotion->total_revenue = 0;
-            $promotion->products_sold = 0;
-            $promotion->average_order_value_with = 0;
-            $promotion->average_order_value_without = 0;
-            $promotion->orders = OrderItem::where('promotion_id', $promotion->promotion_id)->get();
-            $promotion->items = PromotionItem::where('promotion_id', $promotion->promotion_id)->get();
-
-            if ($promotion->orders) {
-                foreach ($promotion->orders as $order) {
-                    $promotion->total_revenue += $order->total;
-                    $promotion->products_sold += count($promotion->items);
+            // Fetch orders with and without the promotion
+            $promotionOrders = OrderItem::where('promotion_id', $promotion->promotion_id)->get();
+            $ordersWithoutPromotion = OrderItem::whereNull('promotion_id')->get();
+    
+            // Initialize metrics
+            $totalRevenue = 0;
+            $totalSold = 0;
+            $totalOrderValueWithPromotion = 0;
+            $totalOrderValueWithoutPromotion = 0;
+            $orderCountWithPromotion = 0;
+            $orderCountWithoutPromotion = 0;
+    
+            // Calculate metrics for orders with the promotion
+            foreach ($promotionOrders as $order) {
+                $totalRevenue += $order->total;
+                $totalSold += $order->quantity;
+                $totalOrderValueWithPromotion += $order->total;
+                $orderCountWithPromotion++;
+            }
+    
+            // Calculate metrics for orders without the promotion
+            foreach ($ordersWithoutPromotion as $order) {
+                $totalOrderValueWithoutPromotion += $order->total;
+                $orderCountWithoutPromotion++;
+            }
+    
+            // Compute average order values
+            $averageOrderValueWithPromotion = $orderCountWithPromotion > 0 ? $totalOrderValueWithPromotion / $orderCountWithPromotion : 0;
+            $averageOrderValueWithoutPromotion = $orderCountWithoutPromotion > 0 ? $totalOrderValueWithoutPromotion / $orderCountWithoutPromotion : 0;
+    
+            // Store metrics and details
+            $revenueByPromotion[$promotion->promotion_id] = [
+                'title' => $promotion->title,
+                'start_at' => $promotion->start_at, // Assuming these fields exist
+                'end_at' => $promotion->end_at,
+                'totalRevenue' => $totalRevenue,
+                'productsSold' => $totalSold,
+                'averageOrderValueWithPromotion' => $averageOrderValueWithPromotion,
+                'averageOrderValueWithoutPromotion' => $averageOrderValueWithoutPromotion,
+                'orders' => $promotionOrders,
+            ];
+        }
+    
+        // Prepare data for the chart
+        $chartData = [];
+        $allMonths = [];
+    
+        foreach ($revenueByPromotion as $promotionId => $data) {
+            // Prepare chart data
+            $months = [];
+            $revenue = [];
+    
+            foreach ($data['orders'] as $order) {
+                $orderMonth = $order->created_at->format('Y-m');
+                if (!isset($revenue[$orderMonth])) {
+                    $revenue[$orderMonth] = 0;
                 }
-
-                foreach ($promotion->items as $item) {
-                    $orders = OrderItem::where('product_id', $item->product_id)->get();
-                    foreach ($orders as $order) {
-                        $promotion->total_revenue_without += $order->total;
-                        $promotion->products_sold_without += count($orders);
-                    }
-                }
-
-                if ($promotion->products_sold > 0) {
-                    $promotion->average_order_value_with = $promotion->total_revenue / $promotion->products_sold;
-                }
-
-                if ($promotion->products_sold_without > 0) {
-                    $promotion->average_order_value_without = $promotion->total_revenue_without / $promotion->products_sold_without;
+                $revenue[$orderMonth] += $order->total;
+                if (!in_array($orderMonth, $months)) {
+                    $months[] = $orderMonth;
                 }
             }
+    
+            $chartData[$data['title']] = [
+                'months' => $months,
+                'revenue' => array_values($revenue),
+            ];
+    
+            // Collect all unique months for chart x-axis
+            $allMonths = array_unique(array_merge($allMonths, $months));
         }
-
-        $xmlContent = $this->generateXMLContent($promotions);
-
+    
+        // Create a new Chart instance
+        $chart = new Chart;
+    
+        // Set chart options (height, responsiveness)
+        $chart->options([
+            'responsive' => true,
+            'maintainAspectRatio' => false,
+            'scales' => [
+                'x' => [
+                    'beginAtZero' => true,
+                    'type' => 'category',
+                    'labels' => $allMonths,
+                ],
+                'y' => [
+                    'beginAtZero' => true,
+                ],
+            ],
+        ]);
+    
+        // Add datasets for each promotion
+        foreach ($chartData as $promotionTitle => $data) {
+            $chart->dataset($promotionTitle, 'line', $data['revenue'])
+                ->options([
+                    'backgroundColor' => 'rgba(255, 87, 51, 0.2)', // Change color as needed
+                    'borderColor' => '#FF5733', // Change color as needed
+                    'borderWidth' => 2,
+                ]);
+        }
+    
+        // Generate XML content
+        $xmlContent = $this->generateXMLContent($revenueByPromotion);
+    
+        // Store XML content
         Storage::put('xml/promotion_report.xml', $xmlContent);
-
+    
         // Load the XSLT stylesheet
         $xslt = new \DOMDocument();
         $xslt->load(storage_path('app/xslt/promotion_report.xslt'));
-
+    
         // Load XML data
         $xml = new \DOMDocument();
         $xml->loadXML($xmlContent);
-
+    
+        // Transform XML to HTML using XSLT
         $proc = new \XSLTProcessor();
         $proc->importStylesheet($xslt);
-
+    
         $html = $proc->transformToXML($xml);
-
-        return view('admin.promotion_report', ['html' => $html], ['promotions' => $promotions]);
+    
+        // Return the view with chart and HTML content
+        return view('admin.promotion_report', ['html' => $html], compact('chart'));
     }
 
-    private function generateXMLContent($promotions)
+    protected function generateXMLContent($revenueByPromotion)
     {
-        $xml = '<?xml version="1.0" encoding="UTF-8"?>';
-        $xml .= '<promotionPerformanceReport>';
-
-        foreach ($promotions as $promotion) {
-            $xml .= '<promotion>';
-            $xml .= '<id>' . $promotion->promotion_id . '</id>';
-            $xml .= '<title>' . $promotion->title . '</title>';
-            $xml .= '<totalRevenue>' . $promotion->total_revenue . '</totalRevenue>';
-            $xml .= '<productsSold>' . $promotion->products_sold . '</productsSold>';
-            $xml .= '<averageOrderValueWithPromotion>' . $promotion->average_order_value_with . '</averageOrderValueWithPromotion>';
-            $xml .= '<averageOrderValueWithoutPromotion>' . $promotion->average_order_value_without . '</averageOrderValueWithoutPromotion>';
-            $xml .= '</promotion>';
+        $xml = new \DOMDocument('1.0', 'UTF-8');
+        $xml->formatOutput = true;
+    
+        $root = $xml->createElement('PromotionReports');
+        $xml->appendChild($root);
+    
+        foreach ($revenueByPromotion as $promotionId => $data) {
+            // Create promotion element
+            $promotionElement = $xml->createElement('Promotion');
+            $root->appendChild($promotionElement);
+    
+            // Add promotion details
+            $promotionElement->appendChild($xml->createElement('ID', $promotionId));
+            $promotionElement->appendChild($xml->createElement('Title', htmlspecialchars($data['title'])));
+            $promotionElement->appendChild($xml->createElement('StartDate', $data['start_at']));
+            $promotionElement->appendChild($xml->createElement('EndDate', $data['end_at']));
+    
+            // Add revenue and metrics
+            $revenueElement = $xml->createElement('RevenueDetails');
+            $promotionElement->appendChild($revenueElement);
+    
+            $totalRevenueElement = $xml->createElement('TotalRevenue', number_format($data['totalRevenue'], 2));
+            $revenueElement->appendChild($totalRevenueElement);
+    
+            $averageOrderValueWithElement = $xml->createElement('AverageOrderValueWith', number_format($data['averageOrderValueWithPromotion'], 2));
+            $revenueElement->appendChild($averageOrderValueWithElement);
+    
+            $averageOrderValueWithoutElement = $xml->createElement('AverageOrderValueWithout', number_format($data['averageOrderValueWithoutPromotion'], 2));
+            $revenueElement->appendChild($averageOrderValueWithoutElement);
+    
+            $productsSoldElement = $xml->createElement('ProductsSold', $data['productsSold']);
+            $promotionElement->appendChild($productsSoldElement);
+    
+            // Add monthly revenue details
+            $monthlyRevenueElement = $xml->createElement('MonthlyRevenue');
+            $promotionElement->appendChild($monthlyRevenueElement);
+    
+            $monthlyRevenue = [];
+    
+            foreach ($data['orders'] as $order) {
+                $orderMonth = $order->created_at->format('Y-m'); // Format month as YYYY-MM
+                if (!isset($monthlyRevenue[$orderMonth])) {
+                    $monthlyRevenue[$orderMonth] = 0;
+                }
+                $monthlyRevenue[$orderMonth] += $order->total;
+            }
+    
+            foreach ($monthlyRevenue as $month => $revenue) {
+                $monthElement = $xml->createElement('Month');
+                $monthlyRevenueElement->appendChild($monthElement);
+    
+                $monthElement->appendChild($xml->createElement('MonthName', $month));
+                $monthElement->appendChild($xml->createElement('Revenue', number_format($revenue, 2)));
+            }
         }
-
-        $xml .= '</promotionPerformanceReport>';
-        return $xml;
+    
+        return $xml->saveXML();
     }
 
     public function downloadXMLReport()
     {
         return Storage::download('xml/promotion_report.xml');
     }
-
 
     public function showPromotionList($ids)
     {
@@ -371,7 +490,7 @@ class PromotionController extends Controller
                     $promotion->product_list = Promotion::find($promotion->promotion_id)->product;
                 }
                 return view('admin.promotion', ['promotions' => $promotions]);
-            }else{
+            } else {
                 return view('errors.404');
             }
         } catch (Exception $e) {
@@ -468,6 +587,25 @@ class PromotionController extends Controller
             return view('admin.promotion_revert', ['promotions' => $promotions]);
         } catch (Exception $e) {
             return view('errors.404');
+        }
+    }
+
+    public function promotionPublic(Request $request)
+    {
+        try {
+            $api = APIKEY::where('api_key', $request->api_key)->first();
+
+            if(!$api){
+                return response()->json(['success' => false, 'message' => 'Invalid Request'], 400);
+            }
+
+            $promotions = Promotion::where('status', 'active')->get();
+            foreach ($promotions as $promotion) {
+                $promotion->product_list = Promotion::find($promotion->promotion_id)->product;
+            }
+            return response()->json(['success' => true, 'data' => $promotions], 200);
+        } catch (Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
         }
     }
 }

@@ -51,7 +51,15 @@
         <div class="popup_box_body">
             <div class="popup_box_body_chat">
                 <div class="start_message">Enter message to start</div>
-                <div class="chat_ended_message hide">Chat is ended<br>Enter message to start again</div>
+                <div class="chat_ended_message hide">Chat is ended<br>Rate your experience
+                    <div class="rate_btn_holder">
+                        <button class="rate_btn" data-rate="1">Bad</button>
+                        <button class="rate_btn" data-rate="2">Not Bad</button>
+                        <button class="rate_btn" data-rate="3">Ok</button>
+                        <button class="rate_btn" data-rate="4">Nice</button>
+                        <button class="rate_btn" data-rate="5">Excellent</button>
+                    </div>
+                </div>
             </div>
             <div class="paste_area">
                 <p class="paste_area_txt">Upload Image</p>
@@ -117,7 +125,7 @@
                     }
                 },
                 error: function(xhr) {
-                    console.log(xhr.responseText);
+                    return;
                 }
             });
 
@@ -256,7 +264,10 @@
                     chat_id = await createChat()
                 };
 
-                if (!chat_id) return;
+                if (!chat_id) {
+                    showErrorMsg('Failed to create chat');
+                    return;
+                };
 
 
                 clearInterval(intervalId);
@@ -278,7 +289,6 @@
                         success: function(response) {
                             if (response.success == true) {
                                 fetchNewMessages();
-
                             } else {
                                 showErrorMsg(response.info);
                             }
@@ -304,7 +314,6 @@
                         success: function(response) {
                             if (response.success == true) {
                                 fetchNewMessages();
-
                             } else {
                                 showErrorMsg(response.info);
                             }
@@ -317,6 +326,40 @@
                 }
                 intervalId = setInterval(fetchNewMessages, 2000);
             });
+
+
+            $('.rate_btn').on('click', function() {
+                const rate = $(this).attr('data-rate');
+                const chat_id = $('.rate_btn_holder').attr('chat-id');
+
+                if (!chat_id || !rate) {
+                    return;
+                }
+
+                $.ajax({
+                    method: 'POST',
+                    url: '{{ route("rateChat") }}',
+                    data: {
+                        chat_id: chat_id,
+                        rate: rate,
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            $('.chat_ended_message').addClass('hide');
+                            $('.rate_btn_holder').attr('chat-id', '');
+                            $('.start_message').show();
+                        } else {
+                            showErrorMsg(response.info);
+                        }
+                    },
+                    error: function(xhr) {
+                        const response = JSON.parse(xhr.responseText);
+                        showErrorMsg(response.info);
+                    }
+                });
+            });
+
         });
 
         function createChat() {
@@ -476,28 +519,25 @@
                         })
                         last_msg_id = response['last_msg_id'];
 
-                    } else {
-                        showErrorMsg(response.info);
+                    } else if (response.info === 'Chat is ended'){
+                        $('.start_message').hide();
+                        $('.popup_box_body_chat_msg').remove();
+                        $('.chat_ended_message').removeClass('hide');
+                        $('.rate_btn_holder').attr('chat-id', chat_id);
+                        $('.popup_box_body_chat').attr('chat-id', '');
+                        last_msg_id = 0;
+                        clearInterval(intervalId);
                     }
                 },
                 error: function(xhr) {
                     const response = JSON.parse(xhr.responseText);
-                    
-                    if(response.info === 'Chat is ended'){
-                        $('.start_message').hide();
-                        $('.popup_box_body_chat_msg').remove();
-                        $('.chat_ended_message').removeClass('hide');
-                        $('.popup_box_body_chat').attr('chat-id', '');
-                        last_msg_id = 0;
-                        //remove all chat msg direct dun use parent
-                    }else{
-                        showErrorMsg(response.info);
-                    }
-
+                    showErrorMsg(response.info);
                     clearInterval(intervalId);
                 }
             });
         }
+        
+
     </script>
 
 </body>

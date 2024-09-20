@@ -11,6 +11,7 @@
     use App\Http\Controllers\CartItemController;
     use App\Http\Controllers\OrderController;
     use App\Http\Controllers\AdminCustomerController;
+    use App\Http\Controllers\PaymentController;
 
 
 
@@ -21,6 +22,9 @@
     //pass login/register details
     use App\Http\Controllers\AuthController;
     use App\Http\Middleware\CustomerAuth;
+    use App\Http\Middleware\AdminAuth;
+    use App\Http\Controllers\APIkeyController;
+    use App\Models\Product;
 
     Route::get('/auth', [AuthController::class, 'showCustomerForm'])->name('auth.showForm');
     Route::group(['middleware' => ['web']], function () {
@@ -37,6 +41,11 @@
 
         Route::post('/admin/login', [AuthController::class, 'adminLogin'])->name('auth.adminLogin');
         Route::post('/admin/logout', [AuthController::class, 'adminLogout'])->name('auth.adminLogout');
+
+        Route::middleware([AdminAuth::class])->group(function () {
+            Route::post('/admin/apikey/create', [APIkeyController::class, 'createKey'])->name('admin.apikey.create');
+            Route::post('/admin/apikey/delete', [APIkeyController::class, 'deleteKey'])->name('admin.apikey.delete');
+        });
     });
     Route::post('/resendOtp', [AuthController::class, 'resendOtp'])->name('auth.resendOtp');
 
@@ -49,9 +58,11 @@
     Route::get('/product/generateTable', [ProductController::class, 'generateTable']);
 
     //provide api return json responses
-    Route::get('/products', [ProductController::class, 'getAllProducts'])->name('api.products');
-    Route::get('/products/product/{id}', [ProductController::class, 'getOneProduct'])->name('api.product');
+    // Route::get('/products', [ProductController::class, 'getAllProducts'])->name('api.products');
+    // Route::get('/products/product/{id}', [ProductController::class, 'getOneProduct'])->name('api.product');
 
+    Route::get('/api/customer_report', [AdminCustomerController::class, 'customerReportAPI']);
+    
     Route::post('/category/store', [CategoryController::class, 'store'])->name('admin.category.store');
     Route::post('/category/update/{id}', [CategoryController::class, 'update'])->name('admin.category.update');
     Route::delete('/category/{id}', [CategoryController::class, 'destroy'])->name('admin.category.delete');
@@ -65,16 +76,9 @@
     Route::post('/promotion/restore/{id}', [PromotionController::class, 'undoDeletePromotion']);
     Route::post('/promotion/revert/{id}', [PromotionController::class, 'undoUpdatePromotion']);
 
-    Route::middleware(['auth:api', 'admin'])->group(function () {
-        Route::get('/api/customer_report/xml', [AdminCustomerController::class, 'generateXMLReport']);
-        Route::get('/api/customer_report/xslt', [AdminCustomerController::class, 'generateXSLTReport']);
-    });
-
-
     Route::post('/product/image/upload', [ProductController::class, 'productImageUpload']);
     // Route::get('/product/generateTable', [ProductController::class, 'generateTable']);
 
-    Route::post('/cartItem/upload', [CartController::class, 'addToCart'])->name('cart.add');
 
     //Cart Item
     Route::get('/cartItem/getCartItemByCustomerID/{customerID}', [CartItemController::class, 'getCartItemByCustomerID']);
@@ -99,3 +103,9 @@
     //Order
     Route::post('/order/proceedToNext/{id}', [OrderController::class, 'proceedToNext']);
     Route::post('/order/receive/{id}', [OrderController::class, 'receiveOrder']);
+
+
+    Route::group(['prefix' => 'public'], function () {
+        Route::post('/promotions', [PromotionController::class, 'promotionPublic']);
+        Route::post('/products', [ProductController::class, 'getAllProducts']);
+    });
