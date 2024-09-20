@@ -93,7 +93,7 @@ class OrderController extends Controller
             $orders = Order::all();
     
             if ($orders->isEmpty()) {
-$orders = null;
+                $orders = null;
             } else {
                 // Attach order items to each order
                 foreach ($orders as $order) {
