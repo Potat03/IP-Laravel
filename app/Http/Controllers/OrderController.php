@@ -16,9 +16,11 @@ use App\Models\Consumable;
 use App\Models\Collectible;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Support\Facades\Auth;
 
 
+use function Pest\Laravel\json;
 
 class OrderController extends Controller
 {
@@ -288,7 +290,8 @@ $orders = null;
             ->orderBy('year', 'desc')
             ->orderBy('month', 'desc')
             ->get();
-    
+
+            
             return response()->json($monthlySales);
         }
     

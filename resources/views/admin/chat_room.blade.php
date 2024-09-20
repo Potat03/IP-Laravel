@@ -310,13 +310,16 @@
                         if (element['status'] === 'pending') {
                             $('.new_chat').append('<li chat-id="' + element['chat_id'] + '" chat-status="' + element['status'] + '" ><div class="chat_info">' + element['customer_name'] + '<span class="notice_light"></span></div><div class="recent_msg">' + element['latest_message'] + '</div></li>');
                         } else {
-                            $('.active_chat').append('<li chat-id="' + element['chat_id'] + '" chat-status="' + element['status'] + '" ><div class="chat_info">' + element['customer_name'] + '</div><div class="recent_msg">' + element['latest_message'] + '</div></li>');
+                            $('.active_chat').append('<li chat-id="' + element['chat_id'] + '" chat-status="' + element['status'] + '" ><div class="chat_info">' + element['customer_name'] + '<span class="notice_light"></span></div><div class="recent_msg">' + element['latest_message'] + '</div></li>');
                         }
                     }
 
                     //if latest msg change
                     if ($('.chat_list li[chat-id="' + element['chat_id'] + '"] .recent_msg').text() != element['latest_message']) {
                         $('.chat_list li[chat-id="' + element['chat_id'] + '"] .recent_msg').text(element['latest_message']);
+                        if (!$('.chat_list li[chat-id="' + element['chat_id'] + '"]').hasClass('active')) {
+                            $('.chat_list li[chat-id="' + element['chat_id'] + '"] .notice_light').show();
+                        }
                     }
 
                 });
@@ -407,6 +410,7 @@
         $('.chat_hide').removeClass('chat_hide');
         $(clicked_li).detach();
         $(parent).prepend(clicked_li);
+        $(clicked_li).find('.notice_light').hide();
 
         if ($(clicked_li).attr('chat-status') == 'pending') {
             $('.take_chat').addClass('action_show');
@@ -590,10 +594,7 @@
 
                     })
                     last_msg_id = response['last_msg_id'];
-
-                } else {
-                    showErrorMsg(response.info);
-                }
+                } 
             },
             error: function(xhr) {
                 const response = JSON.parse(xhr.responseText);

@@ -12,6 +12,7 @@ use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\Promotion;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Crypt;
 
 
 class StripeController extends Controller
@@ -62,7 +63,7 @@ class StripeController extends Controller
                         'product_data' => [
                             'name' => $cartItem->promotion->title,
                         ],
-                        'unit_amount'  => $cartItem->promotion->discount_amount * 100, // Stripe expects the price in cents
+                        'unit_amount'  => ($cartItem->promotion->original_price - $cartItem->promotion->discount_amount) * 100, // Stripe expects the price in cents
                     ],
                     'quantity' => $cartItem->quantity,
                 ];

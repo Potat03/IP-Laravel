@@ -65,7 +65,7 @@ class Product extends Model
 
     public function category()
     {
-        return $this->belongsToMany(Category::class, 'product_categories', 'product_id', 'category_name');
+        return $this->belongsToMany(Category::class, 'product_category', 'product_id', 'category_name');
     }
 
     public function getIsNewAttribute()

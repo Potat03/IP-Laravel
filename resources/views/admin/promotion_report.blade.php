@@ -86,8 +86,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-      <div id="revenue" style="width: 100%; height: 200px;"></div>
-      <div id="totalSold" style="width: 100%; height: 200px;"></div>
+      {!! $chart->container() !!}
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -96,69 +95,13 @@
   </div>
 </div>
 
-<div id="reportContainer"></div>
+{!! $html !!}
 
 @endsection
 
 @section('js')
-<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-<script  type="text/javascript" defer>
-    
-    google.charts.load('current', {packages: ['corechart','bar']});
-    google.charts.setOnLoadCallback(drawChart);
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    function drawChart() {
-        var data = google.visualization.arrayToDataTable([
-            ['Promotion', 'Revenue'],
-            @foreach($promotions as $promotion)
-            ['{{ $promotion->title }}', {{ $promotion->total_revenue }}],
-            @endforeach
-        ]);
+{!! $chart->script() !!}
 
-        var options = {
-            title: 'Promotion Performance Report',
-            chartArea: {width: '50%'},
-            hAxis: {
-                title: 'Total Sales',
-                minValue: 0
-            },
-            vAxis: {
-                title: 'Promotion'
-            }
-        };
-
-        var chart = new google.visualization.BarChart(document.getElementById('revenue'));
-
-        chart.draw(data, options);
-
-        var data2 = google.visualization.arrayToDataTable([
-            ['Promotion', 'Total Sold'],
-            @foreach($promotions as $promotion)
-            ['{{ $promotion->title }}', {{ $promotion->products_sold }}],
-            @endforeach
-        ]);
-
-        var options2 = {
-            title: 'Promotion Performance Report',
-            chartArea: {width: '50%'},
-            hAxis: {
-                title: 'Total Sold',
-                minValue: 0
-            },
-            vAxis: {
-                title: 'Promotion'
-            }
-        };
-
-        var chart2 = new google.visualization.BarChart(document.getElementById('totalSold'));
-
-        chart2.draw(data2, options2);
-    }
-
-    $(document).ready(function() {
-        
-        let html = `{!! $html !!}`;
-        document.getElementById('reportContainer').innerHTML = html;
-    });
-</script>
 @endsection

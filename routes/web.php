@@ -4,6 +4,7 @@ use App\Http\Middleware\customAuth;
 use App\Http\Middleware\AdminAuth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\AdminCustomerController;
 use App\Http\Controllers\ChatMessageController;
 use App\Http\Controllers\CollectiblesController;
 use App\Http\Controllers\ConsumablesController;
@@ -14,14 +15,12 @@ use App\Http\Controllers\WearableController;
 use App\Http\Controllers\CartItemController;
 use App\Http\Controllers\PromotionController;
 use App\Http\Controllers\CustomerController;
-use App\Http\Controllers\AdminCustomerController;
 use App\Http\Middleware\CustomerAuth;
+use App\Http\Controllers\APIkeyController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\StripeController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\OrderController;
-use App\Http\Controllers\OrderItemController;
-
 
 
 //Default
@@ -39,19 +38,43 @@ Route::get('/shop/collectible', [CollectiblesController::class, 'index'])->name(
 Route::get('/shop/new-arrivals', [ProductController::class, 'newArrivals'])->name('shop.newArrivals');
 Route::get('/product/{id}', [ProductController::class, 'show'])->name('product');
 
+// Route::get('/product/{id}', [ProductController::class, 'showProductImages']);
+
+// Route::get('/cart', function () {
+//     return view('cart');
+// });
 //Promotion
 Route::get('/promotion', [PromotionController::class, 'customerList'])->name('promotion');
 Route::get('/promotion/{id}', [PromotionController::class, 'viewDetails'])->name('promotion.details');
 
 //Cart
-Route::get('/product/{id}', [ProductController::class, 'showProductImages']);
+// Route::get('/product/{id}', [ProductController::class, 'showProductImages']);
 
+
+Route::get('/cart', [CartItemController::class, 'getCartItemByCustomerID']);    
+// Route::get('/cart', function () {
+//     return view('cart');
+// });
+
+Route::get('/cart', [CartItemController::class, 'getCartItemByCustomerID']);
+
+Route::get('/payment', function () {
+    return view('payment');
+});
+
+Route::post('/session', [StripeController::class, 'session'])->name('session');
+// Route::get('/success', [StripeController::class, 'success'])->name('success');
+Route::get('/success', [PaymentController::class, 'processCheckout'])->name('success');
+
+Route::get('/tracking', [OrderController::class, 'getOrderByCustomerID']);    
+Route::get('/orders/getMonthlySales', [OrderController::class, 'getMonthlySales']);
 
 //Chat
 Route::post('/sendMsg', [ChatMessageController::class, 'sendMessage'])->name('sendMsg');
 Route::post('/acceptChat', [ChatMessageController::class, 'acceptChat'])->name('acceptChat');
 Route::post('/endChat', [ChatMessageController::class, 'endChat'])->name('endChat');
 Route::post('/createChat', [ChatMessageController::class, 'createChat'])->name('createChat');
+Route::post('/rateChat', [ChatMessageController::class, 'rateChat'])->name('rateChat');
 
 Route::get('/getCustomerChat', [ChatMessageController::class, 'initCustomerChat'])->name('getCustomerChat');
 Route::get('/getAdmChatList', [ChatMessageController::class, 'initAdminChatList'])->name('getAdmChatList');
@@ -92,10 +115,16 @@ Route::middleware([CustomerAuth::class])->group(function () {
     Route::get('/shippingSec', [CustomerController::class, 'shippingSec'])->name('user.shippingSec');
     Route::get('/supportChatSec', [CustomerController::class, 'supportChatSec'])->name('user.supportChatSec');
     Route::get('/settingSec', [CustomerController::class, 'settingSec'])->name('user.settingSec');
+    Route::get('/otpVerify', [CustomerController::class, 'otpVerification'])->name('profile.otpVerification');
+    Route::get('/enterNewPassword', [CustomerController::class, 'enterNewPassword'])->name('profile.enterNewPassword');
     Route::put('/profile/update', [CustomerController::class, 'updateProfile'])->name('profile.update');
+    Route::post('/profile/requestOtp', [CustomerController::class, 'requestOtp'])->name('profile.requestOtp');
+    Route::post('/profile/verifyOtp', [CustomerController::class, 'verifyOtp'])->name('profile.verifyOtp');
+    Route::put('/profile/change-password', [CustomerController::class, 'changePassword'])->name('profile.changePassword');
+});
 
    
-});
+
 
 //ws
 //communication security 
@@ -141,6 +170,10 @@ Route::middleware([AdminAuth::class])->group(function () {
         return view('admin.product');
     });
 
+    Route::get('/admin/chatReport', function () {
+        return view('admin.chat_report');
+    });
+
     Route::get('/product/get/images/{id}', [ProductController::class, 'showProductImagesAdmin']);
 
     Route::get('/admin/product', action: [ProductController::class, 'getAll'])->name('admin.product');
@@ -158,52 +191,17 @@ Route::middleware([AdminAuth::class])->group(function () {
     Route::get('/admin/promotion/report', [PromotionController::class, 'generatePromotionReport'])->name('admin.promotion.report');
     Route::get('/admin/promotion/report/download', [PromotionController::class, 'downloadXMLReport'])->name('admin.promotion.report.download');
 
+    Route::get('/admin/apikey', [APIkeyController::class, 'listKey'])->name('admin.apikey');
+    Route::get('/admin/customer', [AdminCustomerController::class, 'getAll'])->name('admin.customer');
+    Route::post('/admin/customer/{id}/update', [AdminCustomerController::class, 'update'])->name('admin.customer.update');
+    Route::get('/admin/customer/report', [AdminCustomerController::class, 'showReportPage'])->name('admin.customer.report');
+    Route::get('/admin/customer/report/generateXML', [AdminCustomerController::class, 'generateXMLReport'])->name('admin.customer.generateXML');
+    Route::get('/admin/customer/report/generateXSLT', [AdminCustomerController::class, 'generateXSLTReport'])->name('admin.customer.generateXSLT');
+    Route::get('/admin/orders/prepare', [OrderController::class, 'getPrepareOrders'])->name('admin.orders_prepare');
+    Route::get('/admin/orders/delivery', [OrderController::class, 'getDeliveryOrders'])->name('admin.orders_delivery');
+    Route::get('/admin/orders/delivered', [OrderController::class, 'getDeliveredOrders'])->name('admin.orders_delivered');
+    Route::get('/admin/orders/orderStatusReport', [OrderController::class, 'generateOrderStatusReport'])->name('admin.orders.sales_report');
 });
-
-//WK route
-Route::get('/userlogin', ['middleware' => 'guest:customer', function () {
-    return view('userlogin');
-}])->name('user.login');
-
-Route::middleware([CustomerAuth::class])->group(function () {
-
-    Route::get('/profile', function () {
-        return view('userprofile/layout/userProfile');
-    })->name('user.profile');
-});
-
-Route::get('/userverify', function () {
-    return view('userVerification');
-})->name('user.verify');
-
-
-//WK route
-Route::get('/userlogin', ['middleware' => 'guest:customer', function () {
-    return view('userlogin');
-}])->name('user.login');
-
-Route::middleware([CustomerAuth::class])->group(function () {
-
-    Route::get('/profile', function () {
-        return view('userprofile/layout/userProfile');
-    })->name('user.profile');
-
-    //profile content
-    Route::get('/profileSec', [CustomerController::class, 'profileSec'])->name('profile.profileSec');
-    Route::get('/orderHistorySec', [CustomerController::class, 'orderHistorySec'])->name('profile.orderHistorySec');
-    Route::get('/shippingSec', [CustomerController::class, 'shippingSec'])->name('profile.shippingSec');
-    Route::get('/supportChatSec', [CustomerController::class, 'supportChatSec'])->name('profile.supportChatSec');
-    Route::get('/settingSec', [CustomerController::class, 'settingSec'])->name('profile.settingSec');
-});
-
-
-
-
-
-
-
-
-
 
 //TW blade
 Route::get('/wei', function () {
@@ -251,30 +249,21 @@ Route::get('/getAdmChatList', [ChatMessageController::class, 'initAdminChatList'
 Route::get('/getChatMessage', [ChatMessageController::class, 'adminGetMessage'])->name('getChatMessage');
 Route::get('/getNewMessages', [ChatMessageController::class, 'fetchLatestMessages'])->name('getNewMessages');
 
-
-
-
 use App\Http\Controllers\AdminController;
+
 Route::post('/admin', [AdminController::class, 'create'])->name('admin.create');
-
-
 Route::get('login2', [AuthController::class, 'showLoginForm'])->name('login2');
-
 Route::middleware([AdminAuth::class])->group(function () {
     Route::get('/testchat', function () {
         return view('chatConnectionTest');
-    }); 
-    
+    });
+
     Route::post('login2', [AuthController::class, 'login']);
     Route::post('logout2', [AuthController::class, 'logout'])->name('logout2');
     Route::post('/send-message', [ChatMessageController::class, 'sendMessage'])->name('send.message');
     Route::get('/get-messages', [ChatMessageController::class, 'getMessages'])->name('get.messages');
 });
 
-
-
-
 Route::get('/testmsgcust', function () {
     return view('customer_popup_chat');
 });
-

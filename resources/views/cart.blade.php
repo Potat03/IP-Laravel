@@ -154,11 +154,12 @@ class="d-block img-thumbnail border-0" alt="product image">
                             // Use raw values for calculation
                             $oriUnitPrice = $cartItem->promotion->original_price;
                             $disUnitPrice = $cartItem->promotion->discount_amount;
+                            $unitPriceAfterDis =  $oriUnitPrice- $disUnitPrice;
                             $totalForItem = $cartItem->quantity * $disUnitPrice;
             
                             // Format for display after calculation
                             $formattedOriUnitPrice = number_format($oriUnitPrice, 2);
-                            $formattedDisUnitPrice = number_format($disUnitPrice, 2);
+                            $formattedunitPriceAfterDis = number_format($unitPriceAfterDis, 2);
                             $formattedTotalForItem = number_format($totalForItem, 2);
                         @endphp
                         <tr id="cartItemRow_{{$id}}" class="animate-row" style="animation-delay:'. 0.05 * {{$x}} .'s;">
@@ -184,7 +185,7 @@ class="d-block img-thumbnail border-0" alt="product image">
                             </td>
                             <td style="width:15%;" id="unitPrice_{{$id}}">
                                 <span style="text-decoration: line-through;" id="oriUnitPrice_{{$id}}">RM {{$formattedOriUnitPrice}}</span><br>
-                                <span id="disUnitPrice_{{$id}}">RM {{$formattedDisUnitPrice}}</span>
+                                <span id="disUnitPrice_{{$id}}">RM {{$formattedunitPriceAfterDis}}</span>
                             </td>
                                                         <td style="width:15%;">
                                 <div class="input-group mb-3" style="justify-content: center;margin-bottom:0!important;">
@@ -202,7 +203,7 @@ class="d-block img-thumbnail border-0" alt="product image">
                         </tr>
                         @php
                             // Use raw values for subtotal calculation
-                            $totalDiscount += ($oriUnitPrice * $quantity) - ($disUnitPrice * $quantity);
+                            $totalDiscount += $disUnitPrice * $quantity;
                             $subtotal += $cartItem->quantity * $oriUnitPrice;
                             $x += 1;
                         @endphp
@@ -781,4 +782,22 @@ document.addEventListener('DOMContentLoaded', (event) => {
         row.classList.add('animate-row');
     });
 });
+
+document.addEventListener('DOMContentLoaded', function() {
+        var popupButtons = document.querySelectorAll('.popup_btn');
+        var popupImages = document.querySelectorAll('.popup_image_big_preview');
+        var popupBoxes = document.querySelectorAll('.popup_box');
+
+        popupButtons.forEach(function(button) {
+            button.remove();
+        });
+
+        popupImages.forEach(function(image) {
+            image.remove();
+        });
+
+        popupBoxes.forEach(function(box) {
+            box.remove();
+        });
+    });
 </script>

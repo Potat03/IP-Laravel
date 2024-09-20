@@ -8,15 +8,12 @@ use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Promotion;
 use App\Models\PromotionItem;
-use Carbon\Carbon;
-use App\Models\Wearable;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Admin;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Wearable;
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
-
-use function Symfony\Component\String\b;
 
 class DatabaseSeeder extends Seeder
 {
@@ -25,20 +22,29 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
+        // Seed Customers
         Customer::create([
             'username' => 'customer1',
             'tier' => 'gold',
             'phone_number' => '081234567890',
-            'email' => 'customer@gmail.com',
-            'password' =>  bcrypt('password'),
+            'email' => 'customer1@gmail.com',
+            'password' => bcrypt('password'),
             'status' => 'active',
         ]);
 
+        Customer::create([
+            'username' => 'customer2',
+            'tier' => 'silver',
+            'phone_number' => '082345678901',
+            'email' => 'customer2@gmail.com',
+            'password' => bcrypt('password'),
+            'status' => 'active',
+        ]);
+
+        // Seed Products
         Product::create([
             'name' => 'product1',
-            'description' => 'product1 description',
+            'description' => 'Product 1 description',
             'price' => '100',
             'stock' => '10',
             'status' => 'active',
@@ -46,192 +52,240 @@ class DatabaseSeeder extends Seeder
 
         Product::create([
             'name' => 'product2',
-            'description' => 'product2 description',
-            'price' => '1000',
-            'stock' => '50',
+            'description' => 'Product 2 description',
+            'price' => '200',
+            'stock' => '20',
             'status' => 'active',
         ]);
 
         Product::create([
             'name' => 'product3',
-            'description' => 'product3 description',
-            'price' => '1000',
-            'stock' => '50',
+            'description' => 'Product 3 description',
+            'price' => '300',
+            'stock' => '30',
             'status' => 'active',
         ]);
 
         Product::create([
             'name' => 'product4',
-            'description' => 'product4 description',
-            'price' => '1000',
-            'stock' => '0',
+            'description' => 'Product 4 description',
+            'price' => '400',
+            'stock' => '40',
             'status' => 'active',
         ]);
 
+        // Seed Wearables
         Wearable::create([
-            'product_id' => '1',
+            'product_id' => 1,
             'size' => 'M,L,XL',
             'color' => 'black,white',
             'user_group' => 'men'
         ]);
 
         Wearable::create([
-            'product_id' => '2',
-            'size' => 'M,L,XL',
-            'color' => 'black,green',
-            'user_group' => 'men'
+            'product_id' => 2,
+            'size' => 'S,M,L',
+            'color' => 'blue,red',
+            'user_group' => 'women'
+        ]);
+
+        // Seed Carts
+        Cart::create([
+            'customer_id' => 1,
+            'subtotal' => '3000',
+            'delivery_fee' => '50',
+            'total_discount' => '500',
+            'total' => '2550',
         ]);
 
         Cart::create([
-            'customer_id' => '1',
-            'subtotal' => '8400',
-            'delivery_fee' => '5',
-            'total_discount' => '2220',
-            'total' => '6185',
+            'customer_id' => 2,
+            'subtotal' => '5000',
+            'delivery_fee' => '100',
+            'total_discount' => '1000',
+            'total' => '4100',
+        ]);
+
+        // Seed Promotions
+        Promotion::create([
+            'title' => 'Summer Sale',
+            'description' => 'Discount on summer collection',
+            'discount' => '20',
+            'discount_amount' => '200',
+            'original_price' => '1000',
+            'type' => 'percentage',
+            'limit' => '50',
+            'status' => 'active',
+            'start_at' => Carbon::now(),
+            'end_at' => Carbon::now()->addDays(30),
         ]);
 
         Promotion::create([
-            'title'=>'promotion1',
-            'description'=>'promotion_description',
-            'discount'=>'10',
-            'discount_amount'=> '990',
-            'original_price'=>'1100',
-            'type'=>'test',
-            'limit'=>'10',
-            'status' =>'active',
-            'start_at' => Carbon::now(), 
-            'end_at' => Carbon::now()->addDays(7), 
+            'title' => 'Winter Sale',
+            'description' => 'Discount on winter collection',
+            'discount' => '30',
+            'discount_amount' => '300',
+            'original_price' => '1500',
+            'type' => 'percentage',
+            'limit' => '30',
+            'status' => 'active',
+            'start_at' => Carbon::now(),
+            'end_at' => Carbon::now()->addDays(60),
         ]);
+
+        // Seed Promotion Items
         PromotionItem::create([
-            'promotion_id'=>'1',
-            'product_id'=>'1',
-            'quantity'=>'1',
+            'promotion_id' => 1,
+            'product_id' => 1,
+            'quantity' => 2,
         ]);
+
         PromotionItem::create([
-            'promotion_id'=>'1',
-            'product_id'=>'2',
-            'quantity'=>'1',
+            'promotion_id' => 1,
+            'product_id' => 2,
+            'quantity' => 1,
         ]);
 
-        Promotion::create([
-            'title'=>'promotion2',
-            'description'=>'promotion_description',
-            'discount'=>'50',
-            'discount_amount'=> '1000',
-            'original_price'=>'2000',
-            'type'=>'test',
-            'limit'=>'10',
-            'status' =>'active',
-            'start_at' => Carbon::now(), 
-            'end_at' => Carbon::now()->addDays(7), 
-        ]);
         PromotionItem::create([
-            'promotion_id'=>'2',
-            'product_id'=>'2',
-            'quantity'=>'1',
+            'promotion_id' => 2,
+            'product_id' => 3,
+            'quantity' => 3,
         ]);
+
         PromotionItem::create([
-            'promotion_id'=>'2',
-            'product_id'=>'3',
-            'quantity'=>'1',
-        ]);
-    
-        
-        CartItem::create([
-            'customer_id' => '1',
-            'product_id' => '1',
-            'promotion_id' =>null,
-            'quantity' => '2',
-            'subtotal' => '200',
-            'discount' => '0',
-            'total' => '200', 
+            'promotion_id' => 2,
+            'product_id' => 4,
+            'quantity' => 1,
         ]);
 
-        CartItem::create([
-            'customer_id' => '1',
-            'product_id' => '2',
-            'promotion_id' => null,
-            'quantity' => '2',
-            'subtotal' => '2000',
-            'discount' => '0',
-            'total' => '2000', 
-        ]);
-
-        
-        CartItem::create([
-            'customer_id' => '1',
-            'product_id' => null,
-            'promotion_id' =>'1',
-            'quantity' => '2',
-            'subtotal' => '2200',
-            'discount' => '220',
-            'total' => '1980', 
-        ]);
-
-        CartItem::create([
-            'customer_id' => '1',
-            'product_id' => null,
-            'promotion_id' => '2',
-            'quantity' => '2',
-            'subtotal' => '4000',
-            'discount' => '2000',
-            'total' => '2000', 
-        ]);
-
+        // Seed Orders
         Order::create([
-            'customer_id' => '1',
-            'subtotal' => '10000',
-            'total_discount' => '0',
-            'total' => '10000',
-            'status' => 'pending',
+            'customer_id' => 1,
+            'subtotal' => '5000',
+            'total_discount' => '1000',
+            'total' => '4000',
+            'status' => 'delivered',
             'delivery_address' => 'Jl. Raya Bogor',
             'delivery_method' => 'JNE',
             'tracking_number' => '1234567890',
+            'created_at' => Carbon::now()->subDays(10),
+            'updated_at' => Carbon::now()->subDays(10),
+        ]);
+
+        Order::create([
+            'customer_id' => 2,
+            'subtotal' => '3000',
+            'total_discount' => '500',
+            'total' => '2500',
+            'status' => 'delivery',
+            'delivery_address' => 'Jl. Raya Jakarta',
+            'delivery_method' => 'JNE',
+            'tracking_number' => '0987654321',
+            'created_at' => Carbon::now()->subDays(5),
+            'updated_at' => Carbon::now()->subDays(5),
+        ]);
+
+        // Seed Order Items
+        OrderItem::create([
+            'order_id' => 1,
+            'promotion_id' => 1,
+            'product_id' => 1,
+            'quantity' => 2,
+            'subtotal' => '2000',
+            'discount' => '200',
+            'total' => '1800',
         ]);
 
         OrderItem::create([
-            'order_id' => '1',
-            'promotion_id' => '1',
-            'quantity' => '1',
-            'subtotal' => '10000',
-            'discount' => '0',
-            'total' => '10000',
+            'order_id' => 1,
+            'promotion_id' => 2,
+            'product_id' => 2,
+            'quantity' => 2,
+            'subtotal' => '4000',
+            'discount' => '800',
+            'total' => '3200',
         ]);
 
+        OrderItem::create([
+            'order_id' => 2,
+            'promotion_id' => 1,
+            'product_id' => 3,
+            'quantity' => 1,
+            'subtotal' => '1500',
+            'discount' => '150',
+            'total' => '1350',
+        ]);
+
+        OrderItem::create([
+            'order_id' => 2,
+            'promotion_id' => 2,
+            'product_id' => 4,
+            'quantity' => 1,
+            'subtotal' => '400',
+            'discount' => '120',
+            'total' => '280',
+        ]);
+
+        // Seed Admins
         Admin::create([
+            'name' => 'Manager',
             'role' => 'manager',
             'email' => 'manager@gmail.com',
-            'password' => '$2y$12$SPXDqYIUQGznYrtl7pxsAet5RAxKZhVb6r.9aEgylQlbP2DI89mJO',
+            'password' => bcrypt('managerpassword'),
             'status' => 'active',
         ]);
 
         Admin::create([
+            'name' => 'Admin 1',
             'role' => 'admin',
             'email' => 'admin1@gmail.com',
-            'password' =>  '$2y$12$SPXDqYIUQGznYrtl7pxsAet5RAxKZhVb6r.9aEgylQlbP2DI89mJO',
+            'password' => bcrypt('adminpassword'),
             'status' => 'active',
         ]);
 
         Admin::create([
+            'name' => 'Admin 2',
             'role' => 'admin',
             'email' => 'admin2@gmail.com',
-            'password' =>  '$2y$12$SPXDqYIUQGznYrtl7pxsAet5RAxKZhVb6r.9aEgylQlbP2DI89mJO',
+            'password' => bcrypt('adminpassword'),
             'status' => 'active',
         ]);
 
         Admin::create([
+            'name' => 'Customer Service 1',
             'role' => 'customer_service',
             'email' => 'cs1@gmail.com',
-            'password' =>  '$2y$12$SPXDqYIUQGznYrtl7pxsAet5RAxKZhVb6r.9aEgylQlbP2DI89mJO',
+            'password' => bcrypt('customerpassword'),
             'status' => 'active',
         ]);
 
         Admin::create([
+            'name' => 'Customer Service 2',
             'role' => 'customer_service',
             'email' => 'cs2@gmail.com',
-            'password' =>  '$2y$12$SPXDqYIUQGznYrtl7pxsAet5RAxKZhVb6r.9aEgylQlbP2DI89mJO',
+            'password' => bcrypt('customerpassword'),
             'status' => 'active',
         ]);
-        
+
+        CartItem::create([
+            'customer_id'=>1,
+            'product_id'=>1,
+            'promotion_id'=>null,
+            'quantity'=>2,
+            'details'=>'black',
+            'subtotal'=>200.00,
+            'discount'=>0,
+            'total'=>200,
+        ]);
+        CartItem::create([
+            'customer_id'=>1,
+            'product_id'=>null,
+            'promotion_id'=>2,
+            'quantity'=>2,
+            'details'=>'black',
+            'subtotal'=>3000.00,
+            'discount'=>600,
+            'total'=>2400,
+        ]);
     }
 }

@@ -20,11 +20,15 @@
 .popup_btn_icon {
     font-size: 2em;
     color: #fff;
-    padding: 10px;
     border-radius: 50%;
     cursor: pointer;
     background-color: var(--red);
     opacity: 0.8;
+    height: 60px;
+    width: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .popup_btn_icon:hover, .popup_active .popup_btn_icon, .popup_btn_txt:hover + .popup_btn_icon{
@@ -661,10 +665,34 @@
     transform: translateX(-50%);
     opacity: 0.8;
     display: block;
+    user-select: none;
 }
 
 .chat_ended_message.hide{
     display: none;
+}
+
+.chat_ended_message button{
+    font-size: 0.8em;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+    color: var(--white);
+    background-color: var(--red);
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.1s;
+    opacity: 0.6;
+}
+
+.chat_ended_message button:hover{
+    opacity: 8;
+}
+
+.chat_ended_message button:active{
+    opacity: 1;
 }
 
 /* End Popup */

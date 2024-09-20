@@ -13,11 +13,14 @@ class Chat extends Model
 
     protected $primaryKey = 'chat_id';
 
+    public $timestamps = false;
+
     protected $fillable = [
         'customer_id',
         'admin_id',
         'status',
-        'ended_at'
+        'accepted_at',
+        'ended_at',
     ];
 
     public function admin()

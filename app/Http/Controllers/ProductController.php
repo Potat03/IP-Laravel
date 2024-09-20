@@ -1,14 +1,22 @@
 <?php
 
+/**
+ *
+ * Author: Lim Weng Ni
+ * Date: 20/09/2024
+ */
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Models\Product;
 use App\Models\Wearable;
 use App\Models\Collectible;
 use App\Models\Consumable;
 use App\Models\Category;
 use App\Models\Rating;
+use App\Models\OrderItem;
 use App\Contexts\ProductContext;
 use App\Strategies\WearableStrategy;
 use App\Strategies\CollectibleStrategy;
@@ -31,7 +39,7 @@ class ProductController extends Controller
     {
         try {
             $request->validate([
-                'images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+                'images.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
                 'filesArray' => 'nullable|string',
             ]);
 
@@ -77,7 +85,7 @@ class ProductController extends Controller
     {
         try {
             $request->validate([
-                'images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+                'images.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
                 'existingImages' => 'nullable|string',
                 'filesArray' => 'nullable|string',
             ]);
@@ -295,21 +303,19 @@ class ProductController extends Controller
         }
     }
 
+    //for customer side
     public function index(Request $request)
     {
         try {
             $query = $request->input('search');
             $categoryNames = $request->input('categories', []);
 
-            // Initialize the product query
             $productQuery = Product::query();
 
-            // Apply search filter if provided
             if ($query) {
                 $productQuery->where('name', 'LIKE', "%$query%");
             }
 
-            // Apply category filter if provided
             if (!empty($categoryNames)) {
                 $productQuery->whereIn('product_id', function ($subQuery) use ($categoryNames) {
                     $subQuery->select('product_id')
@@ -320,25 +326,20 @@ class ProductController extends Controller
                 });
             }
 
-            // Paginate products
             $products = $productQuery->paginate(20);
 
-            // Extract product IDs from the paginated results
-            $productIds = $products->items(); // Get the items on the current page
-            $productIds = collect($productIds)->pluck('product_id')->toArray(); // Convert to collection and pluck IDs
+            $productIds = $products->items();
+            $productIds = collect($productIds)->pluck('product_id')->toArray();
 
-            // Fetch main images using the ProductController's getMainImages method
             $productController = new ProductController();
             $mainImages = $productController->getMainImages($productIds);
 
-            // Fetch ratings for products
             $ratingController = new RatingController();
             $productsWithRatings = $ratingController->fetchRatingsForShop($productIds, $products);
 
-            // Fetch all categories for view
             $categories = Category::all();
 
-            // Return view based on AJAX request
+            // use AJAX request return for searching
             if ($request->ajax()) {
                 return view('shop.partials.product-list', [
                     'products' => $productsWithRatings,
@@ -347,7 +348,7 @@ class ProductController extends Controller
                 ]);
             }
 
-            // Return the main view (if not AJAX)
+            // return the main view (if not AJAX)
             return view('shop', [
                 'products' => $productsWithRatings,
                 'mainImages' => $mainImages,
@@ -359,7 +360,38 @@ class ProductController extends Controller
         }
     }
 
+    //admin side
     public function getAll(Request $request)
+    {
+        try {
+            $productQuery = Product::query();
+
+            $query = $request->input('search');
+
+            if ($query) {
+                $productQuery->where('name', 'LIKE', "%$query%");
+            }
+
+            $products = $productQuery->get();
+
+            $categoryController = new CategoryController();
+            $categories = $categoryController->index();
+
+            // use AJAX request return for searching
+            if ($request->ajax()) {
+                return view('admin.partials.data-holder', [
+                    'products' => $products,
+                ]);
+            }
+
+            return view('admin.product', ['products' => $products, 'categories' => $categories]);
+        } catch (Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
+        }
+    }
+
+    //python api
+    public function getAllProducts(Request $request)
     {
         try {
             $products = Product::all();
@@ -367,7 +399,13 @@ class ProductController extends Controller
             $categoryController = new CategoryController();
             $categories = $categoryController->index();
 
-            return view('admin.product', ['products' => $products, 'categories' => $categories]);
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'products' => $products,
+                    'categories' => $categories
+                ]
+            ], 200);
         } catch (Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
         }
@@ -459,7 +497,7 @@ class ProductController extends Controller
         }
     }
 
-    // Show product images
+    //Show product images
     // public function showProductImages($id)
     // {
     //     $product = Product::find($id);
@@ -668,25 +706,20 @@ class ProductController extends Controller
     public function showNewArrivals()
     {
         try {
-            // Get new arrivals
             $newArrivals = Product::where('created_at', '>=', now()->subDays(30))
                 ->where('status', 'active')
                 ->orderBy('created_at', 'desc')
                 ->take(10)
                 ->get();
 
-            // Get product IDs
             $newArrivalsIds = $newArrivals->pluck('product_id')->toArray();
 
-            // Fetch main images
             $mainImages = $this->getMainImages($newArrivalsIds);
 
             $ratingcontroller = new RatingController();
 
-            // Fetch ratings
             $groupedRatings = $ratingcontroller->fetchRatings($newArrivalsIds);
 
-            /// Prepare data for the view
             $data = $newArrivals->map(function ($product) use ($mainImages, $groupedRatings) {
                 $productId = (int) $product->product_id;
                 $productRatings = $groupedRatings[$productId] ?? [];
@@ -713,24 +746,19 @@ class ProductController extends Controller
     public function newArrivals()
     {
         try {
-            // Get new arrivals
             $newArrivals = Product::where('created_at', '>=', now()->subDays(30))
                 ->where('status', 'active')
                 ->orderBy('created_at', 'desc')
                 ->paginate(20);
 
-            // Get product IDs
             $newArrivalsIds = $newArrivals->pluck('product_id')->toArray();
 
-            // Fetch main images
             $mainImages = $this->getMainImages($newArrivalsIds);
 
             $ratingController = new RatingController();
 
-            // Fetch ratings
             $groupedRatings = $ratingController->fetchRatings($newArrivalsIds);
 
-            // Prepare data for the view
             $data = $newArrivals->getCollection()->map(function ($product) use ($mainImages, $groupedRatings) {
                 $productId = (int) $product->product_id;
                 $productRatings = $groupedRatings[$productId] ?? [];
@@ -746,7 +774,6 @@ class ProductController extends Controller
                 ];
             });
 
-            // Update the paginated collection with transformed data
             $newArrivals->setCollection($data);
 
             return view('shop.new-arrivals', ['newArrivals' => $newArrivals]);
@@ -758,47 +785,86 @@ class ProductController extends Controller
 
     public function generateProductReport()
     {
-        // Fetch all products along with their associated category
         $products = Product::all();
 
-        // Prepare XML content with the basic product details, including the category
-        $xmlContent = $this->generateXMLContentForBasicProductInfo($products);
+        $totalValue = Product::sum(DB::raw('price * stock'));
 
-        // Save the XML content to a file (optional)
-        Storage::put('xml/product_report.xml', $xmlContent);
+        $cogs = OrderItem::select(DB::raw('SUM(order_items.quantity * product.price) as total'))
+            ->join('product', 'order_items.product_id', '=', 'product.product_id')
+            ->whereMonth('order_items.created_at', '=', date('m'))
+            ->value('total');
 
-        // Load the XSLT file for transforming the XML into HTML
+        $averageInventory = Product::avg('stock');
+        $inventoryTurnoverRate = $averageInventory ? $cogs / $averageInventory : 0;
+
+        $monthlySales = OrderItem::select('product_id', DB::raw('SUM(quantity) as total_sold'))
+            ->whereMonth('created_at', '=', date('m'))
+            ->groupBy('product_id')
+            ->pluck('total_sold', 'product_id');
+
+        $averageMonthlySales = OrderItem::select('product_id', DB::raw('AVG(quantity) as average_sold'))
+            ->groupBy('product_id')
+            ->pluck('average_sold', 'product_id');
+
+        $reorderRecommendations = [];
+        $leadTimeMonths = 3;
+
+        foreach ($products as $product) {
+            $averageSold = $averageMonthlySales[$product->product_id] ?? 0;
+            $currentStock = $product->stock;
+
+            if ($averageSold > 0) {
+                $recommendedQuantity = ($averageSold * $leadTimeMonths) - $currentStock;
+                if ($recommendedQuantity > 0) {
+                    $reorderRecommendations[$product->product_id] = $recommendedQuantity;
+                }
+            }
+        }
+
+        $xmlContent = $this->generateXMLContentForBasicProductInfo($products, $monthlySales, $totalValue, $inventoryTurnoverRate, $reorderRecommendations);
+
         $xslt = new \DOMDocument();
         $xslt->load(storage_path('app/xslt/product_report.xslt'));
 
-        // Load the generated XML content
         $xml = new \DOMDocument();
         $xml->loadXML($xmlContent);
 
-        // Apply the XSLT transformation
         $proc = new \XSLTProcessor();
         $proc->importStylesheet($xslt);
 
-        // Transform XML to HTML
         $html = $proc->transformToXML($xml);
 
-        // Return the view with the generated HTML
-        return view('admin.product_report', ['html' => $html, 'products' => $products]);
+        return view('admin.product_report', [
+            'html' => $html,
+            'products' => $products,
+            'totalValue' => $totalValue,
+            'inventoryTurnoverRate' => $inventoryTurnoverRate,
+        ]);
     }
 
-    private function generateXMLContentForBasicProductInfo($products)
+    private function generateXMLContentForBasicProductInfo($products, $monthlySales, $totalValue, $inventoryTurnoverRate, $reorderRecommendations)
     {
-        $xml = new \SimpleXMLElement('<products/>');
+        $xml = new \SimpleXMLElement('<report/>');
 
+        $xml->addChild('total_value', $totalValue);
+        $xml->addChild('inventory_turnover_rate', $inventoryTurnoverRate);
+
+        $productsNode = $xml->addChild('products');
         foreach ($products as $product) {
-            $productNode = $xml->addChild('product');
+            $productNode = $productsNode->addChild('product');
             $productNode->addChild('id', $product->product_id);
             $productNode->addChild('name', $product->name);
             $type = $product->getProductType();
             $productNode->addChild('type', $type);
             $productNode->addChild('price', $product->price);
-            $productNode->addChild('stock', $product->stock); // Assuming there's a stock attribute
-            $productNode->addChild('status', $product->status); // Assuming status is a field in your product model
+            $productNode->addChild('stock', $product->stock);
+            $productNode->addChild('status', $product->status);
+
+            $totalSold = $monthlySales[$product->product_id] ?? 0;
+            $productNode->addChild('total_sold', $totalSold);
+
+            $recommendedQuantity = $reorderRecommendations[$product->product_id] ?? 0;
+            $productNode->addChild('restock_recommendation', $recommendedQuantity);
         }
 
         return $xml->asXML();

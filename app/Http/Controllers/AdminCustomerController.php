@@ -11,14 +11,21 @@ class AdminCustomerController extends Controller
     {
         $search = $request->input('search');
 
-        $customers = Customer::when($search, function ($query, $search) {
-            return $query->where('username', 'like', '%' . $search . '%')
-                ->orWhere('email', 'like', '%' . $search . '%')
-                ->orWhere('tier', 'like', '%' . $search . '%')
-                ->orWhere('status', 'like', '%' . $search . '%');
-        })->get();
+        $customers = Customer::withSum('Order', 'subtotal')
+            ->when($search, function ($query, $search) {
+                return $query->where('username', 'like', '%' . $search . '%')
+                    ->orWhere('email', 'like', '%' . $search . '%')
+                    ->orWhere('tier', 'like', '%' . $search . '%')
+                    ->orWhere('status', 'like', '%' . $search . '%');
+            })->get();
 
         return view('admin.customer', compact('customers'));
+    }
+
+
+    public function showReportPage()
+    {
+        return view('admin.customer_report');
     }
 
     public function update(Request $request, $id)
@@ -35,61 +42,72 @@ class AdminCustomerController extends Controller
         return response()->json(['success' => true]);
     }
 
+    public function generateXMLReport()
+    {
+        $customers = Customer::withSum('Order', 'subtotal')->get();
 
-    // public function generateXML()
-    // {
-    //     $customers = Customer::all();
+        $xml = new \DOMDocument('1.0', 'UTF-8');
+        $xml->formatOutput = true;
 
-    //     $xml = new \DOMDocument('1.0', 'UTF-8');
-    //     $xml->formatOutput = true;
+        $root = $xml->createElement('customers');
+        $xml->appendChild($root);
 
-    //     $root = $xml->createElement('customers');
-    //     $xml->appendChild($root);
+        foreach ($customers as $customer) {
+            $customerNode = $xml->createElement('customer');
 
-    //     foreach ($customers as $customer) {
-    //         $customerNode = $xml->createElement('customer');
+            $id = $xml->createElement('id', $customer->customer_id);
+            $customerNode->appendChild($id);
 
-    //         $id = $xml->createElement('id', $customer->customer_id);
-    //         $customerNode->appendChild($id);
+            $username = $xml->createElement('username', $customer->username);
+            $customerNode->appendChild($username);
 
-    //         $username = $xml->createElement('username', $customer->username);
-    //         $customerNode->appendChild($username);
+            $email = $xml->createElement('email', $customer->email);
+            $customerNode->appendChild($email);
 
-    //         $email = $xml->createElement('email', $customer->email);
-    //         $customerNode->appendChild($email);
+            $tier = $xml->createElement('tier', $customer->tier);
+            $customerNode->appendChild($tier);
 
-    //         $tier = $xml->createElement('tier', $customer->tier);
-    //         $customerNode->appendChild($tier);
+            $status = $xml->createElement('status', $customer->status);
+            $customerNode->appendChild($status);
 
-    //         $status = $xml->createElement('status', $customer->status);
-    //         $customerNode->appendChild($status);
+            $totalSpent = $xml->createElement('total_spent', $customer->orders_sum_subtotal); // Add total spent
+            $customerNode->appendChild($totalSpent);
 
-    //         $root->appendChild($customerNode);
-    //     }
+            $root->appendChild($customerNode);
+        }
 
-    //     if (!file_exists(resource_path('storage'))) {
-    //         mkdir(resource_path('storage'), 0755, true);
-    //     }
+        $xmlDirectory = storage_path('app/xml');
+        if (!file_exists($xmlDirectory)) {
+            mkdir($xmlDirectory, 0755, true);
+        }
 
-    //     $filePath = resource_path('storage/customers.xml');
-    //     $xml->save($filePath);
+        $filePath = $xmlDirectory . '/customer_report.xml';
+        $xml->save($filePath);
 
-    //     return response()->download($filePath);
-    // }
+        return response()->download($filePath);
+    }
 
-    // public function generateXSLTReport()
-    // {
-    //     $xml = new \DOMDocument();
-    //     $xml->load(resource_path('storage/customers.xml')); // Load from storage
 
-    //     $xsl = new \DOMDocument();
-    //     $xsl->load(resource_path('storage/customers_report.xsl')); // XSLT also in storage
+    public function generateXSLTReport()
+    {
+        $xmlFile = storage_path('app/xml/customer_report.xml');
+        $xsltFile = storage_path('app/xslt/customer_report.xslt');
 
-    //     $proc = new \XSLTProcessor();
-    //     $proc->importStylesheet($xsl);
+        if (!file_exists($xmlFile) || !file_exists($xsltFile)) {
+            return response()->json(['error' => 'XML or XSLT file not found.'], 404);
+        }
 
-    //     $html = $proc->transformToXML($xml);
+        $xml = new \DOMDocument();
+        $xml->load($xmlFile);
 
-    //     return response($html)->header('Content-Type', 'text/html');
-    // }
+        $xslt = new \DOMDocument();
+        $xslt->load($xsltFile);
+
+        $proc = new \XSLTProcessor();
+        $proc->importStylesheet($xslt);
+
+        $html = $proc->transformToXML($xml);
+
+        return response($html)->header('Content-Type', 'text/html');
+    }
 }

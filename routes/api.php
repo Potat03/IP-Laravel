@@ -21,6 +21,8 @@
     //pass login/register details
     use App\Http\Controllers\AuthController;
     use App\Http\Middleware\CustomerAuth;
+    use App\Http\Middleware\AdminAuth;
+    use App\Http\Controllers\APIkeyController;
 
     Route::get('/auth', [AuthController::class, 'showCustomerForm'])->name('auth.showForm');
     Route::group(['middleware' => ['web']], function () {
@@ -37,6 +39,11 @@
 
         Route::post('/admin/login', [AuthController::class, 'adminLogin'])->name('auth.adminLogin');
         Route::post('/admin/logout', [AuthController::class, 'adminLogout'])->name('auth.adminLogout');
+
+        Route::middleware([AdminAuth::class])->group(function () {
+            Route::post('/admin/apikey/create', [APIkeyController::class, 'createKey'])->name('admin.apikey.create');
+            Route::post('/admin/apikey/delete', [APIkeyController::class, 'deleteKey'])->name('admin.apikey.delete');
+        });
 
 
         Route::post('/cartItem/removeCartItem/{id}', [CartItemController::class, 'removeCartItem']);
@@ -64,6 +71,10 @@
     Route::post('/product/update/{id}', [ProductController::class, 'updateProduct'])->name('product.update');
     Route::get('/product/generateTable', [ProductController::class, 'generateTable']);
 
+    //provide api return json responses
+    Route::get('/products', [ProductController::class, 'getAllProducts'])->name('api.products');
+    Route::get('/products/product/{id}', [ProductController::class, 'getOneProduct'])->name('api.product');
+
     Route::post('/category/store', [CategoryController::class, 'store'])->name('admin.category.store');
     Route::post('/category/update/{id}', [CategoryController::class, 'update'])->name('admin.category.update');
     Route::delete('/category/{id}', [CategoryController::class, 'destroy'])->name('admin.category.delete');
@@ -80,9 +91,8 @@
 
 
     Route::post('/product/image/upload', [ProductController::class, 'productImageUpload']);
-    Route::get('/product/generateTable', [ProductController::class, 'generateTable']);
+    // Route::get('/product/generateTable', [ProductController::class, 'generateTable']);
 
-    Route::post('/cartItem/upload', [CartController::class, 'addToCart'])->name('cart.add');
 
     //Cart Item
     // Route::get('/cartItem/getCartItemByCustomerID/{customerID}', [CartItemController::class, 'getCartItemByCustomerID']);
@@ -94,6 +104,7 @@
 
 
 
-
-
-   
+    Route::group(['prefix' => 'public'], function () {
+        Route::post('/promotions', [PromotionController::class, 'promotionPublic']);
+        Route::post('/orders/getMonthlySales', [OrderController::class, 'getMonthlySales']);
+    });
