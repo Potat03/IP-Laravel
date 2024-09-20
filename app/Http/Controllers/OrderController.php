@@ -53,8 +53,7 @@ class OrderController extends Controller
           
             return view('tracking', ['orders' => $orders]);
         } catch (Exception $e) {
-            Log::error('Fetching orders failed: ' . $e->getMessage());
-            return response()->json(['error' => 'Fetching orders failed.'], 500);
+            return response()->json(['error' => 'Unable to retrieve orders at this time.'], 500);
         }
     }
     
@@ -67,7 +66,7 @@ class OrderController extends Controller
             $order->proceedToNext();
             return response()->json(['success' => true,'message' => 'Order state has been updated.']);
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 400);
+            return response()->json(['error' => 'Unable to proceed to next status at this time.'], 500);
         }
     }
 
@@ -80,7 +79,7 @@ class OrderController extends Controller
             $order->receiveOrder();
             return response()->json(['success' => true,'message' => 'Order state has been updated.']);
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 400);
+            return response()->json(['error' => 'Unable to receive orders at this time.'], 500);
         }
     }
 
@@ -110,8 +109,7 @@ $orders = null;
             $filter = 'all';
             return view('admin.orders_management', ['orders' => $orders, 'filter'=>$filter]);
         } catch (Exception $e) {
-            Log::error('Fetching orders failed: ' . $e->getMessage());
-            return response()->json(['error' => 'Fetching orders failed.'], 500);
+            return response()->json(['error' => 'Unable to retrieve orders at this time.'], 500);
         }
     }
 
@@ -139,8 +137,7 @@ $orders = null;
             }
             return view('admin.orders_prepare', ['orders' => $orders]);
         } catch (Exception $e) {
-            Log::error('Fetching orders failed: ' . $e->getMessage());
-            return response()->json(['error' => 'Fetching orders failed.'], 500);
+            return response()->json(['error' => 'Unable to retrieve orders at this time.'], 500);
         }
     }
 
@@ -169,8 +166,7 @@ $orders = null;
             }
             return view('admin.orders_delivery', ['orders' => $orders]);
         } catch (Exception $e) {
-            Log::error('Fetching orders failed: ' . $e->getMessage());
-            return response()->json(['error' => 'Fetching orders failed.'], 500);
+            return response()->json(['error' => 'Unable to retrieve orders at this time.'], 500);
         }
     }
 
@@ -196,8 +192,7 @@ $orders = null;
             }
             return view('admin.orders_delivered', ['orders' => $orders]);
         } catch (Exception $e) {
-            Log::error('Fetching orders failed: ' . $e->getMessage());
-            return response()->json(['error' => 'Fetching orders failed.'], 500);
+            return response()->json(['error' => 'Unable to retrieve orders at this time.'], 500);
         }
     }
 
