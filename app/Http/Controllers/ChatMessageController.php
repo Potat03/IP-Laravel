@@ -13,6 +13,8 @@ use App\Services\WebPurifyService;
 use App\Models\Admin;
 use DOMDocument;
 use Illuminate\Support\Facades\Log;
+use App\Models\APIkey;
+use Illuminate\Support\Facades\DB;
 
 class ChatMessageController extends Controller
 {
@@ -607,7 +609,7 @@ class ChatMessageController extends Controller
                     'success' => false,
                     'info' => 'File not found'
                 ], 422);
-            } 
+            }
 
             $dom->load($xmlPath);
             // Update the respective XML record
@@ -694,6 +696,9 @@ class ChatMessageController extends Controller
             $endedAtElement = $dom->createElement('ended_at', $chatData['ended_at']);
             $chatElement->appendChild($endedAtElement);
 
+            $duration = $dom->createElement('duration', strtotime($chatData['ended_at']) - strtotime($chatData['created_at']));
+            $chatElement->appendChild($duration);
+
             $root->appendChild($chatElement);
 
             return true;
@@ -730,7 +735,8 @@ class ChatMessageController extends Controller
         }
     }
 
-    public function generateReport() {
+    public function generateReport(Request $request)
+    {
         try {
             // Check if got logged in
             if (!Auth::guard('admin')->check()) {
@@ -743,12 +749,144 @@ class ChatMessageController extends Controller
                 throw new \Exception('You are not allowed to generate report.');
             }
 
+            // 0 = overall report, else invidvidual report for the admin selected
+            $adminId = $request->input('admin_id', '0');
 
+            // current month and year
+            $year_month = $request->input('year_month', date('Y-m'));
 
+            $xml = new \DOMDocument;
+            $xml->loadXML(file_get_contents(storage_path('app/xml/chat.xml')));
+
+            $xsl = new \DOMDocument;
+            $xsl->load(storage_path('app/xslt/chat_report.xslt'));
+            $xsltProcessor = new \XSLTProcessor();
+            $xsltProcessor->importStylesheet($xsl);
+
+            // pass adminid to the file
+            $xsltProcessor->setParameter('', 'admin_id', $adminId);
+            $xsltProcessor->setParameter('', 'year_month', $year_month);
+
+            $html = $xsltProcessor->transformToXML($xml);
+
+            // if is js ajax request return json else return view
+            if ($request->ajax()) {
+                return response()->json(['html' => $html]);
+            }
+
+            // else is mean first time access page, return admin id and name for option also
+            $admin_list = Admin::where('role', 'customer_service')->get(['admin_id', 'name']);
+
+            return view('admin.chat_report', ['report_html' => $html, 'admin_list' => $admin_list]);
         } catch (\Exception $e) {
-            return redirect()->route('admin.dashboard');
+            Log::error($e->getMessage());
+            return redirect()->route('admin.main');
         }
-
     }
 
+    // Api provide for human resource to check the performance of customer service and increase payroll 
+    public function getCustomerServicePerfomance(Request $request)
+    {
+        try {
+            // Check key is api key is provided and valid
+            $api_key = $request->header('api-key');
+
+            if (!$api_key) {
+                return response()->json([
+                    'success' => false,
+                    'info' => 'API key is required'
+                ], 403);
+            }
+
+            $api = APIkey::where('api_key', $api_key)->first();
+
+            if (!$api) {
+                return response()->json([
+                    'success' => false,
+                    'info' => 'Invalid API key'
+                ], 403);
+            }
+
+            $method = $request->input('method', 'overall');
+
+            if ($method == 'overall') {
+                $type = $request->input('type', 'total');
+                $admin_list = Admin::where('role', 'customer_service')->get();
+
+                $rank_list = [];
+                foreach ($admin_list as $admin) {
+
+                    $data = [];
+                    $data['admin_id'] = $admin->admin_id;
+                    $data['email'] = $admin->email;
+                    $data['name'] = $admin->name;
+
+                    switch ($type) {
+                        case 'total':
+                            $data['chat_handled'] = Chat::where('admin_id', $admin->admin_id)->count();
+                            break;
+                        case 'rating':
+                            Chat::where('admin_id', $admin->admin_id)->avg('rating');
+                            break;
+                        case 'duration':
+                            $data['total_chat_duration'] = Chat::where('admin_id', $admin->admin_id)->sum('ended_at') - Chat::where('admin_id', $admin->admin_id)->sum('created_at');
+                            break;
+                    }
+
+                    $rank_list[] = $data;
+                }
+
+                $rank_list = collect($rank_list)->sortByDesc('chat_handled')->values()->all();
+
+                return response()->json([
+                    'success' => true,
+                    'rank_list' => $rank_list
+                ], 200);
+            } else {
+                $admin_id = $request->input('admin_id');
+                $admin = Admin::find($admin_id);
+
+                if (!$admin) {
+                    return response()->json([
+                        'success' => false,
+                        'info' => 'Admin not found'
+                    ], 404);
+                }
+
+                if($admin->getRole() !== 'customer_service') {
+                    return response()->json([
+                        'success' => false,
+                        'info' => 'Admin is not customer service'
+                    ], 400);
+                }
+
+                $data = [];
+                $data['admin_id'] = $admin->admin_id;
+                $data['email'] = $admin->email;
+                $data['name'] = $admin->name;
+                $data['chat_handled'] = Chat::where('admin_id', $admin->admin_id)->count();
+                $data['avg_rating'] = Chat::where('admin_id', $admin->admin_id)->avg('rating');
+                $data['total_chat_duration'] = Chat::where('admin_id', $admin->admin_id)->sum('ended_at') - Chat::where('admin_id', $admin->admin_id)->sum('created_at');
+                $data['total_chat_for_each_rating'] = Chat::where('admin_id', $admin->admin_id)->select('rating', DB::raw('count(*) as total'))->groupBy('rating')->get();
+                $data['avg_duration'] = Chat::where('admin_id', $admin->admin_id)->get()
+                    ->map(function ($chat) {
+                        return strtotime($chat->ended_at) - strtotime($chat->created_at);
+                    })
+                    ->avg();
+                $data['min_chat_duration'] = Chat::where('admin_id', $admin->admin_id)->min('ended_at') - Chat::where('admin_id', $admin->admin_id)->min('created_at');
+                $data['max_chat_duration'] = Chat::where('admin_id', $admin->admin_id)->max('ended_at') - Chat::where('admin_id', $admin->admin_id)->max('created_at');
+            
+                return response()->json([
+                    'success' => true,
+                    'data' => $data
+                ], 200);
+            }
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
+            return response()->json([
+                'success' => false,
+                'info' => "Sorry, something went wrong"
+            ], 500);
+        }
+    }
 }

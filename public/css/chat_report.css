@@ -28,9 +28,10 @@
     opacity: 0.8;
 }
 
-#admin_select{
-    width: 200px;
-    height: 40px;
+#admin_select, #date_select{
+    width: 150px;
+    height: 30px;
+    padding: 0 10px;
     border-radius: 5px;
     border: 2px solid var(--adminmain);
     background-color: var(--white);

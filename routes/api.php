@@ -10,7 +10,9 @@
     use App\Http\Controllers\CartController;
     use App\Http\Controllers\CartItemController;
     use App\Http\Controllers\OrderController;
+    use App\Http\Controllers\AdminCustomerController;
     use App\Http\Controllers\PaymentController;
+    use App\Http\Controllers\ChatMessageController;
 
 
 
@@ -23,6 +25,7 @@
     use App\Http\Middleware\CustomerAuth;
     use App\Http\Middleware\AdminAuth;
     use App\Http\Controllers\APIkeyController;
+    use App\Models\Product;
 
     Route::get('/auth', [AuthController::class, 'showCustomerForm'])->name('auth.showForm');
     Route::group(['middleware' => ['web']], function () {
@@ -43,6 +46,7 @@
         Route::middleware([AdminAuth::class])->group(function () {
             Route::post('/admin/apikey/create', [APIkeyController::class, 'createKey'])->name('admin.apikey.create');
             Route::post('/admin/apikey/delete', [APIkeyController::class, 'deleteKey'])->name('admin.apikey.delete');
+            Route::post('/admin/generateReport', [ChatMessageController::class, 'generateReport'])->name('admin.chat_report');
         });
     });
     Route::post('/resendOtp', [AuthController::class, 'resendOtp'])->name('auth.resendOtp');
@@ -56,9 +60,11 @@
     Route::get('/product/generateTable', [ProductController::class, 'generateTable']);
 
     //provide api return json responses
-    Route::get('/products', [ProductController::class, 'getAllProducts'])->name('api.products');
-    Route::get('/products/product/{id}', [ProductController::class, 'getOneProduct'])->name('api.product');
+    // Route::get('/products', [ProductController::class, 'getAllProducts'])->name('api.products');
+    // Route::get('/products/product/{id}', [ProductController::class, 'getOneProduct'])->name('api.product');
 
+    Route::get('/api/customer_report', [AdminCustomerController::class, 'customerReportAPI']);
+    
     Route::post('/category/store', [CategoryController::class, 'store'])->name('admin.category.store');
     Route::post('/category/update/{id}', [CategoryController::class, 'update'])->name('admin.category.update');
     Route::delete('/category/{id}', [CategoryController::class, 'destroy'])->name('admin.category.delete');
@@ -71,8 +77,6 @@
     Route::put('/promotion/edit/status/{id}', [PromotionController::class, 'togglePromotion']);
     Route::post('/promotion/restore/{id}', [PromotionController::class, 'undoDeletePromotion']);
     Route::post('/promotion/revert/{id}', [PromotionController::class, 'undoUpdatePromotion']);
-
-
 
     Route::post('/product/image/upload', [ProductController::class, 'productImageUpload']);
     // Route::get('/product/generateTable', [ProductController::class, 'generateTable']);
@@ -103,7 +107,8 @@
     Route::post('/order/receive/{id}', [OrderController::class, 'receiveOrder']);
 
 
-
     Route::group(['prefix' => 'public'], function () {
         Route::post('/promotions', [PromotionController::class, 'promotionPublic']);
+        Route::post('/products/report', [ProductController::class, 'monthlyProductReport']);
+        Route::post('/products/restock', [ProductController::class, 'restock']);
     });
