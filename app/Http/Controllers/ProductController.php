@@ -940,7 +940,13 @@ class ProductController extends Controller
     public function restock(Request $request)
     {
         try {
-            $api = APIKEY::where('api_key', $request->api_key)->first();
+            $apiKey = $request->header('Authorization');
+
+            if (strpos($apiKey, 'Bearer ') === 0) {
+                $apiKey = substr($apiKey, 7);
+            }
+
+            $api = APIKEY::where('api_key', $apiKey)->first();
 
             if (!$api) {
                 return response()->json(['success' => false, 'message' => 'Invalid API key'], 400);
@@ -953,7 +959,6 @@ class ProductController extends Controller
 
             $productId = $request->input('productId');
             $quantity = $request->input('quantity');
-
             $product = Product::find($productId);
 
             if ($product) {
