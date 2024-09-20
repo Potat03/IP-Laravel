@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * Author: Lim Weng Ni
@@ -302,21 +303,19 @@ class ProductController extends Controller
         }
     }
 
+    //for customer side
     public function index(Request $request)
     {
         try {
             $query = $request->input('search');
             $categoryNames = $request->input('categories', []);
 
-            // Initialize the product query
             $productQuery = Product::query();
 
-            // Apply search filter if provided
             if ($query) {
                 $productQuery->where('name', 'LIKE', "%$query%");
             }
 
-            // Apply category filter if provided
             if (!empty($categoryNames)) {
                 $productQuery->whereIn('product_id', function ($subQuery) use ($categoryNames) {
                     $subQuery->select('product_id')
@@ -327,25 +326,20 @@ class ProductController extends Controller
                 });
             }
 
-            // Paginate products
             $products = $productQuery->paginate(20);
 
-            // Extract product IDs from the paginated results
-            $productIds = $products->items(); // Get the items on the current page
-            $productIds = collect($productIds)->pluck('product_id')->toArray(); // Convert to collection and pluck IDs
+            $productIds = $products->items();
+            $productIds = collect($productIds)->pluck('product_id')->toArray();
 
-            // Fetch main images using the ProductController's getMainImages method
             $productController = new ProductController();
             $mainImages = $productController->getMainImages($productIds);
 
-            // Fetch ratings for products
             $ratingController = new RatingController();
             $productsWithRatings = $ratingController->fetchRatingsForShop($productIds, $products);
 
-            // Fetch all categories for view
             $categories = Category::all();
 
-            // Return view based on AJAX request
+            // use AJAX request return for searching
             if ($request->ajax()) {
                 return view('shop.partials.product-list', [
                     'products' => $productsWithRatings,
@@ -354,7 +348,7 @@ class ProductController extends Controller
                 ]);
             }
 
-            // Return the main view (if not AJAX)
+            // return the main view (if not AJAX)
             return view('shop', [
                 'products' => $productsWithRatings,
                 'mainImages' => $mainImages,
@@ -366,13 +360,29 @@ class ProductController extends Controller
         }
     }
 
+    //admin side
     public function getAll(Request $request)
     {
         try {
-            $products = Product::all();
+            $productQuery = Product::query();
+
+            $query = $request->input('search');
+
+            if ($query) {
+                $productQuery->where('name', 'LIKE', "%$query%");
+            }
+
+            $products = $productQuery->get();
 
             $categoryController = new CategoryController();
             $categories = $categoryController->index();
+
+            // use AJAX request return for searching
+            if ($request->ajax()) {
+                return view('admin.partials.data-holder', [
+                    'products' => $products,
+                ]);
+            }
 
             return view('admin.product', ['products' => $products, 'categories' => $categories]);
         } catch (Exception $e) {
@@ -380,6 +390,7 @@ class ProductController extends Controller
         }
     }
 
+    //python api
     public function getAllProducts(Request $request)
     {
         try {
