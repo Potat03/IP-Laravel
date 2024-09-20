@@ -13,6 +13,7 @@
     use App\Http\Controllers\OrderController;
     use App\Http\Controllers\AdminCustomerController;
     use App\Http\Controllers\ChatMessageController;
+    use App\Http\Controllers\SuggestionController;
 
 
 
@@ -80,6 +81,7 @@
     // Route::get('/products/product/{id}', [ProductController::class, 'getOneProduct'])->name('api.product');
 
     Route::get('/api/customer_report', [AdminCustomerController::class, 'customerReportAPI']);
+    Route::get('/suggestions/weather/today', [SuggestionController::class, 'getCurrentWeatherSuggestion'])->name('suggestion.weather');
     
     Route::post('/category/store', [CategoryController::class, 'store'])->name('admin.category.store');
     Route::post('/category/update/{id}', [CategoryController::class, 'update'])->name('admin.category.update');
@@ -105,7 +107,6 @@
     // Route::post('/checkout', [PaymentController::class, 'processCheckout']);
 
     //Order
-
 
     Route::group(['prefix' => 'public'], function () {
         Route::post('/promotions', [PromotionController::class, 'promotionPublic']);
