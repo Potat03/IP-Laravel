@@ -15,6 +15,7 @@ return new class extends Migration
         Schema::create('admin', function (Blueprint $table) {
             $table->id('admin_id');
             $table->string('role');
+            $table->string('name');
             $table->string('email')->unique();
             $table->string('password');
             $table->string('remember_token', 100)->nullable();

@@ -19,7 +19,8 @@ class ChatMessage extends Model
         'chat_id',
         'by_customer',
         'message_content',
-        'message_type'
+        'message_type',
+        'rating'
     ];
 
     public function chat()

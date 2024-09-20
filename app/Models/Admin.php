@@ -15,6 +15,7 @@ class Admin extends Authenticatable implements UserInterface
 
     protected $fillable = [
         'role',
+        'name',
         'email',
         'password',
         'session_id',

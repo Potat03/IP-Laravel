@@ -14,8 +14,8 @@ use App\Http\Controllers\WearableController;
 use App\Http\Controllers\CartItemController;
 use App\Http\Controllers\PromotionController;
 use App\Http\Controllers\CustomerController;
-use App\Http\Controllers\AdminCustomerController;
 use App\Http\Middleware\CustomerAuth;
+use App\Http\Controllers\APIkeyController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\StripeController;
 use App\Http\Controllers\PaymentController;
@@ -77,6 +77,7 @@ Route::post('/sendMsg', [ChatMessageController::class, 'sendMessage'])->name('se
 Route::post('/acceptChat', [ChatMessageController::class, 'acceptChat'])->name('acceptChat');
 Route::post('/endChat', [ChatMessageController::class, 'endChat'])->name('endChat');
 Route::post('/createChat', [ChatMessageController::class, 'createChat'])->name('createChat');
+Route::post('/rateChat', [ChatMessageController::class, 'rateChat'])->name('rateChat');
 
 Route::get('/getCustomerChat', [ChatMessageController::class, 'initCustomerChat'])->name('getCustomerChat');
 Route::get('/getAdmChatList', [ChatMessageController::class, 'initAdminChatList'])->name('getAdmChatList');
@@ -143,6 +144,10 @@ Route::middleware([AdminAuth::class])->group(function () {
         return view('admin.product');
     });
 
+    Route::get('/admin/chatReport', function () {
+        return view('admin.chat_report');
+    });
+
     Route::get('/product/get/images/{id}', [ProductController::class, 'showProductImagesAdmin']);
 
     Route::get('/admin/product', action: [ProductController::class, 'getAll'])->name('admin.product');
@@ -160,6 +165,7 @@ Route::middleware([AdminAuth::class])->group(function () {
     Route::get('/admin/promotion/report', [PromotionController::class, 'generatePromotionReport'])->name('admin.promotion.report');
     Route::get('/admin/promotion/report/download', [PromotionController::class, 'downloadXMLReport'])->name('admin.promotion.report.download');
 
+    Route::get('/admin/apikey', [APIkeyController::class, 'listKey'])->name('admin.apikey');
     Route::get('/admin/customer', [AdminCustomerController::class, 'getAll'])->name('admin.customer');
     Route::post('/admin/customer/{id}/update', [AdminCustomerController::class, 'update'])->name('admin.customer.update');
     Route::get('/admin/customer/report', [AdminCustomerController::class, 'showReportPage'])->name('admin.customer.report');
