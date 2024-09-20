@@ -19,7 +19,8 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->command('check:lowstock')->twiceDaily(6, 18);
-        // $schedule->command('check:lowstock')->everyFiveMinutes();
+        // $schedule->command('check:lowstock')->everyMinute();
+        // $schedule->command(\App\Console\Commands\CheckLowStockAndReorder::class)->everyMinute();
     }
 
     /**
@@ -31,4 +32,9 @@ class Kernel extends ConsoleKernel
 
         require base_path('routes/console.php');
     }
+
+    protected $commands = [
+        //        'App\Console\Commands\CheckLowStockAndReorder',
+        Commands\CheckLowStockAndReorder::class
+    ];
 }
