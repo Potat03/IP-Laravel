@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use App\Models\CartItem;
+use App\Models\Promotionitem;
 use App\Models\Product;
 use App\Models\Cart;
 use App\Models\Promotion;
@@ -53,9 +54,9 @@ class CartItemController extends Controller
    public function getCartItemByCustomerID()
    {
        try {
-            //$user = Auth::guard('customer')->user();
-            //$customerID = $user->id;
-            $customerID = 1;
+        //communication security 
+            $user = Auth::guard('customer')->user();
+            $customerID = $user->customer_id;
 
            // Databse security
            $cartItems = CartItem::where('customer_id', $customerID)->get();
@@ -75,13 +76,18 @@ class CartItemController extends Controller
                 } else {
                     // Database security
                     $cartItem->promotion = Promotion::where('promotion_id', $cartItem->promotion_id)->first();
+                    $cartItem->promotion->products = PromotionItem::where('promotion_id', $cartItem->promotion_id)->get();
+                    foreach( $cartItem->promotion->products as $product){
+                        $product = Product::where('product_id', $cartItem->product_id)->first();
+                    }
+
                 }
             }
             
            }
    
 
-        //    return response()->json(['cartItems'=>$cartItems, 'products'=>$products, 'promotions' => $promotions]);
+    //    return response()->json(['cartItems'=>$cartItems]);
            //return to view
               return view('cart', ['cartItems'=>$cartItems]);
        } catch (Exception $e) {
@@ -174,8 +180,9 @@ public function updateTotal(Request $request, $id)
 
 public function removeCartItem(Request $request, $id){
     try {
-
-        $customerID = 1;
+        //communication security 
+        $user = Auth::guard('customer')->user();
+        $customerID = $user->customer_id;
 
         $cart = Cart::where('customer_id', $customerID)->first();   
         $cart->subtotal = $request->newSubtotal;  

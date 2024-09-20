@@ -12,8 +12,11 @@ use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\Promotion;
 use App\Models\PromotionItem;
+use App\Models\Payment;
 use Stripe\Stripe;
 use Stripe\Charge;
+use Carbon\Carbon;
+
 
 
 
@@ -23,8 +26,11 @@ class PaymentController extends Controller
     
     public function processCheckout(Request $request)
 {
-           $customerID = 1;
-    $request->validate([
+     //comunication security     
+     $user = Auth::guard('customer')->user();
+     $customerID = $user->customer_id;
+     
+     $request->validate([
         'first_name' => 'required|regex:/^[\pL\s]+$/u',
         'last_name' => 'required|regex:/^[\pL\s]+$/u',
         'delivery_address' => 'required|string',
@@ -44,14 +50,26 @@ class PaymentController extends Controller
             'created_at' => now(),
             ]);
 
+    
+
 
         $cartItems = CartItem::where('customer_id', $customerID)->get();
         $products = [];
         $promotions= [];
 
 
-        $order = Order::where('customer_id', $customerID)->first();          
-
+        $order = Order::where('customer_id', $customerID)
+        ->orderBy('order_id', 'desc')
+        ->first();
+  Payment::create([
+            'order_id' => $order->order_id,
+            'payment_ref' => "stripe",
+            'customer_id' => $customerID,
+            'amount'=>$cart->total,
+            'method'=>'card',
+            'status'=>'success',
+            'paid_at' => today()->toDateString(),
+  ]);
         foreach ($cartItems as $cartItem) {
 
             if ($cartItem->promotion_id == null) {
@@ -111,20 +129,28 @@ class PaymentController extends Controller
             $cartItem->delete(); 
 
            }
-         
-        return response()->json([
-            'success' => true,
-            'message' => 'Form submitted successfully',
-            'data' => [
-                'first_name' => $request->input('first_name'),
-                'last_name' => $request->input('last_name'),
-                'delivery_address' => $request->input('delivery_address'),
-                'email' => $request->input('email'),
-                'phone_number' => $request->input('phone_number'),
-            ]
-        ]);
+           return view('checkoutSuccess', [
+            'first_name' => $request->input('first_name'),
+            'last_name' => $request->input('last_name'),
+            'delivery_address' => $request->input('delivery_address'),
+            'email' => $request->input('email'),
+            'phone_number' => $request->input('phone_number'),
+            'order' => $order
+        ]);  
 
+        // return response()->json([
+        //     'success' => true,
+        //     'message' => 'Form submitted successfully',
+        //     'data' => [
+        //         'first_name' => $request->input('first_name'),
+        //         'last_name' => $request->input('last_name'),
+        //         'delivery_address' => $request->input('delivery_address'),
+        //         'email' => $request->input('email'),
+        //         'phone_number' => $request->input('phone_number'),
+        //     ]
+        // ]);
 
+       
 
     
 }

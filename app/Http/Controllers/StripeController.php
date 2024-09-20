@@ -11,12 +11,19 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\Promotion;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Crypt;
+
 
 class StripeController extends Controller
 {
     public function session(Request $request)
     {
-        $customerID = 1;
+       //comunication security     
+       $user = Auth::guard('customer')->user();
+       $customerID = $user->customer_id;
+
+
         $request->validate([
            'first_name' => 'required|regex:/^[\pL\s]+$/u',
            'last_name' => 'required|regex:/^[\pL\s]+$/u',
@@ -56,7 +63,7 @@ class StripeController extends Controller
                         'product_data' => [
                             'name' => $cartItem->promotion->title,
                         ],
-                        'unit_amount'  => $cartItem->promotion->discount_amount * 100, // Stripe expects the price in cents
+                        'unit_amount'  => ($cartItem->promotion->original_price - $cartItem->promotion->discount_amount) * 100, // Stripe expects the price in cents
                     ],
                     'quantity' => $cartItem->quantity,
                 ];
@@ -90,7 +97,7 @@ class StripeController extends Controller
             'email'           => $request->input('email'),
             'phone_number'    => $request->input('phone_number'),
         ]),
-                'cancel_url' => route('success'), // Optional, if you want a cancel URL
+                'cancel_url' => route('fail'), // Optional, if you want a cancel URL
         ]);
 
         // Redirect to the Stripe Checkout URL

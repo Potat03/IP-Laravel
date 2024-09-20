@@ -2,7 +2,7 @@
 
 namespace App\Memento;
 
-class promotionMemento
+class PromotionMemento
 {
     protected $state;
 

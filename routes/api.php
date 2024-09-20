@@ -3,6 +3,7 @@
     use Illuminate\Http\Request;
     use Illuminate\Support\Facades\Route;
     use App\Http\Controllers\ProductController;
+    use App\Http\Controllers\PaymentController;
     use App\Http\Controllers\CategoryController;
     use App\Http\Controllers\PromotionController;
     use App\Http\Middleware\customAuth;
@@ -11,7 +12,6 @@
     use App\Http\Controllers\CartItemController;
     use App\Http\Controllers\OrderController;
     use App\Http\Controllers\AdminCustomerController;
-    use App\Http\Controllers\PaymentController;
     use App\Http\Controllers\ChatMessageController;
 
 
@@ -48,6 +48,22 @@
             Route::post('/admin/apikey/delete', [APIkeyController::class, 'deleteKey'])->name('admin.apikey.delete');
             Route::post('/admin/generateReport', [ChatMessageController::class, 'generateReport'])->name('admin.chat_report');
         });
+
+
+        Route::post('/cartItem/removeCartItem/{id}', [CartItemController::class, 'removeCartItem']);
+        Route::post('/cart/updateSubtotal', [CartController::class, 'updateSubtotal']);
+        Route::post('/cart/updateTotal', [CartController::class, 'updateTotal']);
+        Route::post('/cart/updateDiscount', [CartController::class, 'updateDiscount']);
+        Route::post('/cartItem/updateQuantity/{id}', [CartItemController::class, 'updateQuantity']);
+        Route::post('/cartItem/updateDiscount/{id}', [CartItemController::class, 'updateDiscount']);
+        Route::post('/cartItem/updateSubtotal/{id}', [CartItemController::class, 'updateSubtotal']);
+        Route::post('/cartItem/updateTotal/{id}', [CartItemController::class, 'updateTotal']);
+
+        Route::post('/order/proceedToNext/{id}', [OrderController::class, 'proceedToNext']);
+        Route::post('/order/receive/{id}', [OrderController::class, 'receiveOrder']);
+
+
+
     });
     Route::post('/resendOtp', [AuthController::class, 'resendOtp'])->name('auth.resendOtp');
 
@@ -83,32 +99,17 @@
 
 
     //Cart Item
-    Route::get('/cartItem/getCartItemByCustomerID/{customerID}', [CartItemController::class, 'getCartItemByCustomerID']);
-
-
-
-    Route::post('/cartItem/updateQuantity/{id}', [CartItemController::class, 'updateQuantity']);
-    Route::post('/cartItem/updateDiscount/{id}', [CartItemController::class, 'updateDiscount']);
-    Route::post('/cartItem/updateSubtotal/{id}', [CartItemController::class, 'updateSubtotal']);
-    Route::post('/cartItem/updateTotal/{id}', [CartItemController::class, 'updateTotal']);
-    Route::post('/cartItem/removeCartItem/{id}', [CartItemController::class, 'removeCartItem']);
-
-
-    //Cart
-    Route::post('/cart/updateSubtotal', [CartController::class, 'updateSubtotal']);
-    Route::post('/cart/updateTotal', [CartController::class, 'updateTotal']);
-    Route::post('/cart/updateDiscount', [CartController::class, 'updateDiscount']);
+    // Route::get('/cartItem/getCartItemByCustomerID/{customerID}', [CartItemController::class, 'getCartItemByCustomerID']);
 
     //Payment
-    Route::post('/checkout', [PaymentController::class, 'processCheckout']);
+    // Route::post('/checkout', [PaymentController::class, 'processCheckout']);
 
     //Order
-    Route::post('/order/proceedToNext/{id}', [OrderController::class, 'proceedToNext']);
-    Route::post('/order/receive/{id}', [OrderController::class, 'receiveOrder']);
 
 
     Route::group(['prefix' => 'public'], function () {
         Route::post('/promotions', [PromotionController::class, 'promotionPublic']);
+        Route::post('/orders/getMonthlySales', [OrderController::class, 'getMonthlySales']);
         Route::post('/products/report', [ProductController::class, 'monthlyProductReport']);
         Route::post('/products/restock', [ProductController::class, 'restock']);
     });
