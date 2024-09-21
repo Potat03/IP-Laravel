@@ -96,7 +96,7 @@ $totalDiscount=0;
         </div>
         <table class="table" id="cart-items-table">
             <tbody>
-                @if(count($cartItems) > 0)
+                @if($cartItems!=null)
                 @php
                     $x = 1;
                 @endphp

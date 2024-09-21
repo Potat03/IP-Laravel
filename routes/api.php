@@ -63,8 +63,6 @@
         Route::post('/order/proceedToNext/{id}', [OrderController::class, 'proceedToNext']);
         Route::post('/order/receive/{id}', [OrderController::class, 'receiveOrder']);
 
-
-
     });
     Route::post('/resendOtp', [AuthController::class, 'resendOtp'])->name('auth.resendOtp');
 
