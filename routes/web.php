@@ -126,8 +126,6 @@ Route::middleware([CustomerAuth::class])->group(function () {
 });
 
 
-
-
 //ws
 //communication security 
 Route::middleware([CustomerAuth::class])->group(function () {
@@ -211,6 +209,11 @@ Route::middleware([AdminAuth::class])->group(function () {
     Route::get('/admin/staff/verify', [AdminController::class, 'verifyEmail'])->name('admin.verifyEmail');
     Route::post('/admin/staff/set-password', [AdminController::class, 'setPassword'])->name('admin.setPassword');
 });
+
+Route::get('admin/verify-otp', [AdminController::class, 'showVerifyOtpForm'])->name('admin.showVerifyOtpForm');
+Route::post('admin/verify-otp', [AdminController::class, 'verifyOtp'])->name('admin.verifyOtp');
+Route::post('/admin/set-password', [AdminController::class, 'setPassword'])->name('admin.setPassword');
+
 
 Route::get('/template', function () {
     return view('admin.error');
