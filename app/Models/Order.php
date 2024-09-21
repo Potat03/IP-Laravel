@@ -103,5 +103,9 @@ class Order extends Model
     {
         // Logic to enable user rating
     }
-}
 
+    public function orderItems()
+    {
+        return $this->hasMany(OrderItem::class, 'order_id', 'order_id');
+    }
+}

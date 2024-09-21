@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+    <!-- Loo Wee Kiat -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title')</title>
@@ -170,18 +171,6 @@
                         <a class="load-content">
                             <i class="fa-regular fa-teddy-bear"></i>
                             Order History
-                        </a>
-                    </li>
-                    <li onclick = "window.location.href = '{{ route('user.shippingSec') }}'">
-                        <a class="load-content">
-                            <i class="fa-regular fa-box"></i>
-                            Shipping
-                        </a>
-                    </li>
-                    <li onclick = "window.location.href = '{{ route('user.settingSec') }}'">
-                        <a class="load-content">
-                            <i class="fa-regular fa-user"></i>
-                            Settings
                         </a>
                     </li>
                 </ul>

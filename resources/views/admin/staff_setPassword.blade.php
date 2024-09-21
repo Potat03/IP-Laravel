@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+    <!-- Loo Wee Kiat -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -22,7 +23,7 @@
         }
 
         .card-header {
-            background-color: red;
+            background-color: blue;
             color: #fff;
             font-size: 24px;
             font-weight: bold;
@@ -30,13 +31,13 @@
         }
 
         .btn-primary {
-            background-color: red;
-            border-color: red;
+            background-color: blue;
+            border-color: blue;
         }
 
         .btn-primary:hover {
-            background-color: red;
-            border-color: red;
+            background-color: blue;
+            border-color: blue;
         }
 
         .alert-danger {

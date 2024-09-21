@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+    <!-- Loo Wee Kiat -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -59,7 +60,7 @@
                             @csrf
 
                             <div class="form-group">
-                                <input type="text" name="email" value="{{ $email }}">
+                                <input type="hidden" name="email" value="{{ $email }}">
                                 <label for="otp">Enter OTP</label>
                                 <input type="text" name="otp" class="form-control" id="otp" required>
                             </div>
