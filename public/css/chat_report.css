@@ -11,7 +11,7 @@
     background-color: var(--grey);
     display: flex;
     flex-direction: column;
-    height: 60vh;
+    height: 70vh;
 }
 
 .report_header_wrap{
@@ -29,7 +29,7 @@
 }
 
 #admin_select, #date_select{
-    width: 150px;
+    width: 180px;
     height: 30px;
     padding: 0 10px;
     border-radius: 5px;

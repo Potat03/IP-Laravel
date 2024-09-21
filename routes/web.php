@@ -21,6 +21,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\StripeController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\AdminController;
 
 
 
@@ -52,7 +53,7 @@ Route::get('/promotion/{id}', [PromotionController::class, 'viewDetails'])->name
 // Route::get('/product/{id}', [ProductController::class, 'showProductImages']);
 
 
-Route::get('/cart', [CartItemController::class, 'getCartItemByCustomerID']);    
+Route::get('/cart', [CartItemController::class, 'getCartItemByCustomerID']);
 // Route::get('/cart', function () {
 //     return view('cart');
 // });
@@ -123,7 +124,7 @@ Route::middleware([CustomerAuth::class])->group(function () {
     Route::put('/profile/change-password', [CustomerController::class, 'changePassword'])->name('profile.changePassword');
 });
 
-   
+
 
 
 //ws
@@ -132,7 +133,7 @@ Route::middleware([CustomerAuth::class])->group(function () {
     Route::get('/cart', [CartItemController::class, 'getCartItemByCustomerID']);
     Route::get('/payment', function () {
         return view('payment');
-    });  
+    });
     Route::post('/session', [StripeController::class, 'session'])->name('session');
     Route::get('/success', [PaymentController::class, 'processCheckout'])->name('success');
     Route::get('/fail',  function () {
@@ -170,15 +171,16 @@ Route::middleware([AdminAuth::class])->group(function () {
         return view('admin.product');
     });
 
-    Route::get('/admin/chatReport', [ChatMessageController::class, 'generateReport']);
+    Route::get('/admin/chatReport', [ChatMessageController::class, 'generateReport'])->name('admin.chat_report');
     Route::get('/admin/apikey', [APIkeyController::class, 'listKey'])->name('admin.apikey');
-    
+
 
     Route::get('/product/get/images/{id}', [ProductController::class, 'showProductImagesAdmin']);
 
     Route::get('/admin/product', action: [ProductController::class, 'getAll'])->name('admin.product');
     Route::get('/admin/product/add', action: [ProductController::class, 'addProduct'])->name('admin.product.add');
     Route::get('/admin/product/edit/{id}', [ProductController::class, 'editProduct'])->name('admin.product.edit');
+    Route::get('/admin/product/view/{id}', [ProductController::class, 'viewProduct'])->name('admin.product.view');
     Route::get('/admin/product/report', [ProductController::class, 'generateProductReport'])->name('admin.product.report');
     Route::get('/admin/category/add', action: [CategoryController::class, 'addCategory'])->name('admin.category.add');
     Route::get('/admin/category/edit/{id}', action: [CategoryController::class, 'editCategory'])->name('admin.category.edit');
@@ -200,19 +202,13 @@ Route::middleware([AdminAuth::class])->group(function () {
     Route::get('/admin/orders/delivery', [OrderController::class, 'getDeliveryOrders'])->name('admin.orders_delivery');
     Route::get('/admin/orders/delivered', [OrderController::class, 'getDeliveredOrders'])->name('admin.orders_delivered');
     Route::get('/admin/orders/orderStatusReport', [OrderController::class, 'generateOrderStatusReport'])->name('admin.orders.sales_report');
-});
 
-//TW blade
-Route::get('/wei', function () {
-    return view('wei');
-});
-
-Route::get('/cc', function () {
-    return view('customerChat');
-});
-
-Route::get('/cc2', function () {
-    return view('adminChat');
+    Route::get('/admin/staff', [AdminController::class, 'index'])->name('admin.staff');
+    Route::get('/admin/staff/create', [AdminController::class, 'showCreateForm'])->name('admin.create');
+    Route::post('/admin/staff/create', [AdminController::class, 'create'])->name('admin.createStaff');
+    Route::post('/admin/staff/{id}/update', [AdminController::class, 'update'])->name('admin.updateStaff');
+    Route::get('/admin/staff/verify', [AdminController::class, 'verifyEmail'])->name('admin.verifyEmail');
+    Route::post('/admin/staff/set-password', [AdminController::class, 'setPassword'])->name('admin.setPassword');
 });
 
 Route::get('/template', function () {
@@ -238,22 +234,3 @@ Route::get('/getCustomerChat', [ChatMessageController::class, 'initCustomerChat'
 Route::get('/getAdmChatList', [ChatMessageController::class, 'initAdminChatList'])->name('getAdmChatList');
 Route::get('/getChatMessage', [ChatMessageController::class, 'adminGetMessage'])->name('getChatMessage');
 Route::get('/getNewMessages', [ChatMessageController::class, 'fetchLatestMessages'])->name('getNewMessages');
-
-use App\Http\Controllers\AdminController;
-
-Route::post('/admin', [AdminController::class, 'create'])->name('admin.create');
-Route::get('login2', [AuthController::class, 'showLoginForm'])->name('login2');
-Route::middleware([AdminAuth::class])->group(function () {
-    Route::get('/testchat', function () {
-        return view('chatConnectionTest');
-    });
-
-    Route::post('login2', [AuthController::class, 'login']);
-    Route::post('logout2', [AuthController::class, 'logout'])->name('logout2');
-    Route::post('/send-message', [ChatMessageController::class, 'sendMessage'])->name('send.message');
-    Route::get('/get-messages', [ChatMessageController::class, 'getMessages'])->name('get.messages');
-});
-
-Route::get('/testmsgcust', function () {
-    return view('customer_popup_chat');
-});
