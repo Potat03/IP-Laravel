@@ -60,7 +60,7 @@
                             @csrf
 
                             <div class="form-group">
-                                <input type="text" name="email" value="{{ $email }}">
+                                <input type="hidden" name="email" value="{{ $email }}">
                                 <label for="otp">Enter OTP</label>
                                 <input type="text" name="otp" class="form-control" id="otp" required>
                             </div>

@@ -1,4 +1,5 @@
 <?php
+// Author: Tan Wei Siang
 
 namespace App\Http\Controllers;
 
@@ -52,6 +53,7 @@ class PaymentController extends Controller
             'status' => 'prepare',
             'delivery_address' => $request->delivery_address,
             'created_at' => now(),
+            'updated_at' => now(),
         ]);
 
         // Payment processing

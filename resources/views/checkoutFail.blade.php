@@ -1,4 +1,5 @@
 @extends('layout.shop')
+{{-- Author: Tan Wei Siang --}}
 
 @section('title', 'Cart')
 
