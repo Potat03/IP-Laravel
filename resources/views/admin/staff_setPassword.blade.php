@@ -23,7 +23,7 @@
         }
 
         .card-header {
-            background-color: red;
+            background-color: blue;
             color: #fff;
             font-size: 24px;
             font-weight: bold;
@@ -31,13 +31,13 @@
         }
 
         .btn-primary {
-            background-color: red;
-            border-color: red;
+            background-color: blue;
+            border-color: blue;
         }
 
         .btn-primary:hover {
-            background-color: red;
-            border-color: red;
+            background-color: blue;
+            border-color: blue;
         }
 
         .alert-danger {
