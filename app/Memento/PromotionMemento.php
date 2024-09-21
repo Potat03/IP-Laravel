@@ -1,6 +1,5 @@
-<!--Nicholas Yap Jia Wey-->
 <?php
-
+//Author : Nicholas Yap Jia Wey
 namespace App\Memento;
 
 class PromotionMemento

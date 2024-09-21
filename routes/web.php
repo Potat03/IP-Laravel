@@ -226,10 +226,6 @@ Route::get('/chat/{chatId}', [ChatController::class, 'show']);
 
 Route::get('/chatImage', [ChatMessageController::class, 'initCustomerChat']);
 
-Route::get('/addMsg', function () {
-    return view('weiTestChat');
-});
-
 Route::post('/sendMsg', [ChatMessageController::class, 'sendMessage'])->name('sendMsg');
 Route::get('/getCustomerChat', [ChatMessageController::class, 'initCustomerChat'])->name('getCustomerChat');
 Route::get('/getAdmChatList', [ChatMessageController::class, 'initAdminChatList'])->name('getAdmChatList');

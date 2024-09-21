@@ -1,6 +1,5 @@
-<!--Nicholas Yap Jia Wey-->
 <?php
-
+//Author : Nicholas Yap Jia Wey
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;

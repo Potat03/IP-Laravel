@@ -1,5 +1,5 @@
-<!--Nicholas Yap Jia Wey-->
 <?php
+//Author : Nicholas Yap Jia Wey
 namespace App\Http\Controllers;
 
 use App\Services\WeatherService;
