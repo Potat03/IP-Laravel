@@ -271,7 +271,7 @@ class OrderController extends Controller
     }
 
     
-    public function getMonthlySales()
+    public function getMonthlySales(Request $request)
     {
         $api = APIKEY::where('api_key', $request->api_key)->first();
 

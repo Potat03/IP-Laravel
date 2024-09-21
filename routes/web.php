@@ -235,18 +235,3 @@ Route::get('/getCustomerChat', [ChatMessageController::class, 'initCustomerChat'
 Route::get('/getAdmChatList', [ChatMessageController::class, 'initAdminChatList'])->name('getAdmChatList');
 Route::get('/getChatMessage', [ChatMessageController::class, 'adminGetMessage'])->name('getChatMessage');
 Route::get('/getNewMessages', [ChatMessageController::class, 'fetchLatestMessages'])->name('getNewMessages');
-
-Route::middleware([AdminAuth::class])->group(function () {
-    Route::get('/testchat', function () {
-        return view('chatConnectionTest');
-    });
-
-    Route::post('login2', [AuthController::class, 'login']);
-    Route::post('logout2', [AuthController::class, 'logout'])->name('logout2');
-    Route::post('/send-message', [ChatMessageController::class, 'sendMessage'])->name('send.message');
-    Route::get('/get-messages', [ChatMessageController::class, 'getMessages'])->name('get.messages');
-});
-
-Route::get('/testmsgcust', function () {
-    return view('customer_popup_chat');
-});
