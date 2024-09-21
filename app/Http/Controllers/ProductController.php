@@ -40,7 +40,7 @@ class ProductController extends Controller
     {
         try {
             $request->validate([
-                'images.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+                'images.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048|mimetypes:image/jpeg,image/png,image/jpg,image/webp',
                 'filesArray' => 'nullable|string',
             ]);
 
@@ -86,7 +86,7 @@ class ProductController extends Controller
     {
         try {
             $request->validate([
-                'images.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+                'images.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048|mimetypes:image/jpeg,image/png,image/jpg,image/webp',
                 'existingImages' => 'nullable|string',
                 'filesArray' => 'nullable|string',
             ]);
