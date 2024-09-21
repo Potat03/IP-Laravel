@@ -1,4 +1,5 @@
 @extends('admin.layout.main')
+{{-- Author: Tan Wei Siang --}}
 
 @section('vite')
     @vite(['resources/css/app.css', 'resources/sass/app.scss', 'resources/js/app.js', 'resources/css/admin-nav.css', 'resources/js/bootstrap.js'])
