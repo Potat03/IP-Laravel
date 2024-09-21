@@ -1,11 +1,11 @@
 <?php
-
+// Author: Loo Wee Kiat & Loh Thiam Wei
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class Admin extends Authenticatable
+class Admin extends Authenticatable implements UserInterface
 {
     use HasFactory;
 
@@ -25,16 +25,6 @@ class Admin extends Authenticatable
     protected $guarded = [
         'remember_token',
     ];
-
-    public function chats()
-    {
-        return $this->hasMany(Chat::class, 'admin_id', 'admin_id');
-    }
-
-    public function adminLogs()
-    {
-        return $this->hasMany(AdminLog::class, 'admin_id', 'admin_id');
-    }
 
     public function verification()
     {

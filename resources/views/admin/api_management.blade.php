@@ -1,3 +1,6 @@
+<!-- Api Management Page -->
+<!-- Author: Loh Thiam Wei -->
+
 @extends('admin.layout.main')
 
 @section('title', 'API Management')

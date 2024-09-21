@@ -1,5 +1,5 @@
 <?php
-
+// Author: Loh Thiam Wei
 namespace App\Factories;
 
 
@@ -7,7 +7,6 @@ use App\Messages\ProductMessage;
 use App\Messages\NormalMessage;
 use App\Messages\ImageMessage;
 use App\Messages\MessageInterface;
-use Illuminate\Support\Facades\DB;
 
 class MessageFactory
 {

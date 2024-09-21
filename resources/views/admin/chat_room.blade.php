@@ -1,3 +1,6 @@
+<!-- Chat Room -->
+<!-- Author: Loh Thiam Wei -->
+
 @extends('admin.layout.main')
 
 @section('title', 'Customer Support')

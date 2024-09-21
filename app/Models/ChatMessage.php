@@ -1,5 +1,5 @@
 <?php
-
+// Author: Loh Thiam Wei
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -19,8 +19,7 @@ class ChatMessage extends Model
         'chat_id',
         'by_customer',
         'message_content',
-        'message_type',
-        'rating'
+        'message_type'
     ];
 
     public function chat()

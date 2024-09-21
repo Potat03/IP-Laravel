@@ -1,3 +1,6 @@
+<!-- Chat Report -->
+<!-- Author: Loh Thiam Wei -->
+
 @extends('admin.layout.main')
 
 @section('title', 'Chat Report')
@@ -142,7 +145,7 @@
         var date = $('#date_select').val();
         $.ajax({
             url: "{{ route('admin.chat_report') }}",
-            type: 'POST',
+            type: 'GET',
             data: {
                 admin_id: admin_id,
                 year_month: date,

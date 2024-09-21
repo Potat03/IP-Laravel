@@ -1,9 +1,7 @@
 <?php
-
+// Author: Loh Thiam Wei
 namespace App\Factories;
 
-use App\Models\Admin;
-use App\Models\Customer;
 use App\Models\UserInterface;
 
 class UserFactory

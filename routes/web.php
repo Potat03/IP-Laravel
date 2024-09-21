@@ -82,15 +82,11 @@ Route::get('/getAdmChatList', [ChatMessageController::class, 'initAdminChatList'
 Route::get('/getChatMessage', [ChatMessageController::class, 'adminGetMessage'])->name('getChatMessage');
 Route::get('/getNewMessages', [ChatMessageController::class, 'fetchLatestMessages'])->name('getNewMessages');
 
-Route::get('/testmsgcust', function () {
-    return view('customer_popup_chat');
-});
 
 //Login
 Route::get('/admin/login', function () {
     return view('admin.login');
 })->name('admin.login');
-
 
 Route::get('/userlogin', function () {
     return view('userlogin');
@@ -153,13 +149,10 @@ Route::middleware([AdminAuth::class])->group(function () {
 
 
 Route::middleware([AdminAuth::class])->group(function () {
-    Route::get('/adminChat', function () {
-        return view('adminChat');
-    });
 
-    Route::get('/adminChat2', function () {
+    Route::get('/admin/chat', function () {
         return view('admin.chat_room');
-    });
+    })->name('admin.chat');
 
     Route::get('/admin/dashboard', function () {
         return view('admin.dashboard');
@@ -169,7 +162,7 @@ Route::middleware([AdminAuth::class])->group(function () {
         return view('admin.product');
     });
 
-    Route::get('/admin/chatReport', [ChatMessageController::class, 'generateReport'])->name('admin.chat_report');
+    Route::get('/admin/generateReport', [ChatMessageController::class, 'generateReport'])->name('admin.chat_report');
     Route::get('/admin/apikey', [APIkeyController::class, 'listKey'])->name('admin.apikey');
 
 
@@ -212,20 +205,3 @@ Route::middleware([AdminAuth::class])->group(function () {
 Route::get('admin/verify-otp', [AdminController::class, 'showVerifyOtpForm'])->name('admin.showVerifyOtpForm');
 Route::post('admin/verify-otp', [AdminController::class, 'verifyOtp'])->name('admin.verifyOtp');
 Route::post('/admin/set-password', [AdminController::class, 'setPassword'])->name('admin.setPassword');
-
-Route::get('/adminLogin', [AuthController::class, 'showAdminLoginForm']);
-Route::post('/adminLogin', [AuthController::class, 'adminLogin'])->name('admin.login');
-Route::get('/adminLogout', [AuthController::class, 'adminLogout'])->name('admin.logout');
-
-Route::get('/chat', [ChatController::class, 'index']);
-Route::post('/chat', [ChatController::class, 'store']);
-Route::get('/chat/{chatId}', [ChatController::class, 'show']);
-
-
-Route::get('/chatImage', [ChatMessageController::class, 'initCustomerChat']);
-
-Route::post('/sendMsg', [ChatMessageController::class, 'sendMessage'])->name('sendMsg');
-Route::get('/getCustomerChat', [ChatMessageController::class, 'initCustomerChat'])->name('getCustomerChat');
-Route::get('/getAdmChatList', [ChatMessageController::class, 'initAdminChatList'])->name('getAdmChatList');
-Route::get('/getChatMessage', [ChatMessageController::class, 'adminGetMessage'])->name('getChatMessage');
-Route::get('/getNewMessages', [ChatMessageController::class, 'fetchLatestMessages'])->name('getNewMessages');

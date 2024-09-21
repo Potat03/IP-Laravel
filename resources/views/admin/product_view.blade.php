@@ -1,7 +1,5 @@
-{{--
-    Author: Lim Weng Ni
-    Date: 20/09/2024
---}}
+<!-- Product View File -->
+<!-- Author: Lim Weng Ni & Loh Thiam Wei -->
 
 @extends('admin.layout.main')
 

@@ -1,3 +1,6 @@
+<!-- Template for admin side -->
+<!-- Author: Loh Thiam Wei & Nicholas Yap Jia Wey -->
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -42,15 +45,8 @@
                 <img src="https://www.w3schools.com/howto/img_avatar.png" alt="profile picture">
                 <div class="top_right_drop_down_menu">
                     <ul>
-                        <li><a href="#">
-                                <div class="li_icon_wrap">
-                                    <i class="fa-regular fa-address-card"></i>
-                                </div>
-                                Profile
-                            </a>
-                        </li>
                         <li onclick="logout();">
-                            <form id="logout-form" action="{{ route('auth.adminLogout') }}" method="POST" style="display: none;">
+                            <form id="logout-form" action="{{ route('auth.admin.logout') }}" method="POST" style="display: none;">
                                 @csrf
                             </form>
                             <a href="#">
@@ -90,7 +86,7 @@
                     @endif
                     @if (Auth::guard('admin')->user()->role == 'customer_service')
                     <li @stack('chat')>
-                        <a href="{{ url('adminChat2') }}" style="width: 100%;display: block;">
+                        <a href="{{ route('admin.chat') }}" style="width: 100%;display: block;">
                             <i class="fa-brands fa-rocketchat"></i>
                             Support Chat
                         </a>

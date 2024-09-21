@@ -1,3 +1,6 @@
+/* Css file for admin api management */
+/* Author: Loh Thiam Wei */
+
 @import url('color.css');
 
 .content_wrap{
@@ -110,8 +113,4 @@
     font-size: 1em;
     font-weight: 300;
     outline: none;
-}
-
-.generate_wrap input::{
-    color: var(--adminmain)
 }

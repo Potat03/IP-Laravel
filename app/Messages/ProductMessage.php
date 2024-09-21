@@ -1,9 +1,7 @@
 <?php
-
+// Author: Loh Thiam Wei
 namespace App\Messages;
 
-use App\Models\Product;
-use App\Http\Controllers\ProductController;
 use App\Services\ChatMessageService;
 
 class ProductMessage implements MessageInterface

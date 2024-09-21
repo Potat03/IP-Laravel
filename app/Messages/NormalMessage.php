@@ -1,5 +1,5 @@
 <?php
-
+// Author: Loh Thiam Wei
 namespace App\Messages;
 
 class NormalMessage implements MessageInterface

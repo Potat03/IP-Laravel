@@ -41,13 +41,12 @@
 
         Route::post('/cartItem/upload', [CartController::class, 'addToCart'])->name('cart.add');
 
-        Route::post('/admin/login', [AuthController::class, 'adminLogin'])->name('auth.adminLogin');
-        Route::post('/admin/logout', [AuthController::class, 'adminLogout'])->name('auth.adminLogout');
+        Route::post('/admin/login', [AuthController::class, 'adminLogin'])->name('auth.admin.login');
+        Route::post('/admin/logout', [AuthController::class, 'adminLogout'])->name('auth.admin.logout');
 
         Route::middleware([AdminAuth::class])->group(function () {
             Route::post('/admin/apikey/create', [APIkeyController::class, 'createKey'])->name('admin.apikey.create');
             Route::post('/admin/apikey/delete', [APIkeyController::class, 'deleteKey'])->name('admin.apikey.delete');
-            Route::post('/admin/generateReport', [ChatMessageController::class, 'generateReport'])->name('admin.chat_report');
         });
 
 

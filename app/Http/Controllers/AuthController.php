@@ -1,5 +1,5 @@
 <?php
-//Loo Wee Kiat
+// Author: Loo Wee Kiat & Loh Thiam Wei
 
 namespace App\Http\Controllers;
 

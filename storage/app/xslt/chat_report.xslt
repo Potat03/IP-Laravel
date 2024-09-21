@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Chat Report xslt file -->
+<!-- Author: Loh Thiam Wei  -->
+
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 
     <xsl:param name="admin_id" select="'0'" />
@@ -44,7 +48,7 @@
                 <div class="small_content">
                     <p>Average Chat Duration</p>
                     <h6>
-                        <xsl:value-of select="$avg_duration" />
+                        <xsl:value-of select="format-number($avg_duration, '0')" />
                         <span>(min)</span>
                     </h6>
                 </div>

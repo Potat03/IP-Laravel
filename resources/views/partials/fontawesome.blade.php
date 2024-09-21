@@ -1,3 +1,6 @@
+<!-- Font awesome file -->
+<!-- Author: Loh Thiam Wei -->
+
 <link rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v6.6.0/css/all.css">
 
 <link rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v6.6.0/css/sharp-duotone-solid.css">

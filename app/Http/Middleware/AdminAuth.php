@@ -1,5 +1,5 @@
 <?php
-
+// Author: Loh Thiam Wei
 namespace App\Http\Middleware;
 
 use Closure;
@@ -10,7 +10,7 @@ class AdminAuth
     public function handle($request, Closure $next)
     {
         if (!Auth::guard('admin')->check()) {
-            return redirect()->route('admin.login');
+            return redirect()->route('auth.admin.login');
         }
 
         $valid = true;
@@ -28,7 +28,7 @@ class AdminAuth
             Auth::guard('admin')->logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();
-            return redirect()->route('admin.login');
+            return redirect()->route('auth.admin.login');
         }
 
 

@@ -1,3 +1,6 @@
+<!-- Login for admin side -->
+<!-- Author: Loh Thiam Wei -->
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -25,7 +28,7 @@
                 <div class="login_welcome">
                     <p>Welcome back!</p>
                 </div>
-                <form action="{{ route('auth.adminLogin') }}" method="POST" id="login_form">
+                <form action="{{ route('auth.admin.login') }}" method="POST" id="login_form">
                     @csrf
                     <div class="login_input">
                         <label for="email"><i class="fa-regular fa-envelope"></i></label>
