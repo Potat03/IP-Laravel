@@ -437,7 +437,7 @@ class ProductController extends Controller
             foreach ($imageFiles as $file) {
                 $filename = basename($file);
 
-                if (strpos($filename, 'main') !== false && preg_match('/\.(jpg|jpeg|png)$/i', $filename)) {
+                if (strpos($filename, 'main') !== false && preg_match('/\.(jpg|jpeg|png|webp)$/i', $filename)) {
                     $mainImage = Storage::url($file);
                     break;
                 }
