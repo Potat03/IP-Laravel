@@ -1,5 +1,5 @@
 @extends('userprofile.layout.userProfile')
-
+<!-- Loo Wee Kiat -->
 @section('vite')
     @vite(['resources/css/app.css', 'resources/sass/app.scss', 'resources/js/app.js', 'resources/css/admin-nav.css', 'resources/js/bootstrap.js'])
 @endsection
@@ -21,7 +21,6 @@
 @section('page_title', 'Order History')
 @section('page_gm', 'Your Orders')
 
-
 @section('content')
     <div class="card shadow p-3">
         <div class="card-body">
@@ -30,12 +29,12 @@
             @if ($orders->isEmpty())
                 <p>No orders found.</p>
             @else
-                <table class="table table-bordered">
+                <table class="table">
                     <thead>
                         <tr>
-                            <th>Order ID</th>
                             <th>Date</th>
                             <th>Total</th>
+                            <th>Delivery Address</th>
                             <th>Status</th>
                             <th>Details</th>
                         </tr>
@@ -43,12 +42,12 @@
                     <tbody>
                         @foreach ($orders as $order)
                             <tr>
-                                <td>{{ $order->order_id }}</td>
                                 <td>{{ $order->created_at->format('d-m-Y') }}</td>
-                                <td>{{ $order->total }}</td>
+                                <td>{{ number_format($order->total, 2) }}</td>
+                                <td>{{ $order->delivery_address }}</td>
                                 <td>{{ ucfirst($order->status) }}</td>
                                 <td>
-                                    <button class="btn btn-info" type="button" data-bs-toggle="collapse"
+                                    <button class="btn btn-danger" type="button" data-bs-toggle="collapse"
                                         data-bs-target="#orderItems_{{ $order->order_id }}">
                                         View Items
                                     </button>
@@ -60,7 +59,8 @@
                                         <table class="table table-sm">
                                             <thead>
                                                 <tr>
-                                                    <th>Product ID</th>
+                                                    <th>Product Name</th>
+                                                    <th>Description</th>
                                                     <th>Quantity</th>
                                                     <th>Subtotal</th>
                                                     <th>Total</th>
@@ -69,10 +69,11 @@
                                             <tbody>
                                                 @foreach ($order->orderItems as $item)
                                                     <tr>
-                                                        <td>{{ $item->product_id }}</td>
+                                                        <td>{{ $item->product->name }}</td>
+                                                        <td>{{ $item->product->description }}</td>
                                                         <td>{{ $item->quantity }}</td>
-                                                        <td>{{ $item->subtotal }}</td>
-                                                        <td>{{ $item->total }}</td>
+                                                        <td>{{ number_format($item->subtotal, 2) }}</td>
+                                                        <td>{{ number_format($item->total, 2) }}</td>
                                                     </tr>
                                                 @endforeach
                                             </tbody>

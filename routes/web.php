@@ -212,27 +212,6 @@ Route::middleware([AdminAuth::class])->group(function () {
     Route::post('/admin/staff/set-password', [AdminController::class, 'setPassword'])->name('admin.setPassword');
 });
 
-<<<<<<< HEAD
-Route::get('admin/verify-otp', [AdminController::class, 'showVerifyOtpForm'])->name('admin.showVerifyOtpForm');
-Route::post('admin/verify-otp', [AdminController::class, 'verifyOtp'])->name('admin.verifyOtp');
-Route::post('/admin/set-password', [AdminController::class, 'setPassword'])->name('admin.setPassword');
-
-
-//TW blade
-Route::get('/wei', function () {
-    return view('wei');
-});
-
-Route::get('/cc', function () {
-    return view('customerChat');
-});
-
-Route::get('/cc2', function () {
-    return view('adminChat');
-});
-
-=======
->>>>>>> 76ba2ba2fba12f57756b9e55af9b2dafdf32ea26
 Route::get('/template', function () {
     return view('admin.error');
 });
@@ -257,11 +236,6 @@ Route::get('/getAdmChatList', [ChatMessageController::class, 'initAdminChatList'
 Route::get('/getChatMessage', [ChatMessageController::class, 'adminGetMessage'])->name('getChatMessage');
 Route::get('/getNewMessages', [ChatMessageController::class, 'fetchLatestMessages'])->name('getNewMessages');
 
-<<<<<<< HEAD
-Route::get('login2', [AuthController::class, 'showLoginForm'])->name('login2');
-=======
-
->>>>>>> 76ba2ba2fba12f57756b9e55af9b2dafdf32ea26
 Route::middleware([AdminAuth::class])->group(function () {
     Route::get('/testchat', function () {
         return view('chatConnectionTest');
