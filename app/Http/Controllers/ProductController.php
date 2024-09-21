@@ -218,7 +218,20 @@ class ProductController extends Controller
                 'supplier' => 'nullable|string',
                 'user_groups' => 'nullable|string',
                 'categories' => 'required|string',
+                'images.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048|mimetypes:image/jpeg,image/png,image/jpg,image/webp',
+                'filesArray' => 'nullable|string'
             ]);
+
+            if ($request->hasFile('images')) {
+                foreach ($request->file('images') as $image) {
+                    $mimeType = $image->getMimeType();
+                    $allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    
+                    if (!in_array($mimeType, $allowedMimeTypes)) {
+                        throw new Exception('Invalid image type: ' . $mimeType);
+                    }
+                }
+            }
 
             $product = new Product();
             $product->name = trim($request->name);
@@ -227,6 +240,7 @@ class ProductController extends Controller
             $product->stock = $request->stock;
             $product->status = trim($request->status);
             $product->created_at = now()->addHours(8);
+    
             $product->save();
 
             if ($request->has('isWearable')) {
@@ -562,7 +576,24 @@ class ProductController extends Controller
                 'halal' => 'nullable|boolean',
                 'supplier' => 'nullable|string',
                 'selected_groups' => 'nullable|string',
+                'images.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048|mimetypes:image/jpeg,image/png,image/jpg,image/webp',
+                'filesArray' => 'nullable|string'
             ]);
+
+            if ($request->hasFile('images')) {
+                foreach ($request->file('images') as $image) {
+                    if (!$image->isValid()) {
+                        throw new Exception('Uploaded image is not valid.');
+                    }
+    
+                    $mimeType = $image->getMimeType();
+                    $allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    
+                    if (!in_array($mimeType, $allowedMimeTypes)) {
+                        throw new Exception('Invalid image type: ' . $mimeType);
+                    }
+                }
+            }
 
             $validatedData['name'] = trim($validatedData['name']);
             $validatedData['description'] = trim($validatedData['description']);
@@ -574,6 +605,7 @@ class ProductController extends Controller
             $product->update($validatedData);
 
             $product->updated_at = now()->addHours(8);
+
             $product->save();
 
             if ($request->has('isWearable') && $request->input('isWearable')) {
