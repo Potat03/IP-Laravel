@@ -67,7 +67,6 @@ Route::post('/session', [StripeController::class, 'session'])->name('session');
 // Route::get('/success', [StripeController::class, 'success'])->name('success');
 Route::get('/success', [PaymentController::class, 'processCheckout'])->name('success');
 
-Route::get('/tracking', [OrderController::class, 'getOrderByCustomerID']);    
 Route::get('/orders/getMonthlySales', [OrderController::class, 'getMonthlySales']);
 
 //Chat
@@ -140,7 +139,7 @@ Route::middleware([CustomerAuth::class])->group(function () {
         return view('checkoutFail');
     })->name('fail');
 
-    Route::get('/tracking', [OrderController::class, 'getOrderByCustomerID']);    
+    Route::get('/tracking', [OrderController::class, 'getOrderByCustomerID'])->name('tracking');    
 });
 
 //communication security 

@@ -207,6 +207,7 @@ public function removeCartItem(Request $request, $id){
         ], 200);
 
     } catch (Exception $e) {
+        // Log::error('Fetching cart items failed: ' . $e->getMessage());
         return response()->json(['error' => 'Unable to update cart at this time.'], 500);
     
     }
