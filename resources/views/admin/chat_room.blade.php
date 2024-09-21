@@ -71,13 +71,17 @@
 @section('js')
 <script>
     var last_msg_id = 0;
+    var errorMsgTimeout = null;
     let live_update_interval = null;
     let live_chat_list_interval = null;
     var selected_chat_id = 0;
     var productRoute = "{{ url('admin/product/view') }}";
     $(document).ready(function() {
 
+        // init chat list
         getChatList();
+
+        // set interval to update chat list in close real-time
         live_chat_list_interval = setInterval(function() {
             getChatList();
         }, 2000);
@@ -169,7 +173,6 @@
             const formData = new FormData();
             formData.append('chat_id', chat_id);
             formData.append('_token', "{{ csrf_token() }}");
-            clearInterval(live_update_interval);
 
             $.ajax({
                 method: 'POST',
@@ -202,7 +205,6 @@
             const formData = new FormData();
             formData.append('chat_id', chat_id);
             formData.append('_token', "{{ csrf_token() }}");
-            clearInterval(live_update_interval);
 
             $.ajax({
                 method: 'POST',
@@ -254,7 +256,7 @@
             }
 
             // To stop the auto fetch , prevent display duplicate message
-            clearInterval(live_update_interval);
+
 
             if (imageSrc) {
                 sendMessage('image', imageSrc);
@@ -264,12 +266,11 @@
                 sendMessage('text', message);
             }
 
-            live_update_interval = setInterval(fetchNewMessages, 2000);
         });
     });
 
-    
 
+    // API functions
     function getChatList() {
 
         // Get Chat List
@@ -279,9 +280,10 @@
             success: function(response) {
                 const chats = response['chat_list'];
 
+                //if the selected chat is not in return data (mean is ended) then remove the chat room
                 $('.chat_list li').each(function() {
                     if (chats.findIndex(x => x['chat_id'] == $(this).attr('chat-id')) == -1) {
-                        if($(this).hasClass('active')){
+                        if ($(this).hasClass('active')) {
                             selected_chat_id = 0;
                             resetChatRoom();
                         }
@@ -291,12 +293,14 @@
 
                 chats.forEach(element => {
 
+                    // check is chat change from pending to active, if so remove from pending
                     const is_change = $('.chat_list li[chat-id="' + element['chat_id'] + '"]').attr('chat-status') != element['status'];
-                    if(is_change){
+                    if (is_change) {
                         $('.chat_list li[chat-id="' + element['chat_id'] + '"]').remove();
                     }
 
-                    //if does on in html now
+                    // check if exist in respective chat list,  
+                    // if not append the chat to respective chat list accodring to status
                     if ($('.chat_list li[chat-id="' + element['chat_id'] + '"]').length == 0 || is_change) {
                         if (element['status'] === 'pending') {
                             $('.new_chat').append('<li chat-id="' + element['chat_id'] + '" chat-status="' + element['status'] + '" ><div class="chat_info">' + element['customer_name'] + '<span class="notice_light"></span></div><div class="recent_msg">' + element['latest_message'] + '</div></li>');
@@ -305,18 +309,21 @@
                         }
                     }
 
-                    //if latest msg change
+                    //if latest msg change update in chat list
                     if ($('.chat_list li[chat-id="' + element['chat_id'] + '"] .recent_msg').text() != element['latest_message']) {
                         $('.chat_list li[chat-id="' + element['chat_id'] + '"] .recent_msg').text(element['latest_message']);
                         if (!$('.chat_list li[chat-id="' + element['chat_id'] + '"]').hasClass('active')) {
                             $('.chat_list li[chat-id="' + element['chat_id'] + '"] .notice_light').show();
                         }
                     }
-
                 });
+
+                // if previous selected chat change status, this will keep it focus
                 if (selected_chat_id != 0) {
                     changeChatRoom(selected_chat_id);
                 }
+
+                // check if chat list is empty, if empty show empty message
                 checkChatListEmpty();
             },
             error: function(xhr) {
@@ -342,6 +349,7 @@
         formData.append('by_customer', 0);
         formData.append('_token', "{{ csrf_token() }}");
 
+        clearInterval(live_update_interval);
         $.ajax({
             method: 'POST',
             url: '{{ route("sendMsg") }}',
@@ -354,6 +362,47 @@
                 } else {
                     showErrorMsg(response.info);
                 }
+                live_update_interval = setInterval(fetchNewMessages, 2000);
+            },
+            error: function(xhr) {
+                const response = JSON.parse(xhr.responseText);
+                showErrorMsg(response.info);
+                if (response.status != 500) {
+                    live_update_interval = setInterval(fetchNewMessages, 2000);
+                }
+            }
+        });
+    }
+
+    function showChat(chat_id) {
+        $.ajax({
+            method: 'GET',
+            url: '{{ route("getChatMessage") }}',
+            data: {
+                chat_id: chat_id
+            },
+            success: function(response) {
+
+                if (response.success) {
+
+                    const messages = response['messages'];
+                    messages.forEach(element => {
+                        let html = generateMsgHtml(element);
+                        $('.chat_content').append(html);
+                    });
+
+                    last_msg_id = response['last_msg_id'];
+
+                    registerImgPreview();
+                    $('.chat_content').scrollTop($('.chat_content')[0].scrollHeight);
+
+                    //wait all iamge load then scroll to most bot
+                    waitImageLoad();
+
+                    live_update_interval = setInterval(fetchNewMessages, 2000);
+                } else {
+                    showErrorMsg(response.info);
+                }
             },
             error: function(xhr) {
                 const response = JSON.parse(xhr.responseText);
@@ -361,6 +410,71 @@
             }
         });
     }
+
+    function fetchNewMessages() {
+
+        //find chat_id from active li
+        const chat_id = $('.chat_list li.active').attr('chat-id');
+
+        $.ajax({
+            method: 'GET',
+            url: '{{ route("getNewMessages") }}',
+            data: {
+                chat_id: chat_id,
+                last_msg_id: last_msg_id,
+                by_customer: 0,
+                _token: "{{ csrf_token() }}"
+            },
+            success: function(response) {
+                if (response['success']) {
+                    const messages = response['messages'];
+
+                    if (messages.length === 0) {
+                        return;
+                    }
+
+                    const image_load = [];
+
+                    messages.forEach(element => {
+
+                        //if exist ignore
+                        if ($('.chat_content .chat_msg[msg-id="' + element['message_id'] + '"]').length > 0) {
+                            return;
+                        }
+
+                        if (element['type'] === 'IMAGE') {
+                            const img = $('<img>').attr('src', element['image_url']);
+                            const deferred = $.Deferred();
+
+                            img.on('load', function() {
+                                deferred.resolve();
+                            }).on('error', function() {
+                                deferred.reject();
+                            });
+                            image_load.push(deferred.promise());
+                        }
+
+                        let html = generateMsgHtml(element);
+                        $('.chat_content').append(html);
+                    });
+
+                    $.when.apply($, image_load).done(function() {
+                        registerImgPreview();
+                        $('.chat_content').scrollTop($('.chat_content')[0].scrollHeight);
+
+                    })
+                    last_msg_id = response['last_msg_id'];
+                }
+            },
+            error: function(xhr) {
+                const response = JSON.parse(xhr.responseText);
+                showErrorMsg(response.info);
+                clearInterval(live_update_interval);
+            }
+        });
+    }
+
+    // Utility functions
 
     function dataURLToBlob(dataURL) {
         const byteString = atob(dataURL.split(',')[1]);
@@ -377,16 +491,19 @@
         });
     }
 
-    function fixTextarea() {
-        const ele = $('.chat_input textarea');
-        ele.css('height', 'auto');
-        ele.css('height', this.scrollHeight - 20 + 'px');
-        if (ele.height() > 80) {
-            ele.css('height', '80px');
+    function generateMsgHtml(msg) {
+        messageHtml = '';
+        if (msg['type'] === 'TEXT') {
+            messageHtml = '<div msg-id="' + msg['message_id'] + '" class="chat_msg ' + (msg['by_customer'] ? 'user_msg' : 'admin_msg') + ' show"><div class="chat_msg_txt">' + msg['text'] + '</div></div>';
+        } else if (msg['type'] === 'IMAGE') {
+            messageHtml = '<div msg-id="' + msg['message_id'] + '" class="chat_msg chat_msg_img_box ' + (msg['by_customer'] ? 'user_msg' : 'admin_msg') + ' show"><div class="chat_msg_img"><img src="' + msg['image_url'] + '" alt="User Image"></div></div>';
+        } else if (msg['type'] === 'PRODUCT') {
+            messageHtml = '<div msg-id="' + msg['message_id'] + '" class="chat_msg product_msg ' + (msg['by_customer'] ? 'user_msg' : 'admin_msg') + ' product_msg show"><div class="product_msg_header"><img src="' + msg['image'] + '" alt="Product Image"><div class="product_msg_title">' + msg['name'] + '(' + msg['id'] + ')</div></div><div class="product_msg_link"><hr><a class="product_msg_footer" href="' + productRoute + '/' + msg['id'] + '" target="_blank">Click to View</a></div></div>';
         }
-        ele.scrollTop(ele[0].scrollHeight);
+        return messageHtml;
     }
 
+    // UI functions
     function changeChatRoom(id) {
         const clicked_li = $('.chat_list li[chat-id="' + id + '"]')[0];
         const parent = $(clicked_li).parent();
@@ -413,28 +530,34 @@
         showChat(id);
     }
 
+    function fixTextarea() {
+        const ele = $('.chat_input textarea');
+        ele.css('height', 'auto');
+        ele.css('height', this.scrollHeight - 20 + 'px');
+        if (ele.height() > 80) {
+            ele.css('height', '80px');
+        }
+        ele.scrollTop(ele[0].scrollHeight);
+    }
+
     function resetChatRoom() {
         $('.chat_list li').removeClass('active');
-        $('#user_name').val('')
+        $('#user_name').val('');
         $('.empty_message').show();
-        fixTextarea();
         $('.chat_input_txt').val('');
         $('.chat_input_txt').addClass('chat_hide');
         $('.chat_input_send').addClass('chat_hide');
         $('#user_name').addClass('chat_hide');
-        $('.action_show').removeClass('action_show');
         $('.action_bar').addClass('chat_hide');
+        $('.action_show').removeClass('action_show');
         $('.paste_area img').remove();
         $('.paste_area').removeClass('show');
         $('.paste_area_remove').remove();
         $('.chat_msg').remove();
+        fixTextarea();
         last_msg_id = 0;
-        if (live_update_interval) {
-            clearInterval(live_update_interval);
-        }
+        clearInterval(live_update_interval);
     }
-
-    var errorMsgTimeout = null;
 
     function showErrorMsg(err_msg) {
         if ($('.chat_error_msg').hasClass('show')) {
@@ -468,129 +591,6 @@
             imagesLoaded++;
             if (imagesLoaded === images.length) {
                 $('.chat_content').scrollTop($('.chat_content')[0].scrollHeight);
-            }
-        });
-    }
-
-    function showChat(chat_id) {
-        $.ajax({
-            method: 'GET',
-            url: '{{ route("getChatMessage") }}',
-            data: {
-                chat_id: chat_id
-            },
-            success: function(response) {
-
-                if (response.success) {
-
-                    const messages = response['messages'];
-                    messages.forEach(element => {
-                        var html = '';
-                        if (element['type'] === 'TEXT') {
-                            if (element['by_customer']) {
-                                html = '<div class="chat_msg user_msg"><div class="chat_msg_txt">' + element['text'] + '</div></div>';
-                            } else {
-                                html = '<div class="chat_msg admin_msg"><div class="chat_msg_txt">' + element['text'] + '</div></div>';
-                            }
-                        } else if (element['type'] === 'IMAGE') {
-                            if (element['by_customer']) {
-                                html = '<div class="chat_msg chat_msg_img_box user_msg"><div class="chat_msg_img"><img src="' + element['image_url'] + '" alt="User Image"></div></div>';
-                            } else {
-                                html = '<div class="chat_msg chat_msg_img_box admin_msg"><div class="chat_msg_img"><img src="' + element['image_url'] + '" alt="User Image"></div></div>';
-                            }
-                        } else if (element['type'] === 'PRODUCT') {
-                            if (element['by_customer']) {
-                                html = '<div class="chat_msg user_msg product_msg"><div class="product_msg_header"><img src="' + element['image'] + '" alt="Product Image"><div class="product_msg_title">' + element['name'] + '(' + element['id'] + ')</div></div><div class="product_msg_link"><hr><a class="product_msg_footer" href="' + productRoute + '/' + element['id'] + '" target="_blank">Click to View</a></div></div>';
-                            } else {
-                                html = '<div class="chat_msg admin_msg product_msg"><div class="product_msg_header"><img src="' + element['image'] + '" alt="Product Image"><div class="product_msg_title">' + element['name'] + '(' + element['id'] + ')</div></div><div class="product_msg_link"><hr><a class="product_msg_footer" href="' + productRoute + '/' + element['id'] + '" target="_blank">Click to View</a></div></div>';
-                            }
-                        }
-                        $('.chat_content').append(html);
-                    });
-
-                    last_msg_id = response['last_msg_id'];
-
-                    registerImgPreview();
-                    $('.chat_content').scrollTop($('.chat_content')[0].scrollHeight);
-
-                    //wait all iamge load then scroll to most bot
-                    waitImageLoad();
-
-                    //check status
-                    if ($('.chat_list li.active').attr('chat-status') == 'active') {
-                        live_update_interval = setInterval(fetchNewMessages, 2000);
-                    }
-                } else {
-                    showErrorMsg(response.info);
-                }
-            },
-            error: function(xhr) {
-                const response = JSON.parse(xhr.responseText);
-                showErrorMsg(response.info);
-            }
-        });
-    }
-
-    function fetchNewMessages() {
-
-        //find chat_id from active li
-        const chat_id = $('.chat_list li.active').attr('chat-id');
-
-
-        $.ajax({
-            method: 'GET',
-            url: '{{ route("getNewMessages") }}',
-            data: {
-                chat_id: chat_id,
-                last_msg_id: last_msg_id,
-                by_customer: 0,
-                _token: "{{ csrf_token() }}"
-            },
-            success: function(response) {
-                if (response['success']) {
-                    const messages = response['messages'];
-
-                    if (messages.length === 0) {
-                        return;
-                    }
-
-                    const image_load = [];
-
-                    messages.forEach(element => {
-                        if (element['type'] === 'TEXT') {
-                            messageHtml = '<div class="chat_msg ' + (element['by_customer'] ? 'user_msg' : 'admin_msg') + ' show"><div class="chat_msg_txt">' + element['text'] + '</div></div>';
-                        } else if (element['type'] === 'IMAGE') {
-                            messageHtml = '<div class="chat_msg ' + (element['by_customer'] ? 'user_msg' : 'admin_msg') + ' show"><div class="chat_msg_img"><img src="' + element['image_url'] + '" alt="User Image"></div></div>';
-
-                            const img = $('<img>').attr('src', element['image_url']);
-                            const deferred = $.Deferred();
-
-                            img.on('load', function() {
-                                deferred.resolve();
-                            }).on('error', function() {
-                                deferred.reject();
-                            });
-
-                            image_load.push(deferred.promise());
-                        } else if (element['type'] === 'PRODUCT') {
-                            messageHtml = '<div class="chat_msg ' + (element['by_customer'] ? 'user_msg' : 'admin_msg') + ' product_msg show"><div class="product_msg_header"><img src="' + element['image'] + '" alt="Product Image"><div class="product_msg_title">' + element['name'] + '(' + element['id'] + ')</div></div><div class="product_msg_link"><hr><a class="product_msg_footer" href="' + productRoute + '/' + element['id'] + '" target="_blank">Click to View</a></div></div>';
-                        }
-
-                        $('.chat_content').append(messageHtml);
-                    });
-
-                    $.when.apply($, image_load).done(function() {
-                        registerImgPreview();
-                        $('.chat_content').scrollTop($('.chat_content')[0].scrollHeight);
-
-                    })
-                    last_msg_id = response['last_msg_id'];
-                } 
-            },
-            error: function(xhr) {
-                const response = JSON.parse(xhr.responseText);
-                showErrorMsg(response.info);
-                clearInterval(live_update_interval);
             }
         });
     }

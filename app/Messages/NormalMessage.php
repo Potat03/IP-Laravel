@@ -16,7 +16,8 @@ class NormalMessage implements MessageInterface
         return [
             'type' => 'TEXT',
             'text' => $this->data->message_content,
-            'by_customer'=> $this->data->by_customer
+            'by_customer'=> $this->data->by_customer,
+            'message_id'=> $this->data->message_id
         ];
     }
 }

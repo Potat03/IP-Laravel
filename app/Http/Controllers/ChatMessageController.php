@@ -256,8 +256,7 @@ class ChatMessageController extends Controller
         } catch (\Illuminate\Validation\ValidationException $e) { // Validation got problem return this
             return response()->json([
                 'success' => false,
-                'info' => 'Invalid data',
-                'errors' => $e->errors()
+                'info' => 'Invalid data'
             ], 422);
         } catch (\Exception $e) {
             return response()->json([

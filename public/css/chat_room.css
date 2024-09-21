@@ -5,6 +5,7 @@
     border-radius: 10px;
     box-shadow: 1px 1px 10px 0px rgba(0, 0, 0,0.30);
     background-color: var(--grey);
+    max-height: 75vh;
 }
 
 .chat_list{
@@ -613,6 +614,7 @@
     align-items: center;
     gap: 10px;
     opacity: 0;
+    z-index: 900;
 }
 
 .chat_error_msg.show{

@@ -33,7 +33,8 @@ class ProductMessage implements MessageInterface
             'image' => $image_url,
             'id' => $product->product_id,
             'name' => $product->name,
-            'by_customer'=> $this->data->by_customer
+            'by_customer'=> $this->data->by_customer,
+            'message_id'=> $this->data->message_id
         ];
     }
 }

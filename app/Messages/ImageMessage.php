@@ -26,7 +26,8 @@ class ImageMessage implements MessageInterface
         return [
             'type' => 'IMAGE',
             'image_url' => $image_url,
-            'by_customer'=> $this->data->by_customer
+            'by_customer'=> $this->data->by_customer,
+            'message_id'=> $this->data->message_id
         ];
     }
 }
