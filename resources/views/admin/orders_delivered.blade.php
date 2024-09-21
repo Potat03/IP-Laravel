@@ -59,8 +59,10 @@
                                 <td style="text-align:left!important;">RM {{ $order->total }}</td>
                                 <td style="text-align:left!important;">{{ \Carbon\Carbon::parse($order->created_at)->format('d-m-Y h:iA') }}</td>
                                 <td style="text-align:let!important;">{{ $order->tracking_number ?? '-' }}</td>
-                                <td style="text-align:left!important;">{{ $order->rating ?? '-' }}</td>
-                                <td>                                        <button type="button" class="btn btn-secondary">DELIVERED</button>
+                                <td style="text-align:left!important;">    {{ $order->received ? 'true' : 'false' }}
+                                </td>
+                                <td>                                        
+                                    <button type="button" class="btn btn-secondary">DELIVERED</button>
                                 </td>
                                 <td>
                                         <button type="button" class="btn btn-primary" disabled>COMPLETE</button>

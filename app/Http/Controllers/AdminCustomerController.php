@@ -145,11 +145,7 @@ class AdminCustomerController extends Controller
                 return response()->json(['success' => false, 'message' => 'Invalid Request'], 400);
             }
 
-            $customers = Customer::withSum('Order', 'subtotal')->get();
-
-            foreach ($customers as $customer) {
-                $customer->orders = $customer->orders;
-            }
+            $customers = Customer::withSum('Order', 'total')->get();
 
             return response()->json(['success' => true, 'data' => $customers], 200);
         } catch (Exception $e) {

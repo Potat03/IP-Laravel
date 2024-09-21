@@ -65,7 +65,7 @@ class CartItemController extends Controller
            $promotions= [];
 
            if ($cartItems->isEmpty()) {
-               Log::warning('No cart items found for Customer ID: ' . $customerID);
+                $cartItems = null;
            }else{
             
             foreach ($cartItems as $cartItem) {
@@ -85,14 +85,10 @@ class CartItemController extends Controller
             }
             
            }
-   
 
-    //    return response()->json(['cartItems'=>$cartItems]);
-           //return to view
               return view('cart', ['cartItems'=>$cartItems]);
        } catch (Exception $e) {
-           Log::error('Fetching cart items failed: ' . $e->getMessage());
-           return response()->json(['error' => 'Fetching cart items failed.'], 500);
+        return response()->json(['error' => 'Unable to retreive cart at this time.'], 500);
        }
    }
    
@@ -100,49 +96,54 @@ class CartItemController extends Controller
    public function updateQuantity(Request $request, $id)
     {
     
-        //Databse security
-        if(
-        $request->validate([
-            'quantity' => 'required|integer|min:1',
-        ])){
+        try{
+            //Databse security
+            if(
+            $request->validate([
+                'quantity' => 'required|integer|min:1',
+            ])){
 
-        // Databse security
-        $cartItem = CartItem::find($id);
-        
-        if ($cartItem) {
-            $cartItem->quantity = $request->input('quantity');
-            $cartItem->save();
+            // Databse security
+            $cartItem = CartItem::find($id);
+            
+            if ($cartItem) {
+                $cartItem->quantity = $request->input('quantity');
+                $cartItem->save();
 
-            return response()->json(['success' => true]);
-        }
+                return response()->json(['success' => true]);
+            }
 
-        return response()->json(['success' => false], 404);
+            }
+        } catch (Exception $e) {
+            return response()->json(['error' => 'Unable to update cart at this time.'], 500);
         }
     }
 
     public function updateDiscount(Request $request, $id)
     {
+        try{
+            //Databse security
+            $request->validate([
+            'discount' => 'required|numeric',
+            ]);
 
-        //Databse security
-        $request->validate([
-        'discount' => 'required|numeric',
-        ]);
+            // Databse security
+            $cartItem = CartItem::find($id);
+            if ($cartItem) {
+                $cartItem->discount = $request->input('discount');
+                $cartItem->save();
 
-    // Databse security
-    $cartItem = CartItem::find($id);
-    if ($cartItem) {
-        $cartItem->discount = $request->input('discount');
-        $cartItem->save();
+                return response()->json(['success' => true]);
+            }
+        }catch (Exception $e) {
+            return response()->json(['error' => 'Unable to update cart at this time.'], 500);
+        }
 
-        return response()->json(['success' => true]);
-    }
-
-    return response()->json(['success' => false], 404);
     }
 
     public function updateSubtotal(Request $request, $id)
     {
-        //Databse security
+       try{ //Databse security
         $request->validate([
             'subtotal' => 'required|numeric',
         ]);
@@ -156,26 +157,31 @@ class CartItemController extends Controller
             return response()->json(['success' => true]);
         }
 
-        return response()->json(['success' => false], 404);
+        }catch (Exception $e) {
+            return response()->json(['error' => 'Unable to update cart at this time.'], 500);
+        }
     }
 
 public function updateTotal(Request $request, $id)
 {
-    //Databse security
-    $request->validate([
-        'total' => 'required|numeric',
-    ]);
+    try{
+        //Databse security
+        $request->validate([
+            'total' => 'required|numeric',
+        ]);
 
-    // Databse security
-    $cartItem = CartItem::find($id);
-    if ($cartItem) {
-        $cartItem->total = $request->input('total');
-        $cartItem->save();
+        // Databse security
+        $cartItem = CartItem::find($id);
+        if ($cartItem) {
+            $cartItem->total = $request->input('total');
+            $cartItem->save();
 
-        return response()->json(['success' => true]);
+            return response()->json(['success' => true]);
+        }
+
+    }catch (Exception $e) {
+        return response()->json(['error' => 'Unable to update cart at this time.'], 500);
     }
-
-    return response()->json(['success' => false], 404);
 }
 
 public function removeCartItem(Request $request, $id){
@@ -201,11 +207,9 @@ public function removeCartItem(Request $request, $id){
         ], 200);
 
     } catch (Exception $e) {
-        // Return a failure response in case of an error
-        return response()->json([
-            'success' => false,
-            'message' => 'Failed to remove cart item: ' . $e->getMessage()
-        ], 500);
+        // Log::error('Fetching cart items failed: ' . $e->getMessage());
+        return response()->json(['error' => 'Unable to update cart at this time.'], 500);
+    
     }
 }
 }

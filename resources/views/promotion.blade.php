@@ -1,3 +1,4 @@
+{{-- Author: Nicholas Yap Jia Wey --}}
 @extends('layout.shop')
 
 @section('title', 'Promotion')

@@ -79,30 +79,12 @@ class Order extends Model
         $this->state->proceedToNext();
     }
 
-    public function showOrder()
-    {
-        return $this->state->canShowToUser();
-    }
-
     public function receiveOrder()
     {
         return $this->state->receiveOrder();
     }
 
-    public function startDelivery()
-    {
-        // Logic for starting delivery
-    }
-
-    public function markAsDelivered()
-    {
-        // Logic for marking order as delivered
-    }
-
-    public function enableRating()
-    {
-        // Logic to enable user rating
-    }
+   
 
     public function orderItems()
     {

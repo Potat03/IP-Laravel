@@ -19,10 +19,9 @@ class StripeController extends Controller
 {
     public function session(Request $request)
     {
-       //comunication security     
-       $user = Auth::guard('customer')->user();
-       $customerID = $user->customer_id;
-
+        //comunication security     
+        $user = Auth::guard('customer')->user();
+        $customerID = $user->customer_id;
 
         $request->validate([
            'first_name' => 'required|regex:/^[\pL\s]+$/u',
@@ -68,7 +67,6 @@ class StripeController extends Controller
                     'quantity' => $cartItem->quantity,
                 ];
             }
-
         }
 
         $lineItems[] = [
@@ -84,7 +82,6 @@ class StripeController extends Controller
 
         // Set Stripe API key
         Stripe::setApiKey(config('services.stripe.secret')); // Use the secret from the config
-
        
         // Create the Checkout Session
         $session = Session::create([
@@ -104,8 +101,5 @@ class StripeController extends Controller
         return redirect()->away($session->url);
     }
 
-    public function success()
-    {
-       
-    }
+   
 }

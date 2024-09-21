@@ -68,7 +68,6 @@ Route::post('/session', [StripeController::class, 'session'])->name('session');
 // Route::get('/success', [StripeController::class, 'success'])->name('success');
 Route::get('/success', [PaymentController::class, 'processCheckout'])->name('success');
 
-Route::get('/tracking', [OrderController::class, 'getOrderByCustomerID']);
 Route::get('/orders/getMonthlySales', [OrderController::class, 'getMonthlySales']);
 
 //Chat
@@ -139,7 +138,7 @@ Route::middleware([CustomerAuth::class])->group(function () {
         return view('checkoutFail');
     })->name('fail');
 
-    Route::get('/tracking', [OrderController::class, 'getOrderByCustomerID']);
+    Route::get('/tracking', [OrderController::class, 'getOrderByCustomerID'])->name('tracking');    
 });
 
 //communication security 
@@ -214,11 +213,6 @@ Route::get('admin/verify-otp', [AdminController::class, 'showVerifyOtpForm'])->n
 Route::post('admin/verify-otp', [AdminController::class, 'verifyOtp'])->name('admin.verifyOtp');
 Route::post('/admin/set-password', [AdminController::class, 'setPassword'])->name('admin.setPassword');
 
-
-Route::get('/template', function () {
-    return view('admin.error');
-});
-
 Route::get('/adminLogin', [AuthController::class, 'showAdminLoginForm']);
 Route::post('/adminLogin', [AuthController::class, 'adminLogin'])->name('admin.login');
 Route::get('/adminLogout', [AuthController::class, 'adminLogout'])->name('admin.logout');
@@ -230,9 +224,6 @@ Route::get('/chat/{chatId}', [ChatController::class, 'show']);
 
 Route::get('/chatImage', [ChatMessageController::class, 'initCustomerChat']);
 
-Route::get('/addMsg', function () {
-    return view('weiTestChat');
-});
 Route::post('/sendMsg', [ChatMessageController::class, 'sendMessage'])->name('sendMsg');
 Route::get('/getCustomerChat', [ChatMessageController::class, 'initCustomerChat'])->name('getCustomerChat');
 Route::get('/getAdmChatList', [ChatMessageController::class, 'initAdminChatList'])->name('getAdmChatList');

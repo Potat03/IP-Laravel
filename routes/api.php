@@ -63,8 +63,6 @@
         Route::post('/order/proceedToNext/{id}', [OrderController::class, 'proceedToNext']);
         Route::post('/order/receive/{id}', [OrderController::class, 'receiveOrder']);
 
-
-
     });
     Route::post('/resendOtp', [AuthController::class, 'resendOtp'])->name('auth.resendOtp');
 
@@ -80,7 +78,6 @@
     // Route::get('/products', [ProductController::class, 'getAllProducts'])->name('api.products');
     // Route::get('/products/product/{id}', [ProductController::class, 'getOneProduct'])->name('api.product');
 
-    Route::get('/api/customer_report', [AdminCustomerController::class, 'customerReportAPI']);
     Route::get('/suggestions/weather/today', [SuggestionController::class, 'getCurrentWeatherSuggestion'])->name('suggestion.weather');
     
     Route::post('/category/store', [CategoryController::class, 'store'])->name('admin.category.store');
@@ -114,4 +111,5 @@
         Route::post('/products/report', [ProductController::class, 'monthlyProductReport']);
         Route::get('/getPerformance/customerService', [ChatMessageController::class, 'getCustomerServicePerfomance']);
         Route::post('/products/restock', [ProductController::class, 'restock']);
+        Route::post('/customer_report', [AdminCustomerController::class, 'customerReportAPI']);
     });
