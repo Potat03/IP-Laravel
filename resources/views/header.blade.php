@@ -24,6 +24,9 @@
             <li class="nav-item">
                 <a class="nav-link" href="{{route('promotion')}}">Promotion</a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('tracking') }}">Tracking</a>
+            </li>
         </ul>
 
         <form class="d-flex m-0">

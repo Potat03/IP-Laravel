@@ -40,7 +40,7 @@ class ProductController extends Controller
     {
         try {
             $request->validate([
-                'images.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+                'images.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048|mimetypes:image/jpeg,image/png,image/jpg,image/webp',
                 'filesArray' => 'nullable|string',
             ]);
 
@@ -86,7 +86,7 @@ class ProductController extends Controller
     {
         try {
             $request->validate([
-                'images.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+                'images.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048|mimetypes:image/jpeg,image/png,image/jpg,image/webp',
                 'existingImages' => 'nullable|string',
                 'filesArray' => 'nullable|string',
             ]);
@@ -104,7 +104,7 @@ class ProductController extends Controller
             $filesArrayFromRequest = json_decode($request->input('filesArray', '[]'), true);
 
             $mainImageExists = false;
-            foreach (['jpg', 'png', 'jpeg'] as $extension) {
+            foreach (['jpg', 'png', 'jpeg', 'webp'] as $extension) {
                 if (in_array('main.' . $extension, $existingImages)) {
                     $mainImageExists = true;
                     break;
@@ -113,7 +113,7 @@ class ProductController extends Controller
 
             foreach ($existingImages as $image) {
                 if (!in_array($image, $existingImagesFromRequest)) {
-                    if ($mainImageExists && in_array($image, ['main.jpg', 'main.png', 'main.jpeg'])) {
+                    if ($mainImageExists && in_array($image, ['main.jpg', 'main.png', 'main.jpeg', 'main.webp'])) {
                         $mainImageExists = false; // Update flag
                         Log::info('Deleted main image: ' . $image);
                     }
@@ -150,7 +150,7 @@ class ProductController extends Controller
             }
 
             if (!$images && !$mainImageExists) {
-                $remainingImages = array_diff($existingImages, ['main.jpg', 'main.png', 'main.jpeg']);
+                $remainingImages = array_diff($existingImages, ['main.jpg', 'main.png', 'main.jpeg', 'main.webp']);
                 if (!empty($remainingImages)) {
                     $newMainImage = reset($remainingImages);
                     $newMainImageExtension = pathinfo($newMainImage, PATHINFO_EXTENSION);
@@ -218,7 +218,20 @@ class ProductController extends Controller
                 'supplier' => 'nullable|string',
                 'user_groups' => 'nullable|string',
                 'categories' => 'required|string',
+                'images.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048|mimetypes:image/jpeg,image/png,image/jpg,image/webp',
+                'filesArray' => 'nullable|string'
             ]);
+
+            if ($request->hasFile('images')) {
+                foreach ($request->file('images') as $image) {
+                    $mimeType = $image->getMimeType();
+                    $allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    
+                    if (!in_array($mimeType, $allowedMimeTypes)) {
+                        throw new Exception('Invalid image type: ' . $mimeType);
+                    }
+                }
+            }
 
             $product = new Product();
             $product->name = trim($request->name);
@@ -227,6 +240,7 @@ class ProductController extends Controller
             $product->stock = $request->stock;
             $product->status = trim($request->status);
             $product->created_at = now()->addHours(8);
+    
             $product->save();
 
             if ($request->has('isWearable')) {
@@ -437,7 +451,7 @@ class ProductController extends Controller
             foreach ($imageFiles as $file) {
                 $filename = basename($file);
 
-                if (strpos($filename, 'main') !== false && preg_match('/\.(jpg|jpeg|png)$/i', $filename)) {
+                if (strpos($filename, 'main') !== false && preg_match('/\.(jpg|jpeg|png|webp)$/i', $filename)) {
                     $mainImage = Storage::url($file);
                     break;
                 }
@@ -529,7 +543,7 @@ class ProductController extends Controller
     public function getMainImageExtension($productId)
     {
         $folderPath = 'public/images/products/' . $productId;
-        $extensions = ['jpg', 'jpeg', 'png'];
+        $extensions = ['jpg', 'jpeg', 'png', 'webp'];
 
         foreach ($extensions as $extension) {
             $mainImage = 'main.' . $extension;
@@ -562,7 +576,24 @@ class ProductController extends Controller
                 'halal' => 'nullable|boolean',
                 'supplier' => 'nullable|string',
                 'selected_groups' => 'nullable|string',
+                'images.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048|mimetypes:image/jpeg,image/png,image/jpg,image/webp',
+                'filesArray' => 'nullable|string'
             ]);
+
+            if ($request->hasFile('images')) {
+                foreach ($request->file('images') as $image) {
+                    if (!$image->isValid()) {
+                        throw new Exception('Uploaded image is not valid.');
+                    }
+    
+                    $mimeType = $image->getMimeType();
+                    $allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    
+                    if (!in_array($mimeType, $allowedMimeTypes)) {
+                        throw new Exception('Invalid image type: ' . $mimeType);
+                    }
+                }
+            }
 
             $validatedData['name'] = trim($validatedData['name']);
             $validatedData['description'] = trim($validatedData['description']);
@@ -574,6 +605,7 @@ class ProductController extends Controller
             $product->update($validatedData);
 
             $product->updated_at = now()->addHours(8);
+
             $product->save();
 
             if ($request->has('isWearable') && $request->input('isWearable')) {

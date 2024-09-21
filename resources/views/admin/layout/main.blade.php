@@ -80,7 +80,7 @@
                         </a>
 
                     </li>
-                    @if (Auth::guard('admin')->user()->role != 'customer_service') 
+                    @if (Auth::guard('admin')->user()->role != 'customer_service')
                     <li @stack('promotion')>
                         <a href="{{ route('admin.promotion') }}" style="width: 100%;display: block;">
                             <i class="fa-regular fa-megaphone"></i>
@@ -88,7 +88,7 @@
                         </a>
                     </li>
                     @endif
-                    @if (Auth::guard('admin')->user()->role == 'customer_service') 
+                    @if (Auth::guard('admin')->user()->role == 'customer_service')
                     <li @stack('chat')>
                         <a href="{{ url('adminChat2') }}" style="width: 100%;display: block;">
                             <i class="fa-brands fa-rocketchat"></i>
@@ -96,7 +96,7 @@
                         </a>
                     </li>
                     @endif
-                    @if (Auth::guard('admin')->user()->role != 'customer_service') 
+                    @if (Auth::guard('admin')->user()->role != 'customer_service')
                     <li @stack('order')>
                         <a href="#" style="width: 100%;display: block;">
                             <i class="fa-regular fa-box"></i>
@@ -110,11 +110,17 @@
                         </a>
                     </li>
                     @endif
-                    @if (Auth::guard('admin')->user()->role == 'manager') 
+                    @if (Auth::guard('admin')->user()->role == 'manager')
                     <li @stack('api')>
                         <a href="{{ route('admin.apikey') }}" style="width: 100%;display: block;">
                             <i class="fa-solid fa-webhook"></i>
                             API
+                        </a>
+                    </li>
+                    <li @stack('adminManage')>
+                        <a href="{{ route('admin.staff') }}" style="width: 100%;display: block;">
+                            <i class="fa-regular fa-user"></i>
+                            Staff
                         </a>
                     </li>
                     <li @stack('report')>
@@ -153,7 +159,28 @@
         </div>
 
         <script>
+            $(document).ready(function() {
+                fixHeight();
 
+                $('.top_right').on('click', function() {
+                    $('.top_right_drop_down_menu').toggleClass('show');
+                });
+
+                $('.admin_content').on('click', function(event) {
+                    if (!$(event.target).closest('.top_right').length) {
+                        $('.top_right_drop_down_menu').removeClass('show');
+                    }
+                });
+                updateTime();
+            });
+
+            $(window).resize(function() {
+                fixHeight();
+            });
+
+            function fixHeight() {
+                $('.lower_content').css('max-height', $('.admin_content').height() - 200);
+            }
 
             function updateTime() {
                 var date = new Date();
@@ -180,7 +207,6 @@
             function logout() {
                 $('#logout-form').submit();
             }
-
         </script>
 
         @yield('js')

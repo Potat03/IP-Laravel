@@ -50,4 +50,6 @@
             <restock_recommendation>0</restock_recommendation>
         </product>
     </products>
+    <total_value>0</total_value>
+    <inventory_turnover_rate>0</inventory_turnover_rate>
 </report>

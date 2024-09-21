@@ -1,5 +1,5 @@
 <?php
-
+//Loo Wee Kiat
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -29,8 +29,16 @@ class CustomerController extends Controller
 
     public function orderHistorySec()
     {
-        return view('userprofile.orderHistorySec', ['customer' => $this->customer]);
+        $customerId = Auth::guard('customer')->user()->customer_id;
+
+        $orders = \App\Models\Order::where('customer_id', $customerId)
+            ->with('orderItems')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('userprofile.order_history', ['orders' => $orders]);
     }
+
 
     public function shippingSec()
     {
@@ -123,15 +131,14 @@ class CustomerController extends Controller
         $request->validate([
             'password' => 'required|min:8|confirmed|regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[!$#%]).*$/',
         ]);
-    
+
         if (Hash::check($request->password, $this->customer->password)) {
             return back()->withErrors(['password' => 'The new password cannot be the same as your current password.']);
         }
-    
+
         $this->customer->password = Hash::make($request->password);
         $this->customer->save();
-    
+
         return redirect()->route('user.profileSec')->with('message', 'Password has been changed successfully.');
     }
-    
 }
