@@ -104,7 +104,7 @@ class ProductController extends Controller
             $filesArrayFromRequest = json_decode($request->input('filesArray', '[]'), true);
 
             $mainImageExists = false;
-            foreach (['jpg', 'png', 'jpeg'] as $extension) {
+            foreach (['jpg', 'png', 'jpeg', 'webp'] as $extension) {
                 if (in_array('main.' . $extension, $existingImages)) {
                     $mainImageExists = true;
                     break;
@@ -113,7 +113,7 @@ class ProductController extends Controller
 
             foreach ($existingImages as $image) {
                 if (!in_array($image, $existingImagesFromRequest)) {
-                    if ($mainImageExists && in_array($image, ['main.jpg', 'main.png', 'main.jpeg'])) {
+                    if ($mainImageExists && in_array($image, ['main.jpg', 'main.png', 'main.jpeg', 'main.webp'])) {
                         $mainImageExists = false; // Update flag
                         Log::info('Deleted main image: ' . $image);
                     }
@@ -150,7 +150,7 @@ class ProductController extends Controller
             }
 
             if (!$images && !$mainImageExists) {
-                $remainingImages = array_diff($existingImages, ['main.jpg', 'main.png', 'main.jpeg']);
+                $remainingImages = array_diff($existingImages, ['main.jpg', 'main.png', 'main.jpeg', 'main.webp']);
                 if (!empty($remainingImages)) {
                     $newMainImage = reset($remainingImages);
                     $newMainImageExtension = pathinfo($newMainImage, PATHINFO_EXTENSION);
@@ -529,7 +529,7 @@ class ProductController extends Controller
     public function getMainImageExtension($productId)
     {
         $folderPath = 'public/images/products/' . $productId;
-        $extensions = ['jpg', 'jpeg', 'png'];
+        $extensions = ['jpg', 'jpeg', 'png', 'webp'];
 
         foreach ($extensions as $extension) {
             $mainImage = 'main.' . $extension;
