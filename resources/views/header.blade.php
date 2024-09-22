@@ -486,6 +486,11 @@
     function fetchNewMessages() {
         const chat_id = $('.popup_box_body_chat').attr('chat-id');
 
+        if(!chat_id || chat_id == '') {
+            clearInterval(intervalId);
+            return;
+        }
+
         $.ajax({
             method: 'GET',
             url: '{{ route("getNewMessages") }}',

@@ -419,6 +419,11 @@
         //find chat_id from active li
         const chat_id = $('.chat_list li.active').attr('chat-id');
 
+        if(chat_id == 0 || chat_id == null){
+            clearInterval(live_update_interval);
+            return;
+        }
+
         $.ajax({
             method: 'GET',
             url: '{{ route("getNewMessages") }}',

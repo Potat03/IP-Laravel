@@ -697,7 +697,7 @@ class ChatMessageController extends Controller
             $endedAtElement = $dom->createElement('ended_at', $chatData['ended_at']);
             $chatElement->appendChild($endedAtElement);
 
-            $duration = $dom->createElement('duration', strtotime($chatData['ended_at']) - strtotime($chatData['created_at']));
+            $duration = $dom->createElement('duration', (strtotime($chatData['ended_at']) - strtotime($chatData['created_at'])) / 60);
             $chatElement->appendChild($duration);
 
             $root->appendChild($chatElement);
