@@ -150,6 +150,10 @@ Route::middleware([AdminAuth::class])->group(function () {
 
 Route::middleware([AdminAuth::class])->group(function () {
 
+    Route::get('/admin', function () {
+        return view('admin.main');
+    });
+
     Route::get('/admin/chat', function () {
         return view('admin.chat_room');
     })->name('admin.chat');

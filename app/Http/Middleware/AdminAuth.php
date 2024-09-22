@@ -10,7 +10,7 @@ class AdminAuth
     public function handle($request, Closure $next)
     {
         if (!Auth::guard('admin')->check()) {
-            return redirect()->route('auth.admin.login');
+            return redirect()->route('admin.login');
         }
 
         $valid = true;
@@ -28,7 +28,7 @@ class AdminAuth
             Auth::guard('admin')->logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();
-            return redirect()->route('auth.admin.login');
+            return redirect()->route('admin.login');
         }
 
 

@@ -7,6 +7,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     @vite(['resources/sass/app.scss', 'resources/js/app.js', 'resources/css/userlogin.css'])
+    <link rel="icon" href="{{ asset('images/logo.png') }}" type="image/x-icon" />
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <title>User Login</title>
     <style>

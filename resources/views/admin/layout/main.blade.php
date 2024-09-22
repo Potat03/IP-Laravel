@@ -8,6 +8,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title')</title>
+    <link rel="icon" href="{{ asset('images/logo.png') }}" type="image/x-icon" />
 
     @include('partials.fontawesome')
     <link href="{{ asset('css/admin_nav.css') }}" rel="stylesheet">
