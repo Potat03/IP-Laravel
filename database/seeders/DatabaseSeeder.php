@@ -169,18 +169,18 @@ class DatabaseSeeder extends Seeder
         // Seed Carts
         Cart::create([
             'customer_id' => 1,
-            'subtotal' => '3000',
-            'delivery_fee' => '50',
-            'total_discount' => '500',
-            'total' => '2550',
+            'subtotal' => '3120',
+            'delivery_fee' => '5',
+            'total_discount' => '600',
+            'total' => '2520',
         ]);
 
         Cart::create([
             'customer_id' => 2,
-            'subtotal' => '5000',
-            'delivery_fee' => '100',
-            'total_discount' => '1000',
-            'total' => '4100',
+            'subtotal' => '0',
+            'delivery_fee' => '5',
+            'total_discount' => '0',
+            'total' => '0',
         ]);
 
         // Seed Promotions
@@ -238,27 +238,39 @@ class DatabaseSeeder extends Seeder
         // Seed Orders
         Order::create([
             'customer_id' => 1,
-            'subtotal' => '5000',
-            'total_discount' => '1000',
-            'total' => '4000',
+            'subtotal' => '1000',
+            'total_discount' => '200',
+            'total' => '805',
+            'status' => 'delivered',
+            'delivery_address' => 'Jl. Raya Bogor',
+            'delivery_method' => 'JNE',
+            'tracking_number' => '1234567890',
+            'received' => true,
+            'created_at' => Carbon::now()->subDays(35),
+            'updated_at' => Carbon::now()->subDays(30),
+        ]);
+        Order::create([
+            'customer_id' => 1,
+            'subtotal' => '120',
+            'total_discount' => '0',
+            'total' => '120',
             'status' => 'delivered',
             'delivery_address' => 'Jl. Raya Bogor',
             'delivery_method' => 'JNE',
             'tracking_number' => '1234567890',
             'created_at' => Carbon::now()->subDays(35),
-            'updated_at' => Carbon::now()->subDays(35),
+            'updated_at' => Carbon::now()->subDays(30),
         ]);
-
         Order::create([
-            'customer_id' => 2,
-            'subtotal' => '3000',
-            'total_discount' => '500',
-            'total' => '2500',
+            'customer_id' => 1,
+            'subtotal' => '300',
+            'total_discount' => '0',
+            'total' => '300',
             'status' => 'delivery',
             'delivery_address' => 'Jl. Raya Jakarta',
             'delivery_method' => 'JNE',
             'tracking_number' => '0987654321',
-            'created_at' => Carbon::now()->subDays(5),
+            'created_at' => Carbon::now()->subDays(10),
             'updated_at' => Carbon::now()->subDays(5),
         ]);
 
@@ -266,46 +278,40 @@ class DatabaseSeeder extends Seeder
         OrderItem::create([
             'order_id' => 1,
             'promotion_id' => 1,
+            'product_id' => null,
+            'quantity' => 1,
+            'subtotal' => '1000',
+            'discount' => '200',
+            'total' => '800',
+            'created_at' => Carbon::now()->subDays(35),
+            'updated_at' => Carbon::now()->subDays(35),
+        ]);
+
+        OrderItem::create([
+            'order_id' => 2,
+            'promotion_id' => null,
             'product_id' => 1,
             'quantity' => 2,
-            'subtotal' => '2000',
-            'discount' => '200',
-            'total' => '1800',
+            'subtotal' => '120',
+            'discount' => '0',
+            'total' => '120',
             'created_at' => Carbon::now()->subDays(35),
             'updated_at' => Carbon::now()->subDays(35),
         ]);
 
         OrderItem::create([
-            'order_id' => 1,
-            'promotion_id' => 2,
-            'product_id' => 2,
-            'quantity' => 2,
-            'subtotal' => '4000',
-            'discount' => '800',
-            'total' => '3200',
-            'created_at' => Carbon::now()->subDays(35),
-            'updated_at' => Carbon::now()->subDays(35),
-        ]);
-
-        OrderItem::create([
-            'order_id' => 2,
+            'order_id' => 3,
             'promotion_id' => 1,
             'product_id' => 3,
-            'quantity' => 1,
-            'subtotal' => '1500',
-            'discount' => '150',
-            'total' => '1350',
+            'quantity' => 3,
+            'subtotal' => '300',
+            'discount' => '0',
+            'total' => '300',
+            'created_at' => Carbon::now()->subDays(10),
+            'updated_at' => Carbon::now()->subDays(10),
         ]);
 
-        OrderItem::create([
-            'order_id' => 2,
-            'promotion_id' => 2,
-            'product_id' => 4,
-            'quantity' => 1,
-            'subtotal' => '400',
-            'discount' => '120',
-            'total' => '280',
-        ]);
+      
 
         // Seed Admins
         Admin::create([
@@ -354,9 +360,9 @@ class DatabaseSeeder extends Seeder
             'promotion_id' => null,
             'quantity' => 2,
             'details' => 'black',
-            'subtotal' => 200.00,
+            'subtotal' => 120.00,
             'discount' => 0,
-            'total' => 200,
+            'total' => 120,
         ]);
 
         CartItem::create([

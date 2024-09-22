@@ -156,7 +156,7 @@ class="d-block img-thumbnail border-0" alt="product image">
                             $oriUnitPrice = $cartItem->promotion->original_price;
                             $disUnitPrice = $cartItem->promotion->discount_amount;
                             $unitPriceAfterDis =  $oriUnitPrice- $disUnitPrice;
-                            $totalForItem = $cartItem->quantity * $disUnitPrice;
+                            $totalForItem = $cartItem->quantity * $unitPriceAfterDis;
             
                             // Format for display after calculation
                             $formattedOriUnitPrice = number_format($oriUnitPrice, 2);
@@ -358,9 +358,12 @@ function productMinus(id) {
     var currentValue = parseInt(quantityInput.value, 10);
 
     // Ensure quantity does not go below 1
+if(currentValue!=1){
+    console.log(currentValue);
     var newValue = currentValue > 1 ? currentValue - 1 : 1;
     quantityInput.value = newValue;
 
+    console.log(newValue);
     // Get the total price and unit price elements
     var totalPrice = document.getElementById(`totalForItem_${id}`);
     var unitPriceElement = document.getElementById(`oriUnitPrice_${id}`);
@@ -394,6 +397,7 @@ function productMinus(id) {
     updateCartItemTotal(id, newTotalPrice);
     updateCartSubtotal(newSubtotal);
     updateCartTotal(newTotal);
+}
 
 }
 
@@ -401,6 +405,7 @@ function promotionMinus(id) {
     // Get the quantity input element and update its value
     var quantityInput = document.getElementById(`quantity_${id}`);
     var currentValue = parseInt(quantityInput.value, 10);
+    if(currentValue!=1){
 
     // Ensure quantity does not go below 1
     var newValue = currentValue > 1 ? currentValue - 1 : 1;
@@ -451,7 +456,7 @@ function promotionMinus(id) {
     updateCartSubtotal(newSubtotal);
     updateCartTotal(newTotal);
     updateCartDiscount(newTotalDiscount);
-
+    }
 }
 
 function updateCartItemQuantity(id, quantity) {
