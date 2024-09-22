@@ -3,14 +3,14 @@
   <Promotion>
     <ID>1</ID>
     <Title>Summer Sale</Title>
-    <StartDate>2024-09-20</StartDate>
-    <EndDate>2024-10-20</EndDate>
+    <StartDate>2024-09-22</StartDate>
+    <EndDate>2024-10-22</EndDate>
     <RevenueDetails>
-      <TotalRevenue>3,150.00</TotalRevenue>
-      <AverageOrderValueWith>1,575.00</AverageOrderValueWith>
-      <AverageOrderValueWithout>0.00</AverageOrderValueWithout>
+      <TotalRevenue>3,350.00</TotalRevenue>
+      <AverageOrderValueWith>1,116.67</AverageOrderValueWith>
+      <AverageOrderValueWithout>100.00</AverageOrderValueWithout>
     </RevenueDetails>
-    <ProductsSold>3</ProductsSold>
+    <ProductsSold>4</ProductsSold>
     <MonthlyRevenue>
       <Month>
         <MonthName>2024-08</MonthName>
@@ -18,19 +18,19 @@
       </Month>
       <Month>
         <MonthName>2024-09</MonthName>
-        <Revenue>1,350.00</Revenue>
+        <Revenue>1,550.00</Revenue>
       </Month>
     </MonthlyRevenue>
   </Promotion>
   <Promotion>
     <ID>2</ID>
     <Title>Winter Sale</Title>
-    <StartDate>2024-09-20</StartDate>
-    <EndDate>2024-11-19</EndDate>
+    <StartDate>2024-09-22</StartDate>
+    <EndDate>2024-11-21</EndDate>
     <RevenueDetails>
       <TotalRevenue>3,480.00</TotalRevenue>
       <AverageOrderValueWith>1,740.00</AverageOrderValueWith>
-      <AverageOrderValueWithout>0.00</AverageOrderValueWithout>
+      <AverageOrderValueWithout>100.00</AverageOrderValueWithout>
     </RevenueDetails>
     <ProductsSold>3</ProductsSold>
     <MonthlyRevenue>
@@ -43,5 +43,18 @@
         <Revenue>280.00</Revenue>
       </Month>
     </MonthlyRevenue>
+  </Promotion>
+  <Promotion>
+    <ID>3</ID>
+    <Title>asdad</Title>
+    <StartDate>2024-09-22</StartDate>
+    <EndDate>2024-09-25</EndDate>
+    <RevenueDetails>
+      <TotalRevenue>0.00</TotalRevenue>
+      <AverageOrderValueWith>0.00</AverageOrderValueWith>
+      <AverageOrderValueWithout>100.00</AverageOrderValueWithout>
+    </RevenueDetails>
+    <ProductsSold>0</ProductsSold>
+    <MonthlyRevenue/>
   </Promotion>
 </PromotionReports>

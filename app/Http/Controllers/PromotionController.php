@@ -148,7 +148,7 @@ class PromotionController extends Controller
         try {
             $promotion = Promotion::find($id);
             $promotionCaretaker = new PromotionCaretaker();
-            $promotionCaretaker->addMemento($promotion->saveToMemento());
+            $promotionCaretaker->addMemento($promotion->saveToMemento(true));
 
             $promotion->status = 'deleted';
             $promotion->save();
@@ -168,21 +168,6 @@ class PromotionController extends Controller
                 $promotion->status = 'active';
             }
             $promotion->save();
-            return response()->json(['success' => true, 'data' => $promotion], 200);
-        } catch (Exception $e) {
-            return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
-        }
-    }
-
-    public function undoDeletePromotion($id)
-    {
-        try {
-            $promotion = Promotion::find($id);
-            //get the memento object
-            $promotionCaretaker = new PromotionCaretaker();
-            $promotionMemento = $promotionCaretaker->getMemento($id);
-            $promotion->restoreFromMemento($promotionMemento);
-
             return response()->json(['success' => true, 'data' => $promotion], 200);
         } catch (Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
@@ -547,6 +532,7 @@ class PromotionController extends Controller
             } else {
                 return view('errors.404');
             }
+
 
             $promotionCaretaker = new PromotionCaretaker();
             $mementoList = $promotionCaretaker->getMementoList();

@@ -4,7 +4,7 @@
 @push('promotion', 'class="active"')
 
 @section('vite')
-@vite(['resources/css/app.css','resources/sass/app.scss', 'resources/js/app.js', 'resources/css/admin-nav.css','resources/js/bootstrap.js'])
+@vite(['resources/css/app.css','resources/sass/app.scss', 'resources/js/app.js','resources/js/bootstrap.js'])
 @endsection
 
 @section('css')
@@ -146,7 +146,7 @@
     }
     document.addEventListener('DOMContentLoaded', function() {
 
-        let productLimit = document.getElementById('limit').value == "single" ? 1 : 0;
+        let productLimit = {{ $promotion->type == 'single' ? 1 : 0 }};
 
         displayProducts()
 
@@ -171,6 +171,8 @@
 
         document.getElementById('product_select').addEventListener('change', function() {
             let product_id = this.value;
+            
+            console.log(productLimit)
             if (product_id == -1) {
                 return;
             }

@@ -4,7 +4,7 @@
 @push('promotion', 'class="active"')
 
 @section('vite')
-@vite(['resources/css/app.css','resources/sass/app.scss', 'resources/js/app.js', 'resources/css/admin-nav.css','resources/js/bootstrap.js'])
+@vite(['resources/css/app.css','resources/sass/app.scss', 'resources/js/app.js','resources/js/bootstrap.js'])
 @endsection
 
 @section('css')
@@ -47,7 +47,6 @@
             <div class="ms-auto">
             @if (Auth::guard('admin')->user()->role == 'manager' || Auth::guard('admin')->user()->role == 'admin')
                 <button class="btn btn-secondary me-2" onclick="window.location.href='{{ route('admin.promotion.revert') }}'"><i class="fa-regular fa-trash-undo pe-2"></i>Revert</button>
-                <button class="btn btn-secondary me-2" onclick="window.location.href='{{ route('admin.promotion.restore') }}'"><i class="fa-regular fa-trash-undo pe-2"></i>Restore</button>
                 <button class="btn btn-primary" onclick="window.location.href='{{ route('admin.promotion.add') }}'"><i class="fa-regular fa-plus pe-2"></i>Create</button>
             @endif
             </div>

@@ -52,7 +52,7 @@ class Promotion extends Model
         return $this->hasMany(PromotionItem::class, 'promotion_id', 'promotion_id');
     }
 
-    public function saveToMemento()
+    public function saveToMemento($wasDeleted = false)
     {
         return new PromotionMemento(
             $this->promotion_id,
@@ -66,7 +66,8 @@ class Promotion extends Model
             $this->status,
             $this->start_at,
             $this->end_at,
-            $this->promotionItem()->get()
+            $this->promotionItem()->get(),
+            $wasDeleted
         );
     }
 

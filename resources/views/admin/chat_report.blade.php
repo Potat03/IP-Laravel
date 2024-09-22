@@ -6,7 +6,7 @@
 @section('title', 'Chat Report')
 
 @section('vite')
-    @vite(['resources/css/app.css', 'resources/sass/app.scss', 'resources/js/app.js', 'resources/css/admin-nav.css', 'resources/js/bootstrap.js'])
+    @vite(['resources/css/app.css', 'resources/sass/app.scss', 'resources/js/app.js', 'resources/js/bootstrap.js'])
 @endsection
 
 @section('css')

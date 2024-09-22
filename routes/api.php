@@ -13,8 +13,11 @@
     use App\Http\Controllers\OrderController;
     use App\Http\Controllers\AdminCustomerController;
     use App\Http\Controllers\ChatMessageController;
-    use App\Http\Controllers\SuggestionController;
-
+    use App\Http\Controllers\AuthController;
+    use App\Http\Middleware\CustomerAuth;
+    use App\Http\Middleware\AdminAuth;
+    use App\Http\Controllers\APIkeyController;
+    use App\Models\Product;
 
 
     // Route::get('/user', function (Request $request) {
@@ -22,11 +25,6 @@
     // })->middleware('auth:sanctum');
 
     //pass login/register details
-    use App\Http\Controllers\AuthController;
-    use App\Http\Middleware\CustomerAuth;
-    use App\Http\Middleware\AdminAuth;
-    use App\Http\Controllers\APIkeyController;
-    use App\Models\Product;
 
     Route::get('/auth', [AuthController::class, 'showCustomerForm'])->name('auth.showForm');
     Route::group(['middleware' => ['web']], function () {

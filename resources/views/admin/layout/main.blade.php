@@ -95,7 +95,7 @@
                     @endif
                     @if (Auth::guard('admin')->user()->role != 'customer_service')
                     <li @stack('order')>
-                        <a href="#" style="width: 100%;display: block;">
+                        <a href="{{ route('admin.orders_prepare')}}" style="width: 100%;display: block;">
                             <i class="fa-regular fa-box"></i>
                             Order
                         </a>
@@ -127,7 +127,7 @@
                         </a>
                         <div class="collapse" id="collapseReport" style="padding-top: 10px; padding-left: 10px;">
                             <ul style="display:flex; flex-direction:column;">
-                                <li><a class="text-light" style="width: 100%;display: block;" href="">Sales Report</a></li>
+                                <li><a class="text-light" style="width: 100%;display: block;" href="{{route('admin.orders.sales_report')}}">Sales Report</a></li>
                                 <li><a class="text-light" style="width: 100%;display: block;" href="{{ route('admin.product.report' )}}">Product Report</a></li>
                                 <li><a class="text-light" style="width: 100%;display: block;" href="{{ route('admin.promotion.report' )}}">Promotion Report</a></li>
                                 <li><a class="text-light" style="width: 100%;display: block;" href="{{ route('admin.customer.report' )}}">Customer Report</a></li>

@@ -6,9 +6,9 @@ class PromotionMemento
 {
     protected $state;
 
-    public function __construct($promotion_id, $title, $description, $discount, $discount_amount, $original_price, $type, $limit, $status, $start_at, $end_at, $product_list)
+    public function __construct($promotion_id, $title, $description, $discount, $discount_amount, $original_price, $type, $limit, $status, $start_at, $end_at, $product_list, $wasDeleted = false)
     {
-        $this->state = compact('promotion_id', 'title', 'description', 'discount', 'discount_amount', 'original_price', 'type', 'limit', 'status', 'start_at', 'end_at', 'product_list');
+        $this->state = compact('promotion_id', 'title', 'description', 'discount', 'discount_amount', 'original_price', 'type', 'limit', 'status', 'start_at', 'end_at', 'product_list', 'wasDeleted');
     }
 
     public function getPromotion()
