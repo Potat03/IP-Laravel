@@ -91,7 +91,7 @@ class DatabaseSeeder extends Seeder
         Wearable::create([
             'product_id' => 2,
             'size' => 'S,M,L',
-            'color' => '',
+            'color' => 'pink',
             'user_group' => 'women'
         ]);
 

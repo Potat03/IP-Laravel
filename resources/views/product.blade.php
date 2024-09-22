@@ -591,7 +591,7 @@
 
                 // Prepare the payload
                 let payload = {
-                    type: productType,
+                    type: "product",
                     product_id: productId,
                     quantity: quantity,
                 };

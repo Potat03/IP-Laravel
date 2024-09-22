@@ -33,7 +33,6 @@
             <button class="btn btn-outline-dark" type="button" onclick="window.location.href=`{{ url('/cart') }}`">
                 <i class="fa-solid fa-cart-shopping"></i>
                 Cart
-                <span class="badge bg-dark text-white ms-1 rounded-pill">0</span>
             </button>
         </form>
 

@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Customer;
+use App\Models\Product;
+use App\Models\Order;
+use App\Models\Promotion;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
@@ -31,10 +34,22 @@ class CustomerController extends Controller
     {
         $customerId = Auth::guard('customer')->user()->customer_id;
 
-        $orders = \App\Models\Order::where('customer_id', $customerId)
+        $orders = Order::where('customer_id', $customerId)
             ->with('orderItems')
             ->orderBy('created_at', 'desc')
             ->get();
+
+        foreach ($orders as $order) {
+            foreach($order->orderItems as $orderItem) {
+                if($orderItem->product_id) {
+                    $product = Product::find($orderItem->product_id);
+                    $orderItem->product = $product;
+                }else if($orderItem->promotion_id) {
+                    $promotion = Promotion::find($orderItem->promotion_id);
+                    $orderItem->promotion = $promotion;
+                }
+            }
+        }
 
         return view('userprofile.order_history', ['orders' => $orders]);
     }

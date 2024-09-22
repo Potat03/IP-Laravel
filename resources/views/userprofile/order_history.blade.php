@@ -68,13 +68,23 @@
                                             </thead>
                                             <tbody>
                                                 @foreach ($order->orderItems as $item)
-                                                    <tr>
-                                                        <td>{{ $item->product->name }}</td>
-                                                        <td>{{ $item->product->description }}</td>
-                                                        <td>{{ $item->quantity }}</td>
-                                                        <td>{{ number_format($item->subtotal, 2) }}</td>
-                                                        <td>{{ number_format($item->total, 2) }}</td>
-                                                    </tr>
+                                                    @if($item->product)
+                                                        <tr>
+                                                            <td>{{ $item->product->name }}</td>
+                                                            <td>{{ $item->product->description }}</td>
+                                                            <td>{{ $item->quantity }}</td>
+                                                            <td>{{ number_format($item->subtotal, 2) }}</td>
+                                                            <td>{{ number_format($item->total * $item->quantity, 2) }}</td>
+                                                        </tr>
+                                                    @elseif($item->promotion)
+                                                        <tr>
+                                                            <td>{{ $item->promotion->title }}</td>
+                                                            <td>{{ $item->promotion->description }}</td>
+                                                            <td>{{ $item->quantity }}</td>
+                                                            <td>{{ number_format($item->subtotal, 2) }}</td>
+                                                            <td>{{ number_format($item->total * $item->quantity, 2) }}</td>
+                                                        </tr>
+                                                    @endif
                                                 @endforeach
                                             </tbody>
                                         </table>

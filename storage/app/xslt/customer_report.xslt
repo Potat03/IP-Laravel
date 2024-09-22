@@ -8,7 +8,7 @@
         <head>
             <title>Customer Report</title>
             <style>
-                h1, h2 {
+                .summary h1,.summary h2 {
                     text-align: center;
                     color: #4CAF50;
                 }
