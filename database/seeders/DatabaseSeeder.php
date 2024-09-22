@@ -14,6 +14,8 @@ use App\Models\Admin;
 use App\Models\Wearable;
 use App\Models\Consumable;
 use App\Models\Collectible;
+use App\Models\Category;
+use App\Models\ProductCategory;
 use App\Models\Chat;
 use App\Models\ChatMessage;
 use Carbon\Carbon;
@@ -105,6 +107,63 @@ class DatabaseSeeder extends Seeder
             'expire_date' => '2024-09-28',
             'portion' => '10',
             'is_halal' => '1'
+        ]);
+
+        // Seed Category
+        Category::create([
+            'category_name' => 'Snacks',
+            'description' => 'Snacks'
+        ]);
+
+        Category::create([
+            'category_name' => 'Shirt',
+            'description' => 'Shirt'
+        ]);
+
+        Category::create([
+            'category_name' => 'Kimono',
+            'description' => 'Kimono'
+        ]);
+
+        Category::create([
+            'category_name' => 'Lucky Bag',
+            'description' => 'Lucky Bag'
+        ]);
+
+        Category::create([
+            'category_name' => 'Limited Edition',
+            'description' => 'Limited Edition'
+        ]);
+
+        // Seed Product Category
+        ProductCategory::create([
+            'product_id' => 1,
+            'category_name' => 'Shirt'
+        ]);
+
+        ProductCategory::create([
+            'product_id' => 1,
+            'category_name' => 'Limited Edition'
+        ]);
+
+        ProductCategory::create([
+            'product_id' => 2,
+            'category_name' => 'Kimono'
+        ]);
+
+        ProductCategory::create([
+            'product_id' => 3,
+            'category_name' => 'Limited Edition'
+        ]);
+
+        ProductCategory::create([
+            'product_id' => 3,
+            'category_name' => 'Lucky Bag'
+        ]);
+
+        ProductCategory::create([
+            'product_id' => 4,
+            'category_name' => 'Snacks'
         ]);
 
         // Seed Carts
