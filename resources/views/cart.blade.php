@@ -119,7 +119,7 @@ $totalDiscount=0;
                             <td style="width:15%;text-align:left!important">
                                 <div class="card-img-top">
                                    
-<img src="{{ asset('storage/images/products/' . $cartItem->product->product_id . '/main.png') }}"
+<img src="{{ asset('storage/images/products/' . $cartItem->product->product_id . '/main.jpg') }}"
 class="d-block img-thumbnail border-0" alt="product image">
                                    
                                 </div>                            
@@ -173,7 +173,7 @@ class="d-block img-thumbnail border-0" alt="product image">
                                             @break
                                             @endif
                                             <div class="{{count($cartItem->promotion->products) == 1 ? 'col-12' : 'col-6'}} p-0">
-                                                <img src="{{ asset('storage/images/products/' . $product->product_id . '/main.png') }}"
+                                                <img src="{{ asset('storage/images/products/' . $product->product_id . '/main.jpg') }}"
                                                     class="d-block img-thumbnail border-0" alt="product image">
                                             </div>
                                             @endforeach

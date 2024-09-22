@@ -118,12 +118,6 @@ Route::middleware([CustomerAuth::class])->group(function () {
     Route::post('/profile/requestOtp', [CustomerController::class, 'requestOtp'])->name('profile.requestOtp');
     Route::post('/profile/verifyOtp', [CustomerController::class, 'verifyOtp'])->name('profile.verifyOtp');
     Route::put('/profile/change-password', [CustomerController::class, 'changePassword'])->name('profile.changePassword');
-});
-
-
-//ws
-//communication security 
-Route::middleware([CustomerAuth::class])->group(function () {
     Route::get('/cart', [CartItemController::class, 'getCartItemByCustomerID']);
     Route::get('/payment', function () {
         return view('payment');
@@ -135,14 +129,6 @@ Route::middleware([CustomerAuth::class])->group(function () {
     })->name('fail');
 
     Route::get('/tracking', [OrderController::class, 'getOrderByCustomerID'])->name('tracking');    
-});
-
-//communication security 
-Route::middleware([AdminAuth::class])->group(function () {
-    Route::get('/admin/orders/prepare', [OrderController::class, 'getPrepareOrders'])->name('admin.orders_prepare');
-    Route::get('/admin/orders/delivery', [OrderController::class, 'getDeliveryOrders'])->name('admin.orders_delivery');
-    Route::get('/admin/orders/delivered', [OrderController::class, 'getDeliveredOrders'])->name('admin.orders_delivered');
-    Route::get('/admin/orders/orderStatusReport', [OrderController::class, 'generateOrderStatusReport'])->name('admin.orders.sales_report');
 });
 
 

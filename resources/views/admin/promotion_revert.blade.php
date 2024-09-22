@@ -4,7 +4,7 @@
 @push('promotion', 'class="active"')
 
 @section('vite')
-@vite(['resources/css/app.css','resources/sass/app.scss', 'resources/js/app.js', 'resources/css/admin-nav.css','resources/js/bootstrap.js'])
+@vite(['resources/css/app.css','resources/sass/app.scss', 'resources/js/app.js','resources/js/bootstrap.js'])
 @endsection
 
 @section('css')
@@ -71,7 +71,11 @@
                                 <span class="badge {{$promotion->status == 'active' ? 'bg-success' : 'bg-danger'}}">{{$promotion->status}}</span>
                             </td>
                             <td>
-                                <button class="btn btn-success" onclick="confirmation({{$index++}})"><i class="fa-regular fa-trash-can-undo pe-2"></i>Restore</button>
+                                @if($promotion->wasDeleted)
+                                <button class="btn btn-danger" onclick="confirmation({{$index}})">Revert</button>
+                                @else
+                                <button class="btn btn-success" onclick="confirmation({{$index}})">Revert</button>
+                                @endif
                             </td>
                         </tr>
                 @endforeach

@@ -1,7 +1,7 @@
 @extends('layout.shop')
 {{-- Author: Tan Wei Siang --}}
 
-@section('title', 'Cart')
+@section('title', 'Orders')
 
 @push('styles')
 @vite(['resources/css/general.css'])
@@ -80,7 +80,7 @@
                         <th style="width:12%;text-align:left!important;">RECEIVED</th>
                         <th style="width:15%;text-align:left!important;">STATUS</th>
                     </tr>
-                    @if(count($orders) > 1)
+                    @if(count($orders) >= 1)
                     @php
                     $x = 1;
                     @endphp
