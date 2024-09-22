@@ -151,7 +151,7 @@ class DatabaseSeeder extends Seeder
         PromotionItem::create([
             'promotion_id' => 2,
             'product_id' => 3,
-            'quantity' => 3,
+            'quantity' => 1,
         ]);
 
         PromotionItem::create([
