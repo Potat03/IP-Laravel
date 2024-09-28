@@ -66,6 +66,19 @@ class OrderController extends Controller
         $order = Order::where('order_id',$id)->first();
         try {
             $order->proceedToNext();
+
+            foreach ($order->orderItems as $orderItem) {
+                if ($orderItem->product_id != null) {
+                    $product = Product::where('product_id', $orderItem->product_id)->first();
+    
+                    if ($product) {
+                        // Deduct the quantity from the product stock
+                        $product->stock -= $orderItem->quantity;
+                        $product->save();
+                    }
+                }
+            }
+            
             return response()->json(['success' => true,'message' => 'Order state has been updated.']);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Unable to proceed to next status at this time.'], 500);

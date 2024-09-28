@@ -176,9 +176,9 @@
                                 <button type="button" class="btn btn-outline-primary user-group-btn"
                                     data-group="unisex">Unisex</button>
                                 <button type="button" class="btn btn-outline-primary user-group-btn"
-                                    data-group="male">Male</button>
+                                    data-group="men">Men</button>
                                 <button type="button" class="btn btn-outline-primary user-group-btn"
-                                    data-group="female">Female</button>
+                                    data-group="women">Women</button>
                             </div>
 
                             <input type="hidden" id="selectedGroupsInput" name="selected_groups" value="">

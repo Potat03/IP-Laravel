@@ -26,7 +26,6 @@ class ProductContext
         // Save specific attributes based on product type
         $specificProduct = $this->specificStrategy->getProduct();
         $this->specificStrategy->setSpecificAttributes($specificAttributes);
-        $specificProduct->save();
 
         // Save the product
         $specificProduct->save();
